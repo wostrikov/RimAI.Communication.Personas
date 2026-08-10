@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LanguageData>
+  <!-- Auto-Generation Settings (ModSettings) -->
+  <RPD_Settings_EnableAutoGen>Увімкнути автоматичну генерацію</RPD_Settings_EnableAutoGen>
+  <RPD_Settings_EnableAutoGenTip>Автоматично генерувати персони для нових персонажів, коли вони приєднуються до вашої колонії. Налаштуйте категорії та пресети у вікні конфігурації.</RPD_Settings_EnableAutoGenTip>
+  <RPD_Settings_ConfigAutoGen>Налаштувати</RPD_Settings_ConfigAutoGen>
+  <RPD_Settings_ConfigAutoGenTip>Відкрити вікно налаштування автоматичної генерації, щоб налаштувати категорії, пресети та параметри контексту.</RPD_Settings_ConfigAutoGenTip>
+  <!-- Auto-Generation Config Window -->
+  <RPD_AutoGen_ConfigTitle>Налаштування автоматичної генерації</RPD_AutoGen_ConfigTitle>
+  <RPD_AutoGen_QueueStatus>Черга: {0} персонажів</RPD_AutoGen_QueueStatus>
+  <RPD_AutoGen_Generating>генерується</RPD_AutoGen_Generating>
+  <RPD_AutoGen_Enable>Увімкнути</RPD_AutoGen_Enable>
+  <RPD_AutoGen_EnableTip>Увімкнути автоматичну генерацію для цієї категорії, коли персонажі вперше з’являються</RPD_AutoGen_EnableTip>
+  <RPD_AutoGen_OnlyOnRoleChange>Під час зміни ролі</RPD_AutoGen_OnlyOnRoleChange>
+  <RPD_AutoGen_OnlyOnRoleChangeShort>Зміна</RPD_AutoGen_OnlyOnRoleChangeShort>
+  <RPD_AutoGen_OnlyOnRoleChangeTip>Генерувати, коли роль персонажа змінюється на цю категорію (незалежно від параметра «Увімкнути»). Колоніст: із неколоніста на колоніста (вербування/звільнення/приєднання біженця). В’язень: із нев’язня на в’язня (полонення ворога/арешт союзника чи нейтрала, без арешту колоніста). Раб: із нераба на раба (поневолення в’язня/купівля у торговця). Відвідувач: із представника фракції гравця на відвідувача (викуп фракцією/продаж раба). Інше: із представника фракції гравця в іншу категорію (залишення колонії/здичавіння). Ворог: вимкнено (щоб уникнути масових спрацювань під час рейдів).</RPD_AutoGen_OnlyOnRoleChangeTip>
+  <RPD_AutoGen_SyncModSettings>Синхронізувати з ModSettings</RPD_AutoGen_SyncModSettings>
+  <RPD_AutoGen_SyncModSettingsShort>Синхронізувати</RPD_AutoGen_SyncModSettingsShort>
+  <RPD_AutoGen_SyncModSettingsTip>Використовувати глобальний контекст ModSettings замість власного контексту для цієї категорії</RPD_AutoGen_SyncModSettingsTip>
+  <RPD_AutoGen_Preset>Пресет:</RPD_AutoGen_Preset>
+  <RPD_AutoGen_AdvancedPreset>Розширені</RPD_AutoGen_AdvancedPreset>
+  <RPD_AutoGen_AdvancedPresetTooltip>Використовувати розширений пресет RimTalk для цієї категорії. Якщо встановлено «Немає», використовуються внутрішні промпти.</RPD_AutoGen_AdvancedPresetTooltip>
+  <!-- Auto-Gen Notes Editor -->
+  <RPD_AutoGen_NotesLabel>Нотатки автоматичної генерації (шаблон Scriban)</RPD_AutoGen_NotesLabel>
+  <RPD_AutoGen_InsertTemplate>Вставити шаблон…</RPD_AutoGen_InsertTemplate>
+  <RPD_AutoGen_InsertTemplateTip>Натисніть, щоб вставити умовний шаблон. Виберіть шаблон колоніста, в’язня, раба, фракції або раси.</RPD_AutoGen_InsertTemplateTip>
+  <RPD_AutoGen_InsertRace>Вставити шаблон раси…</RPD_AutoGen_InsertRace>
+  <RPD_AutoGen_InsertColonist>Шаблон колоніста</RPD_AutoGen_InsertColonist>
+  <RPD_AutoGen_InsertPrisoner>Шаблон в’язня</RPD_AutoGen_InsertPrisoner>
+  <RPD_AutoGen_InsertSlave>Шаблон раба</RPD_AutoGen_InsertSlave>
+  <RPD_AutoGen_InsertFactionTemplate>Шаблон фракції…</RPD_AutoGen_InsertFactionTemplate>
+  <RPD_AutoGen_NotesHint>Використовуйте синтаксис Scriban для створення динамічних нотаток. Натисніть кнопку «Вставити шаблон», щоб швидко додати умовні шаблони для колоністів, в’язнів або рабів.</RPD_AutoGen_NotesHint>
+  <!-- Template Content -->
+  <RPD_AutoGen_Template_Colonist>{{- if pawn.IsColonist -}}
+Введіть вміст, пов’язаний із колоністом
+{{- end -}}</RPD_AutoGen_Template_Colonist>
+  <RPD_AutoGen_Template_Prisoner>{{- if pawn.IsPrisoner -}}
+  {{- if pawn.d_basic_status == "Quest Prisoner" -}}
+Введіть вміст, пов’язаний із в’язнем за завданням
+  {{- else -}}
+Інші випадки, можливо, персонаж з’явився на ворожій базі
+  {{- end -}}
+{{- end -}}</RPD_AutoGen_Template_Prisoner>
+  <RPD_AutoGen_Template_Slave>{{- if pawn.IsSlave -}}
+  {{- if pawn.Map.IsPlayerHome -}}
+Раби, привезені торговцями
+  {{- else -}}
+Інші випадки, можливо, придбані на глобальній мапі
+  {{- end -}}
+{{- end -}}</RPD_AutoGen_Template_Slave>
+  <RPD_AutoGen_Template_Faction>{{- if pawn.Faction.def.def_name == "{0}" -}}
+Введіть вміст, пов’язаний із фракцією
+{{- end -}}</RPD_AutoGen_Template_Faction>
+  <RPD_AutoGen_Template_Race>{{- if pawn.def.def_name == "{0}" -}}
+Введіть вміст, пов’язаний із расою
+{{- end -}}</RPD_AutoGen_Template_Race>
+  <!-- Auto-Gen Category Names -->
+  <RPD_AutoGen_CategoryColonist>Колоніст</RPD_AutoGen_CategoryColonist>
+  <RPD_AutoGen_CategoryPrisoner>В’язень</RPD_AutoGen_CategoryPrisoner>
+  <RPD_AutoGen_CategorySlave>Раб</RPD_AutoGen_CategorySlave>
+  <RPD_AutoGen_CategoryVisitor>Відвідувач</RPD_AutoGen_CategoryVisitor>
+  <RPD_AutoGen_CategoryEnemy>Ворог</RPD_AutoGen_CategoryEnemy>
+  <RPD_AutoGen_CategoryOther>Інше</RPD_AutoGen_CategoryOther>
+  <!-- Auto-Evolve Notes Editor -->
+  <RPD_AutoEvolve_NotesLabel>Нотатки для автовдосконалення (шаблон Scriban)</RPD_AutoEvolve_NotesLabel>
+  <RPD_AutoEvolve_NotesHint>Використовуйте синтаксис Scriban для створення динамічних нотаток для автовдосконалення. Приклад: {{- if pawn.IsPrisoner -}}Зосередьтеся на полоні та інстинктах виживання{{- else if pawn.IsColonist -}}Зосередьтеся на житті колонії та стосунках{{- end -}}.</RPD_AutoEvolve_NotesHint>
+  <!-- Batch Director Notes Hints -->
+  <RPD_Batch_SceneNotesHint>Ці нотатки буде додано до промптів генерації. Підтримується синтаксис Scriban для динамічного вмісту. Використовуйте {%raw%}...{%endraw%}, щоб екранувати приклади коду.</RPD_Batch_SceneNotesHint>
+</LanguageData>

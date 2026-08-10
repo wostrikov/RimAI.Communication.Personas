@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<LanguageData>
+  <!-- Main Library Window -->
+  <RPD_Library_Title>Бібліотека директорів</RPD_Library_Title>
+  <RPD_Library_TabPresets>Бібліотека пресетів</RPD_Library_TabPresets>
+  <RPD_Library_TabRules>Правила автовизначення</RPD_Library_TabRules>
+  <RPD_Library_ResetDefaults>Скинути типові налаштування</RPD_Library_ResetDefaults>
+  <RPD_Library_ResetConfirm>НЕБЕЗПЕКА: Це видалить УСІ ваші власні пресети та правила й відновить типову бібліотеку.\nВи впевнені?</RPD_Library_ResetConfirm>
+  <RPD_Settings_OpenLibrary>Відкрити бібліотеку пресетів</RPD_Settings_OpenLibrary>
+  <RPD_Tip_OpenLibrary>Керуйте пресетами особистості персонажів і правилами автоматичного призначення для нових персонажів</RPD_Tip_OpenLibrary>
+  <!-- Presets Tab -->
+  <RPD_Library_CreatePreset>+ Створити новий пресет</RPD_Library_CreatePreset>
+  <RPD_Library_DeletePreset>Видалити</RPD_Library_DeletePreset>
+  <RPD_Library_ImportTemplate>Імпортувати шаблон</RPD_Library_ImportTemplate>
+  <RPD_Library_SelectToEdit>Виберіть або створіть пресет для редагування</RPD_Library_SelectToEdit>
+  <RPD_Library_PresetName>Назва пресету:</RPD_Library_PresetName>
+  <RPD_Library_PresetCategory>Категорія (введіть, щоб створити нову):</RPD_Library_PresetCategory>
+  <RPD_Library_Chattiness>Балучість: {0}</RPD_Library_Chattiness>
+  <RPD_Library_Description>Опис персони:</RPD_Library_Description>
+  <RPD_Library_I_E>Імпорт / експорт</RPD_Library_I_E>
+  <RPD_Library_ManageVanilla>Керування ванільними</RPD_Library_ManageVanilla>
+  <RPD_Library_ManageBuiltin>Керування вбудованими</RPD_Library_ManageBuiltin>
+  <!-- Menu Action Items -->
+  <RPD_Library_AddAll>Додати всі пресети «{0}»</RPD_Library_AddAll>
+  <RPD_Library_RemoveAll>Видалити всі пресети «{0}»</RPD_Library_RemoveAll>
+  <RPD_Library_AddSpecific>Додати вибрані...</RPD_Library_AddSpecific>
+  <RPD_Library_AllAdded>(Усі вже в бібліотеці)</RPD_Library_AllAdded>
+  <!-- Feedback Messages -->
+  <RPD_Library_MsgAdded>Пресети {0} успішно додано.</RPD_Library_MsgAdded>
+  <RPD_Library_MsgRemoved>Пресети {0} успішно видалено.</RPD_Library_MsgRemoved>
+  <!-- Rules Tab -->
+  <RPD_Library_CreateRule>+ Створити нове правило</RPD_Library_CreateRule>
+  <RPD_Library_DeleteRule>Видалити правило</RPD_Library_DeleteRule>
+  <RPD_Library_SelectToEditRule>Виберіть або створіть правило для редагування</RPD_Library_SelectToEditRule>
+  <RPD_Library_RuleEnabled>Правило ввімкнено</RPD_Library_RuleEnabled>
+  <RPD_Library_Priority>Пріоритет: {0} (вищий замінює нижчий)</RPD_Library_Priority>
+  <RPD_Library_TargetType>Тип цілі: {0}</RPD_Library_TargetType>
+  <RPD_Library_TargetDef>Визначення цілі: {0}</RPD_Library_TargetDef>
+  <RPD_Library_TargetSelect>Вибрати визначення цілі...</RPD_Library_TargetSelect>
+  <RPD_Library_TargetMissing>УВАГА: визначення не знайдено! (Мод відсутній?)</RPD_Library_TargetMissing>
+  <RPD_Library_NoDefsFound>Сумісних визначень не знайдено</RPD_Library_NoDefsFound>
+  <RPD_RuleType_Age>Вік</RPD_RuleType_Age>
+  <RPD_Library_AgeRange>Діапазон віку</RPD_Library_AgeRange>
+  <RPD_Library_SelectAll>Вибрати все</RPD_Library_SelectAll>
+  <RPD_Library_UnselectAll>Скасувати вибір усього</RPD_Library_UnselectAll>
+  <RPD_Library_Category>Категорія</RPD_Library_Category>
+  <RPD_Library_PresetsPool>Бібліотека пресетів</RPD_Library_PresetsPool>
+  <!-- Preset Browser Window -->
+  <RPD_Browser_ApplySelected>Застосувати вибране</RPD_Browser_ApplySelected>
+  <RPD_Browser_ApplyRandom>Застосувати випадкове</RPD_Browser_ApplyRandom>
+  <RPD_Browser_TipApplySelected>Застосувати поточний вибраний пресет зі списку вище.</RPD_Browser_TipApplySelected>
+  <RPD_Browser_TipApplyRandom>Застосувати випадковий пресет із поточного видимого списку.</RPD_Browser_TipApplyRandom>
+  <RPD_Browser_NoPresetsInCategory>У цій категорії немає пресетів.</RPD_Browser_NoPresetsInCategory>
+  <RPD_Browser_AppliedSuccess>Застосовано пресет: {0}</RPD_Browser_AppliedSuccess>
+  <RPD_Browser_Disabled>(Вимкнено)</RPD_Browser_Disabled>
+  <!-- Rule Type Names -->
+  <RPD_RuleType_FactionDef>Фракція</RPD_RuleType_FactionDef>
+  <RPD_RuleType_RaceDef>Раса</RPD_RuleType_RaceDef>
+  <RPD_RuleType_XenotypeDef>Ксенотип</RPD_RuleType_XenotypeDef>
+  <!-- Import/Export Window -->
+  <RPD_IO_Export>Експортувати…</RPD_IO_Export>
+  <RPD_IO_TipExport>Ліва кнопка миші: скопіювати в буфер обміну\nПрава кнопка миші: зберегти у файл</RPD_IO_TipExport>
+  <RPD_IO_ImportAppend>Імпортувати (додати)</RPD_IO_ImportAppend>
+  <RPD_IO_ImportOverwrite>Імпортувати (перезаписати)</RPD_IO_ImportOverwrite>
+  <RPD_IO_ImportFile>Імпортувати з файлу</RPD_IO_ImportFile>
+  <RPD_IO_ConfirmOverwrite>Перезаписати ВСІ наявні пресети та правила?</RPD_IO_ConfirmOverwrite>
+  <RPD_IO_MsgExportClipboard>Бібліотеку експортовано в буфер обміну.</RPD_IO_MsgExportClipboard>
+  <RPD_IO_MsgExportFile>Бібліотеку експортовано у файл:\n{0}</RPD_IO_MsgExportFile>
+  <RPD_IO_MsgImportSuccess>Бібліотеку успішно імпортовано.</RPD_IO_MsgImportSuccess>
+  <RPD_IO_MsgImportFail>Помилка імпорту: недійсний формат або пошкоджені дані.\n{0}</RPD_IO_MsgImportFail>
+  <RPD_IO_MsgNoFolder>Папку для експорту не знайдено.</RPD_IO_MsgNoFolder>
+  <RPD_IO_MsgNoFiles>Файлів не знайдено</RPD_IO_MsgNoFiles>
+</LanguageData>
