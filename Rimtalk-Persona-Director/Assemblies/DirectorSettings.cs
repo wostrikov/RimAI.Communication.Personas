@@ -523,6 +523,7 @@ namespace RimPersonaDirector
         }
         public void InitPresets()
         {
+            bool migratedLegacyDefault = false;
             if (presets == null) presets = new List<PromptPreset>();
 
             // 1. 确保至少有3个槽位
@@ -536,8 +537,16 @@ namespace RimPersonaDirector
             string[] englishLabels = { "Standard (3 Options)", "Story-Driven", "Data-Driven", "Evolution (Update Only)" };
             for (int i = 0; i < localizedDefaults.Length; i++)
             {
-                if (IsLegacyEnglishDefault(presets[i].text, i)) presets[i].text = localizedDefaults[i];
-                if (presets[i].label == englishLabels[i]) presets[i].label = localizedLabels[i];
+                if (IsLegacyEnglishDefault(presets[i].text, i))
+                {
+                    presets[i].text = localizedDefaults[i];
+                    migratedLegacyDefault = true;
+                }
+                if (presets[i].label == englishLabels[i])
+                {
+                    presets[i].label = localizedLabels[i];
+                    migratedLegacyDefault = true;
+                }
             }
             if (IsLegacyEnglishDefault(activePrompt, 0)) activePrompt = "";
 
@@ -576,6 +585,8 @@ namespace RimPersonaDirector
                 presets[3].label = localizedLabels[3];
                 presets[3].text = DefaultPrompt_Evolve;
             }
+            if (migratedLegacyDefault && Scribe.mode == LoadSaveMode.PostLoadInit)
+                LongEventHandler.ExecuteWhenFinished(Write);
         }
 
         private static bool IsLegacyEnglishDefault(string value, int index)
@@ -583,14 +594,15 @@ namespace RimPersonaDirector
             if (string.IsNullOrEmpty(value) || index < 0 || index >= 4) return false;
             string[] hashes =
             {
-                "573BA139D001F5E65CE39A3E2610A99275769DCEDDCA43A995D0BEB35FF4FF10",
+                "A87080AAC9C5B7561F4E59D8AE8F91187096FC68322223C26DBE1C119FBEA69E",
                 "F6F6B7291CD23F8E95B1B8884D470AE175D020E7F332EB51B707CB2846F04172",
                 "6D828D85D6ABE1AF4E7BE2C005FF4547C723FF57E0FC3727FB435A351D774209",
                 "4A441356B0473AFD9ED14DAC14C36202CEA3DA01C4C09BB13312194490EEC1A5"
             };
             using (SHA256 sha = SHA256.Create())
             {
-                byte[] digest = sha.ComputeHash(Encoding.UTF8.GetBytes(value));
+                string normalized = value.Replace("\r\n", "\n").Trim();
+                byte[] digest = sha.ComputeHash(Encoding.UTF8.GetBytes(normalized));
                 string actual = BitConverter.ToString(digest).Replace("-", "");
                 return string.Equals(actual, hashes[index], StringComparison.Ordinal);
             }
