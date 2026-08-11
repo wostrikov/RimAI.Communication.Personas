@@ -8,6 +8,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
     <RimWorldWorkshopDir Condition=" '$(RimWorldWorkshopDir)' == '' ">$(RIMWORLD_WORKSHOP_DIR)</RimWorldWorkshopDir>
+    <RimTalkModDir Condition=" '$(RimTalkModDir)' == '' ">$(RimWorldWorkshopDir)\3551203752</RimTalkModDir>
     <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk-PersonaDirector\bin\</BaseOutputPath>
     <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk-PersonaDirector\obj\</BaseIntermediateOutputPath>
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
@@ -24,6 +25,6 @@
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(RimWorldDir)\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UIModule"><HintPath>$(RimWorldDir)\RimWorldWin64_Data\Managed\UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="0Harmony"><HintPath>$(RimWorldWorkshopDir)\2009463077\Current\Assemblies\0Harmony.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="RimTalk"><HintPath>$(RimWorldWorkshopDir)\3551203752\1.6\Assemblies\RimTalk.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="RimTalk"><HintPath>$(RimTalkModDir)\1.6\Assemblies\RimTalk.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 </Project>

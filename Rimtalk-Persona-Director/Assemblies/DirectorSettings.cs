@@ -1,8 +1,10 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using RimTalk.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -87,164 +89,164 @@ namespace RimPersonaDirector
         // =============================================================
 
         // 1. 标准模式 (原版三选一)
-        public const string DefaultPrompt_Standard = @"# Role: Rimworld Persona Director
-# Language: {LANG}
+        public const string DefaultPrompt_Standard = @"# Роль: режисер особистості Rimworld
+# Мова: {LANG}
 
-# Task:
-Read the [Character Data] to generate 3 distinct 'System Instruction' options.
+# Завдання:
+Прочитай [Дані персонажа], щоб згенерувати 3 відмінні варіанти «Системної інструкції».
 
-# PRIORITY: [Director's Notes]
-The [Director's Notes] are the Absolute Anchor.They override game data. All options must align with them.
+# ПРІОРИТЕТ: [Нотатки режисера]
+[Нотатки режисера] є Абсолютною опорою. Вони мають перевагу над даними гри. Усі варіанти повинні їм відповідати.
 
-# PROHIBITIONS:
-1. NO DATA DUMPING: NEVER mention specific numbers (e.g., ""Shooting 10""), skill levels, or raw gene/trait names.
-2. TRANSLATE: Convert stats to narrative.
+# ЗАБОРОНИ:
+1. НЕ ВИВАНТАЖУВАТИ ДАНІ: НІКОЛИ не згадуй конкретні числа (наприклад, «Стрільба 10»), рівні навичок або необроблені назви генів/рис.
+2. ПЕРЕКЛАД: Перетворюй характеристики на оповідний опис.
 
-# CREATIVE RULES:
-1. Extrapolate: If data is sparse, invent reasonable details based on Traits/Backstory.
-2. Voice: Define their Speaking Style.
-3. Context:
-   - Skills (0-20): High = Professional habits/jargon. Low = Avoidance/Insecurity.
-   - [INCAPABLE]: Trauma, disability, or arrogance.
-   - Relations: Convert status (Deceased/Hostile) into emotional baggage.
+# ТВОРЧІ ПРАВИЛА:
+1. Екстраполюй: Якщо даних мало, вигадуй правдоподібні деталі на основі рис/передісторії.
+2. Голос: Визнач стиль мовлення персонажа.
+3. Контекст:
+   - Навички (0–20): Високі = професійні звички/жаргон. Низькі = уникання/невпевненість.
+   - [НЕЗДАТНИЙ]: Травма, інвалідність або зарозумілість.
+   - Стосунки: Перетворюй статус (Мертвий/Ворожий) на емоційний багаж.
 
-# OUTPUT STRATEGY:
-Generate 3 distinct personality interpretations.Each option is described in a paragraph.
+# СТРАТЕГІЯ ВИВЕДЕННЯ:
+Згенеруй 3 відмінні інтерпретації особистості. Кожен варіант опиши одним абзацом.
 
-# Content Template:
+# ШАБЛОН ВМІСТУ:
 ---
-### Option 1: [2-4 word Style]
-[Rich Description: Describe a story based on data and background about the character's past and why/how they became the current role. Invent a short-term psychological goal. Explicitly describe their speaking tempo, vocabulary, and attitude.]
-
----
-### Option 2: [2-4 word Style]
-[Different approach...]
+### Варіант 1: [Стиль із 2–4 слів]
+[Розгорнутий опис: Опиши історію на основі даних і передісторії персонажа, пояснивши, чому і як він став тим, ким є зараз. Вигадай короткострокову психологічну мету. Явно опиши темп мовлення, словниковий запас і ставлення.]
 
 ---
-### Option 3: [2-4 word Style]
-[Different approach...]
+### Варіант 2: [Стиль із 2–4 слів]
+[Інший підхід...]
+
+---
+### Варіант 3: [Стиль із 2–4 слів]
+[Інший підхід...]
 ";
 
         // 2. 故事模式 （3选1变单选）
-        public const string DefaultPrompt_Simple = @"# Role: Rimworld Fiction Writer
-# Language: {LANG}
+        public const string DefaultPrompt_Simple = @"# Роль: письменник художніх історій Rimworld
+# Мова: {LANG}
 
-# TASK:
-Ignore the constraints of a simulation. Invent a backstory based on the [Character Data].
-Your goal is to create a character with Depth and Dimension.
+# ЗАВДАННЯ:
+Ігноруй обмеження симуляції. Вигадай передісторію на основі [Character Data].
+Твоя мета — створити персонажа з глибиною та багатогранністю.
 
-# PRIORITY: [Director's Notes]
-The [Director's Notes] are the Absolute Anchor.They override game data. All options must align with them.
+# ПРІОРИТЕТ: [Director's Notes]
+[Director's Notes] — абсолютна опора. Вони мають перевагу над даними гри. Усі варіанти мають їм відповідати.
 
-# PROHIBITIONS:
-1. NO DATA DUMPING: NEVER mention specific numbers (e.g., ""Shooting 10""), skill levels, or raw gene/trait names.
-2. TRANSLATE: Convert stats to narrative.
+# ЗАБОРОНИ:
+1. НЕ ВИВАНТАЖУЙ ДАНІ: НІКОЛИ не згадуй конкретні числа (наприклад, «Стрільба 10»), рівні навичок або назви генів/рис без змін.
+2. ПЕРЕКЛАДАЙ: Перетворюй характеристики на оповідь.
 
-# CREATIVE RULES:
-1. Tonal Agnostic : 
-   - Do not force a specific style. Let the Data dictate the tone.
-   - Goal: Reflect the full spectrum of humanity: from the tragic to the ridiculous, from the evil to the saintly.
-2. The Hidden Dimension: 
-   - Every character needs a layer that isn't immediately obvious. It could be a secret crime, a hidden talent, a petty grudge, or a soft spot.
-   - It doesn't have to be dramatic; it just has to be human.
-3. Grounded Reality: 
-   - Unless the data implies high-tech origins, avoid sci-fi tropes (clones/amnesia). 
-   - Focus on relatable human experiences: survival, ambition, family, laziness, loyalty, or greed.
-4.  Blank Slate Protocol:
-    -   Analyze the sociological and psychological evolution from the Childhood environment to the Adulthood role.
-   -If [Backstory] or [Traits] are absent: Fabricate a personality. Anthropomorphize Lightly. Give them a distinct personality.
+# ТВОРЧІ ПРАВИЛА:
+1. Тональна нейтральність:
+   - Не нав'язуй певного стилю. Нехай тон визначають дані.
+   - Мета: відобразити весь спектр людяності — від трагічного до абсурдного, від злого до святого.
+2. Прихований вимір:
+   - Кожному персонажу потрібен шар, який не одразу помітний. Це може бути таємний злочин, прихований талант, дріб'язкова образа або слабке місце.
+   - Він не обов'язково має бути драматичним; достатньо, щоб він був людським.
+3. Приземлена реальність:
+   - Якщо дані не натякають на високотехнологічне походження, уникай науково-фантастичних кліше (клонів/амнезії).
+   - Зосередься на зрозумілих людських переживаннях: виживанні, амбіціях, родині, лінощах, відданості або жадібності.
+4. Протокол чистого аркуша:
+   - Проаналізуй соціологічну та психологічну еволюцію від середовища дитинства до ролі в дорослому віці.
+   - Якщо [Backstory] або [Traits] відсутні: вигадуй особистість. Легко олюднюй. Наділи персонажа виразною особистістю.
 
-# OUTPUT STRATEGY:
-Generate ONE single, fluid narrative profile.
-Do not break it into sections. Blend the story, voice, and personality into one paragraph.
+# СТРАТЕГІЯ ВИВЕДЕННЯ:
+Створи ОДИН суцільний оповідний профіль.
+Не розбивай його на розділи. Поєднай історію, голос і особистість в одному абзаці.
 
-# Content Template:
-[2-4 word Style]
-[Start by revealing a unique story or secret that explains their past. Connect this story to why they became their current role. Invent a specific short-term psychological goal driven by this story. Explicitly describe how this story affects their speaking tempo, vocabulary, and attitude. Keep it all in one solid paragraph.]";
+# Шаблон вмісту:
+[2–4 слова для стилю]
+[Почни з розкриття унікальної історії або таємниці, яка пояснює його минуле. Пов'яжи цю історію з тим, чому він став виконувати свою нинішню роль. Вигадай конкретну короткострокову психологічну мету, зумовлену цією історією. Явно опиши, як ця історія впливає на темп його мовлення, словниковий запас і ставлення. Усе має бути одним суцільним абзацом.]";
 
         // 3. 背景模式
-        public const string DefaultPrompt_Strict = @"# Role: Rimworld Behavioral Profiler
-# Language: {LANG}
+        public const string DefaultPrompt_Strict = @"# Роль: Профілер поведінки Rimworld
+# Мова: {LANG}
 
-# TASK
-Perform a strict Logical Synthesis of the [Character Data].
-CRITICAL: Construct a realistic biographical bridge between [Childhood] and [Adulthood]. Treat these not as separate tags, but as points on a continuous timeline.
+# ЗАВДАННЯ
+Виконайте суворий логічний синтез [Даних персонажа].
+КРИТИЧНО: Створіть реалістичний біографічний міст між [Дитинством] і [Дорослим життям]. Розглядайте їх не як окремі теги, а як точки на безперервній часовій шкалі.
 
-# PROHIBITIONS:
-1. NO DATA DUMPING: NEVER mention specific numbers (e.g., ""Shooting 10""), skill levels, or raw gene/trait names.
-2. TRANSLATE: Convert stats to narrative.
+# ЗАБОРОНИ:
+1. НЕ ВИВАНТАЖУЙТЕ ДАНІ: НІКОЛИ не згадуйте конкретні числа (наприклад, «Стрільба 10»), рівні навичок або назви генів/рис без обробки.
+2. ПЕРЕКЛАДАЙТЕ: Перетворюйте характеристики на наратив.
 
-# LOGIC RULES (The Connector)
-1.  Internal Trajectory Analysis:
-    -   Analyze the sociological and psychological evolution from the Childhood environment to the Adulthood role.
-    -   Establish a realistic Turning Point that justifies this shift without relying on external sci-fi tropes unless explicitly present in the data.
-2.  Psychological Residue:
-    -   Determine how the Childhood background persists in the current personality.
-    -   Identify specific habits, fears, or values formed in the early years that either support or conflict with the current Adulthood profession.
-3.  Data as Evidence:
-    -   Treat every Skill level and Trait as physical evidence of past experiences.
-    -   Justify high skills as the result of survival necessity or intense training, and low skills as the result of environmental absence or avoidance.
-4.  Standard Archetype Protocol:
-    -   If [Backstory] or [Traits] are absent: Apply the Default Factory Settings for their Race or Age.
+# ПРАВИЛА ЛОГІКИ (Зв’язувальний елемент)
+1. Аналіз внутрішньої динаміки:
+    -   Проаналізуйте соціологічну та психологічну еволюцію від середовища Дитинства до ролі в Дорослому житті.
+    -   Визначте реалістичний переломний момент, який пояснює цю зміну, не покладаючись на зовнішні науково-фантастичні тропи, якщо їх прямо не наведено в даних.
+2. Психологічний слід:
+    -   Визначте, як дитячий досвід зберігається в теперішній особистості.
+    -   Виявіть конкретні звички, страхи або цінності, сформовані в ранні роки, які або підтримують, або суперечать нинішній професії Дорослого життя.
+3. Дані як докази:
+    -   Розглядайте кожен рівень навички та кожну рису як фізичний доказ минулого досвіду.
+    -   Обґрунтуйте високі навички як результат необхідності виживання або інтенсивної підготовки, а низькі — як наслідок відсутності відповідного середовища або уникання.
+4. Стандартний протокол архетипу:
+    -   Якщо [Передісторія] або [Риси] відсутні: застосуйте стандартні заводські налаштування для їхньої раси або віку.
 
-# OUTPUT STRATEGY
-Generate ONE single, cohesive psychological profile.Focus entirely on Causality—explaining the result based strictly on the cause.
-1. Absolute Certainty: Use definitive language. No ""might be"" or ""likely"".
-2. Hidden Logic: NEVER use the words ""Turning Point"", ""Transition"", or ""Trajectory"".
+# СТРАТЕГІЯ ВИВЕДЕННЯ
+Створіть ОДИН цілісний психологічний профіль. Цілком зосередьтеся на причинності — пояснюйте результат, спираючись лише на причину.
+1. Абсолютна впевненість: Використовуйте категоричні формулювання. Жодних «можливо» або «ймовірно».
+2. Прихована логіка: НІКОЛИ не використовуйте слова «Переломний момент», «Перехід» або «Динаміка».
 
-# Content Template
-[2-4 word Style]
-[Describe the logical trajectory of their life based on the data. Explain the turning point that led to their current role. Define a short-term psychological goal consistent with their traits. Explicitly describe their speaking tempo, vocabulary, and attitude as a result of their lived experience. Keep it all in one solid paragraph.]";
+# Шаблон вмісту
+[Стиль із 2–4 слів]
+[Опишіть логічний життєвий шлях персонажа на основі даних. Поясніть переломний момент, що привів його до нинішньої ролі. Визначте короткострокову психологічну мету, що відповідає його рисам. Явно опишіть темп мовлення, словниковий запас і ставлення як результат його життєвого досвіду. Викладіть усе в одному суцільному абзаці.]";
 
         // 4. 演变/更新模式 (专用)
-        public const string DefaultPrompt_Evolve = @"# Role: Rimworld Character Development Analyst
-# Language: {LANG}
+        public const string DefaultPrompt_Evolve = @"# Роль: аналітик розвитку персонажа Rimworld
+# Мова: {LANG}
 
-# Task:
-Analyze the provided data and write a short development addendum. Focus on shifts in the character's mindset, speaking style, and behavioral tendencies.
+# Завдання:
+Проаналізуйте надані дані й напишіть короткий додаток про розвиток. Зосередьтеся на змінах у світогляді персонажа, його стилі мовлення та поведінкових схильностях.
 
-# DATA HIERARCHY:
-1. CORE: [Previous Persona], [Time Context] (Determines the scale and nature of growth).
-2. CONTEXT: [Director's Notes], [New Memories], [Status Changes] (Provides specific triggers for change).
+# ІЄРАРХІЯ ДАНИХ:
+1. ОСНОВА: [Previous Persona], [Time Context] (визначає масштаб і характер розвитку).
+2. КОНТЕКСТ: [Director's Notes], [New Memories], [Status Changes] (надає конкретні тригери для змін).
 
-# CRITICAL RULES:
-1. No Repetition: Never repeat phrases or words from the [Previous Persona].
-2. Cause & Effect: Start with a concise summary of recent experiences/hardships, then describe the resulting shift in mindset and dialogue style.
-3. Synthesis Only: Do not list events. Translate memories and skill changes into character traits.
-4. Dialogue-Focused: Focus on how they now speak or think.
-5. Age Logic: If [Time Context] shows significant aging, prioritize maturity and worldview shifts; if short, focus on immediate emotional reactions and fixations.
-6. Length Limit: Strictly 1-2 sentences. Maximum 50 words.";
+# КРИТИЧНІ ПРАВИЛА:
+1. Без повторів: ніколи не повторюйте фрази чи слова з [Previous Persona].
+2. Причина й наслідок: почніть із стислого підсумку нещодавніх переживань/труднощів, а потім опишіть відповідну зміну світогляду та стилю діалогу.
+3. Лише синтез: не перелічуйте події. Перетворіть спогади й зміни навичок на риси персонажа.
+4. Фокус на діалозі: зосередьтеся на тому, як персонаж тепер говорить або мислить.
+5. Логіка віку: якщо [Time Context] свідчить про значне старіння, надайте пріоритет змінам зрілості та світогляду; якщо період короткий, зосередьтеся на безпосередніх емоційних реакціях і зацикленнях.
+6. Обмеження довжини: суворо 1–2 речення. Максимум 50 слів.";
 
         // =============================================================
         // Technical Protocols (Hidden)
         // =============================================================
 
         public const string HiddenTechnicalPrompt_Single = @"
-# SYSTEM PROTOCOL (JSON FORMAT ENFORCEMENT):
-You must return a valid JSON object. DO NOT use Markdown code blocks.
-The 'persona' field must be a SINGLE LINE string using \n for breaks.
-Fields:
-1. ""persona"":  The full text of the result (use \n for formatting).
+# СИСТЕМНИЙ ПРОТОКОЛ (ЗАБЕЗПЕЧЕННЯ ФОРМАТУ JSON):
+Ви повинні повернути дійсний об’єкт JSON. НЕ використовуйте блоки коду Markdown.
+Поле 'persona' має бути РЯДКОМ В ОДИН РЯДОК із використанням \n для розривів.
+Поля:
+1. ""persona"": Повний текст результату (використовуйте \n для форматування).
 2. ""chattiness"": Float (0.1 - 1.0).
 ";
 
         public const string HiddenTechnicalPrompt_Batch = @"
-# SYSTEM PROTOCOL (BATCH JSON FORMAT ENFORCEMENT):
-You are processing MULTIPLE characters.
-The final output MUST be a valid JSON object with a SINGLE 'persona' field.
-Inside the 'persona' string, list each character's personality.
+# СИСТЕМНИЙ ПРОТОКОЛ (ЗАБЕЗПЕЧЕННЯ ФОРМАТУ ПАКЕТНОГО JSON):
+Ви обробляєте КІЛЬКА персонажів.
+Кінцевий результат MUST бути дійсним об’єктом JSON з ЄДИНИМ полем 'persona'.
+У рядку 'persona' перелічіть особистість кожного персонажа.
 
-CRITICAL FORMAT RULES:
-1. Each character block MUST start with their ID exactly as provided in the input, e.g., '[ID:Human123]'.
-2. Separate characters with '---'.
-3. Use \n for line breaks.
+КРИТИЧНІ ПРАВИЛА ФОРМАТУ:
+1. Блок кожного персонажа MUST починатися з його ID точно так, як його надано у вхідних даних, наприклад '[ID:Human123]'.
+2. Розділяйте персонажів за допомогою '---'.
+3. Використовуйте \n для перенесення рядків.
 
-Example for 'persona' field:
-""[ID:Human101]: Description for John...\n---\n[ID:Human102]: Description for Jane...""
+Приклад для поля 'persona':
+""[ID:Human101]: Опис Джона...\n---\n[ID:Human102]: Опис Джейн...""
 
-Fields:
-1. ""persona"": The combined text for ALL characters.
-2. ""chattiness"": Float (just use 0.5 as a default).
+Поля:
+1. ""persona"": Об’єднаний текст для ВСІХ персонажів.
+2. ""chattiness"": Float (просто використовуйте 0.5 як значення за замовчуванням).
 ";
 
         // =============================================================
@@ -268,14 +270,14 @@ Fields:
         public string rimTalkPreset_Single = ""; // 单体生成用的预设名
         public string rimTalkPreset_Evolve = ""; // 演变生成用的预设名
 
-        //  新增字段：预设库和规则库 
+        //  新增字段：预设库和规则库
         public List<CustomPreset> userPresets = new List<CustomPreset>();
         public List<AssignmentRule> assignmentRules = new List<AssignmentRule>();
         // 初始化状态标记
         public bool _libraryInitialized = false;
         // 缓存 (不保存)
         public static List<PersonalityData> OriginalVanillaCache;
-        //  新增：迁移标记 (默认为 false) 
+        //  新增：迁移标记 (默认为 false)
         private bool _chattinessMigratedV2 = false;
         // ★★★ 新增：目标 RimTalk 预设名称 ★★★
         public string rimTalkPresetName = "Director";
@@ -298,10 +300,10 @@ Fields:
             if (Context == null) Context = new ContextSettings();
 
             Scribe_Collections.Look(ref BatchFilters, "BatchFilters", LookMode.Value, LookMode.Value);
-            // 库数据           
+            // 库数据
             Scribe_Collections.Look(ref userPresets, "userPresets", LookMode.Deep);
             Scribe_Collections.Look(ref assignmentRules, "assignmentRules", LookMode.Deep);
-            // 保存初始化标记 
+            // 保存初始化标记
             Scribe_Values.Look(ref _libraryInitialized, "libraryInitialized", false);
             Scribe_Values.Look(ref _chattinessMigratedV2, "chattinessMigratedV2", false);
 
@@ -427,7 +429,7 @@ Fields:
             PresetSynchronizer.SyncToRimTalk();
             Log.Message("[Persona Director] -> InitLibrary: Sync complete.");
             Log.Message("[Persona Director] Library reset/initialized to defaults.");
-        
+
         }
 
         // ★★★ 辅助方法：智能提取标题 ★★★
@@ -502,9 +504,9 @@ Fields:
                     targetDefName = "Waster",
                     priority = 50 // 种族优先级高于派系
                 };
-                AddIdsToRule(wasterRule, "Apocalypse", "Doomer", "Grindset"); 
+                AddIdsToRule(wasterRule, "Apocalypse", "Doomer", "Grindset");
                 assignmentRules.Add(wasterRule);
-            }          
+            }
         }
 
         private void AddIdsToRule(AssignmentRule rule, params string[] searchLabels)
@@ -529,6 +531,16 @@ Fields:
                 presets.Add(new PromptPreset("", ""));
             }
 
+            string[] localizedDefaults = { DefaultPrompt_Standard, DefaultPrompt_Simple, DefaultPrompt_Strict, DefaultPrompt_Evolve };
+            string[] localizedLabels = { "Стандартний (3 варіанти)", "Сюжетний", "На основі даних", "Розвиток (лише оновлення)" };
+            string[] englishLabels = { "Standard (3 Options)", "Story-Driven", "Data-Driven", "Evolution (Update Only)" };
+            for (int i = 0; i < localizedDefaults.Length; i++)
+            {
+                if (IsLegacyEnglishDefault(presets[i].text, i)) presets[i].text = localizedDefaults[i];
+                if (presets[i].label == englishLabels[i]) presets[i].label = localizedLabels[i];
+            }
+            if (IsLegacyEnglishDefault(activePrompt, 0)) activePrompt = "";
+
             // 2. 数据迁移：如果旧 activePrompt 存在且不是默认值，迁移到 Slot 1
             if (!string.IsNullOrEmpty(activePrompt) && activePrompt != DefaultPrompt_Standard)
             {
@@ -544,25 +556,43 @@ Fields:
             // 3. 填充默认值 (如果槽位为空)
             if (string.IsNullOrEmpty(presets[0].text))
             {
-                presets[0].label = "Standard (3 Options)";
+                presets[0].label = localizedLabels[0];
                 presets[0].text = DefaultPrompt_Standard;
             }
 
             if (string.IsNullOrEmpty(presets[1].text))
             {
-                presets[1].label = "Story-Driven";
+                presets[1].label = localizedLabels[1];
                 presets[1].text = DefaultPrompt_Simple;
             }
 
             if (string.IsNullOrEmpty(presets[2].text))
             {
-                presets[2].label = "Data-Driven";
+                presets[2].label = localizedLabels[2];
                 presets[2].text = DefaultPrompt_Strict;
             }
             if (string.IsNullOrEmpty(presets[3].text))
             {
-                presets[3].label = "Evolution (Update Only)";
+                presets[3].label = localizedLabels[3];
                 presets[3].text = DefaultPrompt_Evolve;
+            }
+        }
+
+        private static bool IsLegacyEnglishDefault(string value, int index)
+        {
+            if (string.IsNullOrEmpty(value) || index < 0 || index >= 4) return false;
+            string[] hashes =
+            {
+                "573BA139D001F5E65CE39A3E2610A99275769DCEDDCA43A995D0BEB35FF4FF10",
+                "F6F6B7291CD23F8E95B1B8884D470AE175D020E7F332EB51B707CB2846F04172",
+                "6D828D85D6ABE1AF4E7BE2C005FF4547C723FF57E0FC3727FB435A351D774209",
+                "4A441356B0473AFD9ED14DAC14C36202CEA3DA01C4C09BB13312194490EEC1A5"
+            };
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] digest = sha.ComputeHash(Encoding.UTF8.GetBytes(value));
+                string actual = BitConverter.ToString(digest).Replace("-", "");
+                return string.Equals(actual, hashes[index], StringComparison.Ordinal);
             }
         }
 
@@ -619,7 +649,7 @@ Fields:
         public bool Inc_Equipment = false;
         public bool Inc_Inventory = false;
         public bool Inc_RimPsyche = false; public bool Inc_RimPsyche_All = false;
-        public bool Inc_Memories = false; 
+        public bool Inc_Memories = false;
         public bool Inc_CommonKnowledge = false;
         public bool Inc_DataComparison = false;
 
