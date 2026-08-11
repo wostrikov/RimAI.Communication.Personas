@@ -13,19 +13,50 @@ using Verse;
 [HarmonyPatch]
 public static class DirectorVariableProvider
 {
+	private const string LegacyParserTypeName = "RimTalk.Prompt.MustacheParser";
+	private const string LegacyContextTypeName = "RimTalk.Prompt.MustacheContext";
+	private const string CurrentParserTypeName = "RimTalk.Prompt.ScribanParser";
+	private const string CurrentContextTypeName = "RimTalk.Prompt.PromptContext";
+
 	private static bool _initialized;
 
 	private static Type _mustacheContextType;
 
+	[HarmonyPrepare]
+	public static bool Prepare()
+	{
+		if (ResolveLegacyTarget() != null)
+		{
+			return true;
+		}
+
+		if (ResolveCurrentRenderTarget() != null)
+		{
+			// Current RimTalk exposes director variables through RimTalkPromptAPI.
+			// DirectorApiAdapter registers them, so the legacy expression patch is obsolete.
+			return false;
+		}
+
+		Log.Error("[Persona Director] Unsupported RimTalk prompt API. Expected either " +
+			"MustacheParser.EvaluateExpression(string, MustacheContext) or " +
+			"ScribanParser.Render(string, PromptContext, bool).");
+		return false;
+	}
+
 	[HarmonyTargetMethod]
 	public static MethodBase TargetMethod()
 	{
-		Type type = AccessTools.TypeByName("RimTalk.Prompt.MustacheParser");
+		return ResolveLegacyTarget();
+	}
+
+	internal static MethodBase ResolveLegacyTarget()
+	{
+		Type type = AccessTools.TypeByName(LegacyParserTypeName);
 		if (type == null)
 		{
 			return null;
 		}
-		_mustacheContextType = AccessTools.TypeByName("RimTalk.Prompt.MustacheContext");
+		_mustacheContextType = AccessTools.TypeByName(LegacyContextTypeName);
 		if (_mustacheContextType == null)
 		{
 			return null;
@@ -34,6 +65,23 @@ public static class DirectorVariableProvider
 		{
 			typeof(string),
 			_mustacheContextType
+		}, (Type[])null);
+	}
+
+	internal static MethodBase ResolveCurrentRenderTarget()
+	{
+		Type parserType = AccessTools.TypeByName(CurrentParserTypeName);
+		Type contextType = AccessTools.TypeByName(CurrentContextTypeName);
+		if (parserType == null || contextType == null)
+		{
+			return null;
+		}
+
+		return AccessTools.Method(parserType, "Render", new Type[3]
+		{
+			typeof(string),
+			contextType,
+			typeof(bool)
 		}, (Type[])null);
 	}
 
