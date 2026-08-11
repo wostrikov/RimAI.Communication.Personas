@@ -43,7 +43,7 @@
   <RPD_Library_AgeRange>Діапазон віку</RPD_Library_AgeRange>
   <RPD_Library_SelectAll>Вибрати все</RPD_Library_SelectAll>
   <RPD_Library_UnselectAll>Скасувати вибір усього</RPD_Library_UnselectAll>
-  <RPD_Library_Category>Категорія</RPD_Library_Category>
+  <RPD_Library_Category>Категорія: {0}</RPD_Library_Category>
   <RPD_Library_PresetsPool>Бібліотека пресетів</RPD_Library_PresetsPool>
   <!-- Preset Browser Window -->
   <RPD_Browser_ApplySelected>Застосувати вибране</RPD_Browser_ApplySelected>
