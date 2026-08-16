@@ -3,7 +3,7 @@ using Verse;
 using RimWorld;
 using System.Linq;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class MainButtonWorker_Director : MainButtonWorker
     {

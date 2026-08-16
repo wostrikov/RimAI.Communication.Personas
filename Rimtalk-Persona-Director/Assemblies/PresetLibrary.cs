@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     // 静态库：只用于提供模板，不保存数据
     [StaticConstructorOnStartup]

@@ -3,11 +3,11 @@
 using HarmonyLib;
 using Verse;
 using RimWorld;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     // 这个类现在既包含执行逻辑，又包含 Harmony 补丁
     [HarmonyPatch]

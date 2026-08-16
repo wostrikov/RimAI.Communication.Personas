@@ -1,9 +1,9 @@
 ﻿using Verse;
 using RimWorld;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using HarmonyLib; // 用于反射读取 Hediff 内容
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class DirectorInitializer : GameComponent
     {
@@ -66,7 +66,7 @@ namespace RimPersonaDirector
 
             if (count > 0)
             {
-                Log.Message($"[Persona Director] Initialization: Applied rules to {count} existing pawns.");
+                Log.Message($"[RimAI.Personas] Initialization: Applied rules to {count} existing pawns.");
             }
         }
     }

@@ -1,9 +1,9 @@
 ﻿using HarmonyLib;
-using RimTalk.Client;
-using RimTalk.Data;
-using RimTalk.Prompt;
-using RimTalk.Service;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Client;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Prompt;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -17,7 +17,7 @@ using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public static class DirectorUtils
     {
@@ -62,7 +62,7 @@ namespace RimPersonaDirector
         private static async Task<PersonalityData> GenerateFromPreset(Pawn p, string presetName, bool isBatch)
         {
             // A. 查找预设
-            var presets = RimTalk.API.RimTalkPromptAPI.GetAllPresets();
+            var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
             var targetPreset = presets.FirstOrDefault(x => x.Name == presetName);
             if (targetPreset == null) return null;
 
@@ -70,10 +70,10 @@ namespace RimPersonaDirector
             object contextObj = null;
             try
             {
-                Type contextType = AccessTools.TypeByName("RimTalk.Prompt.PromptContext");
+                Type contextType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.PromptContext");
                 // 尝试最简单的构造函数
                 contextObj = Activator.CreateInstance(contextType, new object[] { p, null });
-                string contextData = RimTalk.Service.PromptService.CreatePawnContext(p, RimTalk.Service.PromptService.InfoLevel.Normal);
+                string contextData = Ustas.RimAI.Communication.Service.PromptService.CreatePawnContext(p, Ustas.RimAI.Communication.Service.PromptService.InfoLevel.Normal);
                 AccessTools.Property(contextType, "PawnContext").SetValue(contextObj, contextData);
             }
             catch
@@ -83,7 +83,7 @@ namespace RimPersonaDirector
                 return null;
             }
 
-            Type parserType = AccessTools.TypeByName("RimTalk.Prompt.ScribanParser");
+            Type parserType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.ScribanParser");
             MethodInfo renderMethod = AccessTools.Method(parserType, "Render", new[] { typeof(string), contextObj.GetType(), typeof(bool) });
 
             // C. 扁平化构建 (Flattening)
@@ -365,11 +365,11 @@ namespace RimPersonaDirector
             {
                 // 1. 获取 RimTalk 的 Player Pawn (玩家代理)
                 if (_rimTalkGetPlayerMethod == null)
-                    _rimTalkGetPlayerMethod = AccessTools.Method("RimTalk.Data.Cache:GetPlayer");
+                    _rimTalkGetPlayerMethod = AccessTools.Method("Ustas.RimAI.Communication.Data.Cache:GetPlayer");
 
                 // 2. 获取 RimTalk 的对话窗口类型
                 if (_rimTalkWindowType == null)
-                    _rimTalkWindowType = AccessTools.TypeByName("RimTalk.UI.CustomDialogueWindow");
+                    _rimTalkWindowType = AccessTools.TypeByName("Ustas.RimAI.Communication.UI.CustomDialogueWindow");
 
                 if (_rimTalkGetPlayerMethod == null || _rimTalkWindowType == null)
                 {
@@ -499,15 +499,15 @@ namespace RimPersonaDirector
 
         public static string GetExternalMemories(Pawn p, int lastTick)
         {
-            if (!ModsConfig.IsActive("cj.rimtalk.expandmemory")) return null;
+            if (!ModsConfig.IsActive("ustas.rimai.communication.memory")) return null;
 
             try
             {
                 // 1. 初始化反射 (只做一次)
                 if (_memoryCompType == null)
                 {
-                    _memoryCompType = AccessTools.TypeByName("RimTalk.Memory.FourLayerMemoryComp");
-                    _memoryEntryType = AccessTools.TypeByName("RimTalk.Memory.MemoryEntry");
+                    _memoryCompType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.FourLayerMemoryComp");
+                    _memoryEntryType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.MemoryEntry");
 
                     if (_memoryCompType != null)
                     {
@@ -572,16 +572,16 @@ namespace RimPersonaDirector
         public static string GetCommonKnowledge(string context, Pawn p)
         {
             // 1. 检查 Mod 是否激活
-            if (!ModsConfig.IsActive("cj.rimtalk.expandmemory")) return null;
+            if (!ModsConfig.IsActive("ustas.rimai.communication.memory")) return null;
 
             try
             {
                 // 2. 初始化反射信息 (只做一次)
                 if (_injectDetailedMethod == null)
                 {
-                    _memoryManagerType = AccessTools.TypeByName("RimTalk.Memory.MemoryManager");
-                    _knowledgeLibType = AccessTools.TypeByName("RimTalk.Memory.CommonKnowledgeLibrary");
-                    Type scoreType = AccessTools.TypeByName("RimTalk.Memory.KnowledgeScore");
+                    _memoryManagerType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.MemoryManager");
+                    _knowledgeLibType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.CommonKnowledgeLibrary");
+                    Type scoreType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.KnowledgeScore");
 
                     if (_knowledgeLibType != null && scoreType != null)
                     {
@@ -638,11 +638,11 @@ namespace RimPersonaDirector
 
             try
             {
-                var apiHistoryType = AccessTools.TypeByName("RimTalk.Data.ApiHistory");
+                var apiHistoryType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.ApiHistory");
                 if (apiHistoryType != null)
                 {
                     // 1. 查找 AddRequest (尝试新版签名: TalkRequest, Channel)
-                    var channelType = AccessTools.TypeByName("RimTalk.Source.Data.Channel"); // 注意命名空间
+                    var channelType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.Channel"); // 注意命名空间
                     if (channelType != null)
                     {
                         _addRequestMethod = AccessTools.Method(apiHistoryType, "AddRequest", new[] { typeof(TalkRequest), channelType });
@@ -696,14 +696,14 @@ namespace RimPersonaDirector
                 if (!string.IsNullOrEmpty(presetName) && presetName != "None (Use Internal)")
                 {
                     // 1. 查找预设
-                    var presets = RimTalk.API.RimTalkPromptAPI.GetAllPresets();
+                    var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
                     var targetPreset = presets.FirstOrDefault(x => x.Name == presetName);
 
                     if (targetPreset != null)
                     {
                         // 2. 准备渲染上下文 (利用反射创建 Context)
-                        Type contextType = AccessTools.TypeByName("RimTalk.Prompt.PromptContext");
-                        Type parserType = AccessTools.TypeByName("RimTalk.Prompt.ScribanParser");
+                        Type contextType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.PromptContext");
+                        Type parserType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.ScribanParser");
 
                         // 创建 Context: new PromptContext(pawn, null)
                         object contextObj = Activator.CreateInstance(contextType, new object[] { p, null });
@@ -723,7 +723,7 @@ namespace RimPersonaDirector
                             if (string.IsNullOrWhiteSpace(renderedText)) continue;
 
                             // 根据角色拼接到不同的缓冲区
-                            // RimTalk.Data.Role 枚举: System, User, AI
+                            // Ustas.RimAI.Communication.Data.Role 枚举: System, User, AI
                             // PromptEntry.Role 可能是字符串也可能是枚举，我们要判断
                             string roleStr = entry.Role.ToString().ToLowerInvariant();
 
@@ -912,10 +912,10 @@ namespace RimPersonaDirector
                 // 初始化
                 if (addRequestMethod == null)
                 {
-                    var apiHistoryType = AccessTools.TypeByName("RimTalk.Data.ApiHistory");
+                    var apiHistoryType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.ApiHistory");
                     if (apiHistoryType != null)
                     {
-                        var channelType = AccessTools.TypeByName("RimTalk.Source.Data.Channel");
+                        var channelType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.Channel");
                         if (channelType != null)
                         {
                             addRequestMethod = AccessTools.Method(apiHistoryType, "AddRequest", new[] { typeof(TalkRequest), channelType });
@@ -925,7 +925,7 @@ namespace RimPersonaDirector
                 }
 
                 // 记录请求
-                object channelQuery = Enum.Parse(AccessTools.TypeByName("RimTalk.Source.Data.Channel"), "Query");
+                object channelQuery = Enum.Parse(AccessTools.TypeByName("Ustas.RimAI.Communication.Data.Channel"), "Query");
                 object apiLog = addRequestMethod.Invoke(null, new object[] { request, channelQuery });
 
                 if (apiLog != null)
@@ -1967,8 +1967,8 @@ namespace RimPersonaDirector
                 // 1. 初始化反射 (只做一次)
                 if (_contextType == null)
                 {
-                    _contextType = AccessTools.TypeByName("RimTalk.Prompt.PromptContext");
-                    _parserType = AccessTools.TypeByName("RimTalk.Prompt.ScribanParser");
+                    _contextType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.PromptContext");
+                    _parserType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.ScribanParser");
 
                     if (_parserType != null && _contextType != null)
                     {

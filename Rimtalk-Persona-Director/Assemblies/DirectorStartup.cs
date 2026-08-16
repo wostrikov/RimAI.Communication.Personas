@@ -1,9 +1,9 @@
 ﻿using Verse;
 using System;
 using System.Collections.Generic;
-using RimTalk.Data; // 引用以访问 Constant
+using Ustas.RimAI.Communication.Data; // 引用以访问 Constant
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public static class DirectorStartup
     {
@@ -26,7 +26,7 @@ namespace RimPersonaDirector
                     if (Constant.Personalities is IEnumerable<PersonalityData> list)
                     {
                         DirectorSettings.OriginalVanillaCache = new List<PersonalityData>(list);
-                        Log.Message($"[Persona Director] Cached {DirectorSettings.OriginalVanillaCache.Count} original vanilla presets.");
+                        Log.Message($"[RimAI.Personas] Cached {DirectorSettings.OriginalVanillaCache.Count} original vanilla presets.");
                     }
                 }
 
@@ -35,7 +35,7 @@ namespace RimPersonaDirector
                 {
                     if (settings.userPresets.Count == 0 && settings.assignmentRules.Count == 0)
                     {
-                        Log.Message("[Persona Director] First time setup detected. Initializing library...");
+                        Log.Message("[RimAI.Personas] First time setup detected. Initializing library...");
                         settings.InitLibrary();
                     }
 
@@ -46,7 +46,7 @@ namespace RimPersonaDirector
                 // 3. ★★★ 最后再同步 ★★★
                 // 现在可以用我们的数据去覆盖原版了，因为原版已经备份过了
                 PresetSynchronizer.SyncToRimTalk();
-                Log.Message("[Persona Director] Sync to RimTalk completed.");
+                Log.Message("[RimAI.Personas] Sync to RimTalk completed.");
             }
             catch (Exception ex)
             {

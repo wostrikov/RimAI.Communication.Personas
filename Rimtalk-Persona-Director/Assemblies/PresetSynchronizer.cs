@@ -1,5 +1,5 @@
 ﻿using Verse;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +7,7 @@ using HarmonyLib;
 using System;
 using UnityEngine;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public static class PresetSynchronizer
     {
@@ -74,11 +74,11 @@ namespace RimPersonaDirector
                 // 静态字段，实例传 null
                 targetField.SetValue(null, newValue);
 
-                // Log.Message($"[Persona Director] Synced {syncList.Count} presets to RimTalk.");
+                // Log.Message($"[RimAI.Personas] Synced {syncList.Count} presets to Ustas.RimAI.Communication.");
             }
             catch (Exception ex)
             {
-                Log.Warning($"[Persona Director] Sync failed: {ex.Message}");
+                Log.Warning($"[RimAI.Personas] Sync failed: {ex.Message}");
             }
         }
     }

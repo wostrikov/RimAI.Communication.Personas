@@ -1,10 +1,10 @@
 ﻿using HarmonyLib;
 using Verse;
-using RimTalk.Data;
-using RimTalk.Service; // 引用 PromptService
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Service; // 引用 PromptService
 using System;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     [HarmonyPatch(typeof(PromptService), "CreatePawnContext")]
     public static class Patch_PromptService

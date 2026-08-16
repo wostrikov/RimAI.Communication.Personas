@@ -5,7 +5,7 @@ using UnityEngine;
 using Verse;
 using System.Linq;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class Window_ImportExport : Window
     {
@@ -172,7 +172,7 @@ namespace RimPersonaDirector
                 File.WriteAllText(fullPath, xml);
 
                 Messages.Message("RPD_IO_MsgExportFile".Translate(fullPath), MessageTypeDefOf.PositiveEvent, false);
-                Log.Message($"[Persona Director] Library exported to: {fullPath}");
+                Log.Message($"[RimAI.Personas] Library exported to: {fullPath}");
 
                 _text = xml;
             }

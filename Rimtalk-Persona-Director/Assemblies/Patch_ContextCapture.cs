@@ -1,12 +1,12 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 using Verse;
-using RimTalk.Prompt;
-using RimTalk.Service;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Prompt;
+using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.Data;
 using System;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     // ★★★ 核心修复：全时段上下文捕获 ★★★
     // 我们需要在 RimTalk 处理数据的每一个关键节点，都把 Pawn 列表存下来

@@ -5,7 +5,7 @@ using System.Linq; // 确保引用 Linq
 using UnityEngine;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class DirectorMod : Mod
     {
@@ -92,8 +92,8 @@ namespace RimPersonaDirector
             try
             {
                 // 使用反射或直接调用 API 获取预设列表
-                // 假设你有 RimTalk.API 引用
-                var presets = RimTalk.API.RimTalkPromptAPI.GetAllPresets();
+                // 假设你有 Ustas.RimAI.Communication.API 引用
+                var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
                 if (presets != null) rtPresets.AddRange(presets.Select(p => p.Name));
             }
             catch { }
@@ -288,7 +288,7 @@ namespace RimPersonaDirector
             }
 
             // 2. Memory Mod
-            if (ModsConfig.IsActive("cj.rimtalk.expandmemory"))
+            if (ModsConfig.IsActive("ustas.rimai.communication.memory"))
             {
                     DrawFilterRow(list3, "RPD_Filter_Memories".Translate(), ref ctx.Inc_Memories);
                     DrawFilterRow(list3, "RPD_Filter_CommonKnowledge".Translate(), ref ctx.Inc_CommonKnowledge);

@@ -1,11 +1,11 @@
-﻿using RimTalk.API;
-using RimTalk.Data;
-using RimTalk.Prompt;
+﻿using Ustas.RimAI.Communication.API;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Prompt;
 using System;
 using System.Collections.Generic;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     [StaticConstructorOnStartup]
     public static class DirectorApiAdapter
@@ -25,7 +25,7 @@ namespace RimPersonaDirector
             }
             catch { return; }
 
-            Log.Message("[Persona Director] Registering variables for Scriban engine...");
+            Log.Message("[RimAI.Personas] Registering variables for Scriban engine...");
 
             // 变量注册
 
@@ -77,14 +77,14 @@ namespace RimPersonaDirector
 
                             // ★★★ 使用完整列表创建 Context ★★★
                             // 我们使用反射或直接调用 PromptContext(List<Pawn>) 构造函数
-                            var globalStore = RimTalk.Prompt.PromptManager.Instance.VariableStore;
-                            var tempContext = new RimTalk.Prompt.PromptContext(allPawns);
+                            var globalStore = Ustas.RimAI.Communication.Prompt.PromptManager.Instance.VariableStore;
+                            var tempContext = new Ustas.RimAI.Communication.Prompt.PromptContext(allPawns);
 
                             // 确保 CurrentPawn 是当前正在处理的这个 pawn
                             tempContext.CurrentPawn = pawn;
 
                             // 渲染
-                            return RimTalk.Prompt.ScribanParser.Render(personaTemplate, tempContext);
+                            return Ustas.RimAI.Communication.Prompt.ScribanParser.Render(personaTemplate, tempContext);
                         }
                     );
                 }

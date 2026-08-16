@@ -1,11 +1,11 @@
 ﻿using HarmonyLib;
-using RimTalk.UI;
+using Ustas.RimAI.Communication.UI;
 using RimWorld;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     
     [HarmonyPatch(typeof(PersonaEditorWindow), "DoWindowContents")]

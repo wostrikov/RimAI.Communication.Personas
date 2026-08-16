@@ -1,5 +1,5 @@
 using HarmonyLib;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     // 新增：预设数据结构
     public class PromptPreset : IExposable
@@ -346,17 +346,17 @@ namespace RimPersonaDirector
                 }
             }
             _chattinessMigratedV2 = true;
-            Log.Message($"[Persona Director] Migrated {count} user presets to new chattiness scale (v2).");
+            Log.Message($"[RimAI.Personas] Migrated {count} user presets to new chattiness scale (v2).");
         }
 
         public void InitLibrary()
         {
-            Log.Message("[Persona Director] -> InitLibrary: Starting...");
+            Log.Message("[RimAI.Personas] -> InitLibrary: Starting...");
             if (userPresets == null) userPresets = new List<CustomPreset>();
             else userPresets.Clear();
             if (assignmentRules == null) assignmentRules = new List<AssignmentRule>();
             else assignmentRules.Clear();
-            Log.Message("[Persona Director] -> InitLibrary: Cleared existing lists. Loading built-in presets...");
+            Log.Message("[RimAI.Personas] -> InitLibrary: Cleared existing lists. Loading built-in presets...");
             // 填充预设库
             // 1. 内置库
             int builtInCount = 0;
@@ -377,18 +377,18 @@ namespace RimPersonaDirector
                 });
                 builtInCount++;
             }
-            Log.Message($"[Persona Director] -> InitLibrary: Loaded {builtInCount} built-in presets. Loading vanilla presets...");
+            Log.Message($"[RimAI.Personas] -> InitLibrary: Loaded {builtInCount} built-in presets. Loading vanilla presets...");
             // 2. 填充原版
             int vanillaCount = 0;
-            IEnumerable<RimTalk.Data.PersonalityData> sourceList = null;
+            IEnumerable<Ustas.RimAI.Communication.Data.PersonalityData> sourceList = null;
 
             if (OriginalVanillaCache != null)
             {
                 sourceList = OriginalVanillaCache;
             }
-            else if (RimTalk.Data.Constant.Personalities != null)
+            else if (Ustas.RimAI.Communication.Data.Constant.Personalities != null)
             {
-                var currentList = RimTalk.Data.Constant.Personalities as IEnumerable<RimTalk.Data.PersonalityData>;
+                var currentList = Ustas.RimAI.Communication.Data.Constant.Personalities as IEnumerable<Ustas.RimAI.Communication.Data.PersonalityData>;
                 if (currentList != null)
                 {
                     OriginalVanillaCache = currentList.ToList();
@@ -420,15 +420,15 @@ namespace RimPersonaDirector
                     }
                 }
             }
-            Log.Message($"[Persona Director] -> InitLibrary: Loaded {vanillaCount} vanilla presets. Loading default rules...");
+            Log.Message($"[RimAI.Personas] -> InitLibrary: Loaded {vanillaCount} vanilla presets. Loading default rules...");
             _chattinessMigratedV2 = true;
 
             // 3. 填充规则库
             AddDefaultRules();
-            Log.Message("[Persona Director] -> InitLibrary: Default rules loaded. Syncing to RimTalk...");
+            Log.Message("[RimAI.Personas] -> InitLibrary: Default rules loaded. Syncing to Ustas.RimAI.Communication...");
             PresetSynchronizer.SyncToRimTalk();
-            Log.Message("[Persona Director] -> InitLibrary: Sync complete.");
-            Log.Message("[Persona Director] Library reset/initialized to defaults.");
+            Log.Message("[RimAI.Personas] -> InitLibrary: Sync complete.");
+            Log.Message("[RimAI.Personas] Library reset/initialized to defaults.");
 
         }
 

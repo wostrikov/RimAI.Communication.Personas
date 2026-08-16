@@ -1,8 +1,8 @@
 using HarmonyLib;
-using RimPersonaDirector;
-using RimTalk.Data;
-using RimTalk.UI;
-using RimTalk.Util;
+using Ustas.RimAI.Communication.Personas;
+using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using System;
 using System.Collections;
@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Text;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class HistoryLine
     {
@@ -580,7 +580,7 @@ namespace RimPersonaDirector
 
             // 1. 获取预算
             int totalBudget = 5;
-            try { totalBudget = RimTalk.Settings.Get().Context.ConversationHistoryCount; } catch { }
+            try { totalBudget = Ustas.RimAI.Communication.Settings.Get().Context.ConversationHistoryCount; } catch { }
             if (isMonologue) totalBudget = Math.Min(totalBudget, 3);
 
             // 2. 确定人员

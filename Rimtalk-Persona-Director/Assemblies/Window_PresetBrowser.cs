@@ -3,9 +3,9 @@ using Verse;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class Window_PresetBrowser : Window
     {

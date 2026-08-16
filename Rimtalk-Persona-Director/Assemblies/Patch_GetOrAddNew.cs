@@ -1,13 +1,13 @@
 ﻿using HarmonyLib;
 using Verse;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Reflection;
 using System; // 用于 Exception
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     [HarmonyPatch(typeof(Hediff_Persona), "GetOrAddNew")]
     public static class Patch_GetOrAddNew
@@ -66,7 +66,7 @@ namespace RimPersonaDirector
 
                 if (targetMethod == null)
                 {
-                    Log.Error("[Persona Director] Transpiler failed: Could not find target method GenCollection.RandomElement<PersonalityData>(IEnumerable). Auto-assignment will be disabled.");
+                    Log.Error("[RimAI.Personas] Transpiler failed: Could not find target method GenCollection.RandomElement<PersonalityData>(IEnumerable). Auto-assignment will be disabled.");
                     return instructions;
                 }
 
@@ -93,14 +93,14 @@ namespace RimPersonaDirector
 
                 if (!patched)
                 {
-                    Log.Warning("[Persona Director] Transpiler WARNING: Could not find call to RandomElement in Hediff_Persona.GetOrAddNew. Auto-assignment will not work.");
+                    Log.Warning("[RimAI.Personas] Transpiler WARNING: Could not find call to RandomElement in Hediff_Persona.GetOrAddNew. Auto-assignment will not work.");
                 }
 
                 return codes.AsEnumerable();
             }
             catch (Exception ex)
             {
-                Log.Error($"[Persona Director] Transpiler CRITICAL ERROR: {ex.Message}. Auto-assignment is disabled.");
+                Log.Error($"[RimAI.Personas] Transpiler CRITICAL ERROR: {ex.Message}. Auto-assignment is disabled.");
                 return instructions; // 发生任何错误都返回原始代码，保证游戏能运行
             }
         }

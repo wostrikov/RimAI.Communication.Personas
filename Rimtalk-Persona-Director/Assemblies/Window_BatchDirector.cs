@@ -1,4 +1,4 @@
-﻿using RimTalk.Data; 
+﻿using Ustas.RimAI.Communication.Data; 
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class Window_BatchDirector : Window
     {
@@ -423,7 +423,7 @@ namespace RimPersonaDirector
                     // 按钮 2: Edit (Deep Edit)
                     if (Widgets.ButtonText(btn2, "RPD_Batch_Button_DeepEdit".Translate()))
                     {
-                        Find.WindowStack.Add(new RimTalk.UI.PersonaEditorWindow(p));
+                        Find.WindowStack.Add(new Ustas.RimAI.Communication.UI.PersonaEditorWindow(p));
                     }
                 }
             }

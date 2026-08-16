@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
-using RimTalk.Data;
+using Ustas.RimAI.Communication.Data;
 using HarmonyLib;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     [StaticConstructorOnStartup]
     public static class Patcher
     {
         static Patcher()
         {
-            var harmony = new Harmony("com.yourname.rimtalk.director");
+            var harmony = new Harmony("ustas.rimai.communication.personas");
             harmony.PatchAll();
         }
     }
 
-    [HarmonyPatch(typeof(RimTalk.Data.PersonaService), "GeneratePersona")]
+    [HarmonyPatch(typeof(Ustas.RimAI.Communication.Data.PersonaService), "GeneratePersona")]
     public static class Patch_GeneratePersona
     {
         public static bool Prefix(Pawn pawn, ref Task<PersonalityData> __result)

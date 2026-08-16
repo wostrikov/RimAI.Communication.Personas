@@ -1,22 +1,22 @@
 // 警告：某些程序集引用无法自动解析。这可能会导致某些部分反编译错误，
 // 例如属性 getter/setter 访问。要获得最佳反编译结果，请手动将缺少的引用添加到加载的程序集列表中。
 // RPD, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// RimPersonaDirector.DirectorVariableProvider
+// Ustas.RimAI.Communication.Personas.DirectorVariableProvider
 using System;
 using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
-using RimPersonaDirector;
+using Ustas.RimAI.Communication.Personas;
 using Verse;
 
 [HarmonyPatch]
 public static class DirectorVariableProvider
 {
-	private const string LegacyParserTypeName = "RimTalk.Prompt.MustacheParser";
-	private const string LegacyContextTypeName = "RimTalk.Prompt.MustacheContext";
-	private const string CurrentParserTypeName = "RimTalk.Prompt.ScribanParser";
-	private const string CurrentContextTypeName = "RimTalk.Prompt.PromptContext";
+	private const string LegacyParserTypeName = "Ustas.RimAI.Communication.Prompt.MustacheParser";
+	private const string LegacyContextTypeName = "Ustas.RimAI.Communication.Prompt.MustacheContext";
+	private const string CurrentParserTypeName = "Ustas.RimAI.Communication.Prompt.ScribanParser";
+	private const string CurrentContextTypeName = "Ustas.RimAI.Communication.Prompt.PromptContext";
 
 	private static bool _initialized;
 
@@ -37,7 +37,7 @@ public static class DirectorVariableProvider
 			return false;
 		}
 
-		Log.Error("[Persona Director] Unsupported RimTalk prompt API. Expected either " +
+		Log.Error("[RimAI.Personas] Unsupported RimTalk prompt API. Expected either " +
 			"MustacheParser.EvaluateExpression(string, MustacheContext) or " +
 			"ScribanParser.Render(string, PromptContext, bool).");
 		return false;

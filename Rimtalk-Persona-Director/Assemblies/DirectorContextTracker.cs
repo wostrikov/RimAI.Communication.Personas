@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public static class DirectorContextTracker
     {

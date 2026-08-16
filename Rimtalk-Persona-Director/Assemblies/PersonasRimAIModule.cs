@@ -1,7 +1,7 @@
 using Ustas.RimAI.Core.Modules;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     [StaticConstructorOnStartup]
     public static class PersonasRimAIModule

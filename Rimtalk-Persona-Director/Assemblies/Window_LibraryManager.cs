@@ -1,11 +1,11 @@
-﻿using RimTalk.Data;
+﻿using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class Window_LibraryManager : Window
     {
@@ -214,7 +214,7 @@ namespace RimPersonaDirector
             }
         }
 
-        private void OpenManageMenu(string targetCategory, List<RimTalk.Data.PersonalityData> vanillaSource = null, List<CustomPreset> builtInSource = null)
+        private void OpenManageMenu(string targetCategory, List<Ustas.RimAI.Communication.Data.PersonalityData> vanillaSource = null, List<CustomPreset> builtInSource = null)
         {
             List<FloatMenuOption> opts = new List<FloatMenuOption>();
             var userPresets = DirectorMod.Settings.userPresets;

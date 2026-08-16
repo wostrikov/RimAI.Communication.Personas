@@ -3,7 +3,7 @@ using RimWorld.Planet;
 using System.Collections.Generic;
 using Verse;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     public class DirectorWorldComponent : WorldComponent
     {

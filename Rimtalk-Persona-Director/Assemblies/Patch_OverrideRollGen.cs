@@ -1,10 +1,10 @@
 ﻿using HarmonyLib;
-using RimTalk.UI;
+using Ustas.RimAI.Communication.UI;
 using UnityEngine;
 using Verse;
 using System.Reflection;
 
-namespace RimPersonaDirector
+namespace Ustas.RimAI.Communication.Personas
 {
     [HarmonyPatch(typeof(PersonaEditorWindow), "DoWindowContents")]
     public static class Patch_OverrideRollGen
