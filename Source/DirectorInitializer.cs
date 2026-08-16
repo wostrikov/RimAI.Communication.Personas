@@ -22,7 +22,7 @@ namespace Ustas.RimAI.Communication.Personas
         private void ApplyRulesToExistingPawns()
         {
             // 确保 Def 已加载
-            HediffDef personaDef = DefDatabase<HediffDef>.GetNamed("RimTalk_Persona", false);
+            HediffDef personaDef = DefDatabase<HediffDef>.GetNamed("RimTalk_PersonaData", false);
             if (personaDef == null) return;
 
             int count = 0;
