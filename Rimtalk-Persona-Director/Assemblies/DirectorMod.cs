@@ -24,10 +24,13 @@ namespace RimPersonaDirector
             LongEventHandler.ExecuteWhenFinished(DirectorStartup.Initialize);
         }
 
-        public override string SettingsCategory() => Content?.Name ?? "RimAI.Personas";
+        public override string SettingsCategory() => Content?.Name ?? "RimAI.Communication.Personas";
 
         public override void DoSettingsWindowContents(Rect inRect)
         {
+            AccessTools.TypeByName("Ustas.RimAI.Core.Modules.RimAISettingsNavigation")
+                ?.GetMethod("Open")
+                ?.Invoke(null, new object[] { "communication", "personas" });
             // --- 1. 计算内容总高度 (预估) ---
             // 标题(30) + 按钮(30) + 开关(24*4) + 过滤器(200+) + 模板选择(60) + Prompt编辑(300+)
             // 给一个足够大的高度，或者动态计算。这里给 1200f 足够了。
