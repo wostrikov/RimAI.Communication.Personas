@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <name>RimTalk: Persona Director</name>
+  <name>RimAI.Personas</name>
   <author>Rabirinth</author>
   <packageId>RP.RimTalk.PersonaDirector</packageId> 
   <supportedVersions>

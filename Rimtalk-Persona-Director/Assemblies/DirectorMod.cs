@@ -24,7 +24,7 @@ namespace RimPersonaDirector
             LongEventHandler.ExecuteWhenFinished(DirectorStartup.Initialize);
         }
 
-        public override string SettingsCategory() => "RimTalk: Persona Director";
+        public override string SettingsCategory() => Content?.Name ?? "RimAI.Personas";
 
         public override void DoSettingsWindowContents(Rect inRect)
         {
