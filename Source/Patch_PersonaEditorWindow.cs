@@ -1,4 +1,3 @@
-using HarmonyLib;
 using Ustas.RimAI.Communication.UI;
 using RimWorld;
 using System.Threading.Tasks;
@@ -7,11 +6,8 @@ using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
 {
-    
-    [HarmonyPatch(typeof(PersonaEditorWindow), "DoWindowContents")]
     public static class Patch_PersonaEditorWindow_DirectorFeatures
     {
-        // 状态变量
         private static Task<string> evolveTask = null;
         private static string evolveResult = null;
         private static Pawn evolvingPawn = null;
@@ -23,36 +19,29 @@ namespace Ustas.RimAI.Communication.Personas
             evolvingPawn = null;
         }
 
-        public static void Postfix(Rect inRect, Window __instance)
+        public static void DrawFooter(PersonaEditorWindow window, Pawn pawn, Rect inRect)
         {
-            Pawn pawn = (Pawn)AccessTools.Field(typeof(PersonaEditorWindow), "_pawn").GetValue(__instance);
-            if (pawn == null) return;
+            if (window == null || pawn == null) return;
 
-            // 检查并应用结果
             if (evolveResult != null && evolvingPawn == pawn)
             {
-                string currentText = DirectorUtils.GetWindowText(__instance);
+                string currentText = DirectorUtils.GetWindowText(window);
                 string newText = $"{currentText}\n\n[Development]: {evolveResult}";
-                DirectorUtils.SetWindowText(__instance, newText);
-
-                // 清理结果，防止重复应用
+                DirectorUtils.SetWindowText(window, newText);
                 evolveResult = null;
                 evolvingPawn = null;
             }
 
-            // --- 1. 布局参数 ---
             float footerY = inRect.y + 267f;
             float buttonWidth = 80f;
             float buttonHeight = 24f;
             float spacing = 5f;
 
-            // --- 2. ★★★ 预先计算所有按钮的 Rect ★★★ ---
             float startX = inRect.x;
             Rect noteRect = new Rect(startX, footerY, buttonWidth, buttonHeight);
             Rect evolveRect = new Rect(noteRect.xMax + spacing, footerY, buttonWidth, buttonHeight);
             Rect timeRect = new Rect(evolveRect.xMax + spacing, footerY, buttonWidth, buttonHeight);
 
-            // A. 绘制 Edit Notes (如果开启)
             if (PersonasMod.Settings.Context.Inc_DirectorNotes)
             {
                 string currentNotes = PersonasMod.Settings.directorNotes;
@@ -75,83 +64,70 @@ namespace Ustas.RimAI.Communication.Personas
                 }
             }
 
-            if (PersonasMod.Settings.enableEvolveFeature)
+            if (!PersonasMod.Settings.enableEvolveFeature)
+                return;
+
+            bool isEvolving = evolveTask != null && !evolveTask.IsCompleted;
+
+            if (isEvolving)
             {
-                // --- Evolve 按钮 ---
-                bool isEvolving = evolveTask != null && !evolveTask.IsCompleted;
-
-                if (isEvolving)
-                {
-                    Widgets.ButtonText(evolveRect, "RPD_Batch_Status_Generating".Translate(), active: false);
-                }
-                else
-                {
-                    if (Widgets.ButtonText(evolveRect, "RPD_Button_Evolve".Translate()))
-                    {
-                        ClearEvolveState();
-                        evolvingPawn = pawn;
-
-                        // 1. ★★★ 主线程准备数据 ★★★
-                        // 这一步必须在 Task.Run 之外执行！
-                        var (request, currentPersona) = DirectorUtils.PrepareEvolveRequest(pawn, __instance);
-
-                        if (request != null)
-                        {
-                            // 2. ★★★ 启动后台任务 ★★★
-                            // 此时 request 已经包含了所有数据字符串，不需要再访问 Pawn
-                            evolveTask = Task.Run(() =>
-                            {
-                                var result = DirectorUtils.ExecuteEvolveTask(request);
-
-                                if (result != null && !string.IsNullOrEmpty(result.Persona))
-                                {
-                                    return result.Persona.Trim();
-                                }
-                                return null;
-                            });
-
-                            // 3. 结果处理
-                            evolveTask.ContinueWith(task => {
-                                if (task.IsCompleted && !task.IsFaulted)
-                                {
-                                    evolveResult = task.Result;
-                                }
-                                evolveTask = null;
-                            });
-                        }
-                        else
-                        {
-                            Messages.Message("Failed to prepare data.", MessageTypeDefOf.RejectInput, false);
-                        }
-                    }
-                    TooltipHandler.TipRegion(evolveRect, "RPD_Tip_Evolve".Translate());
-                }
-
-                // C. 绘制 Set Time (最右)
-                var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
-                if (worldComp != null)
-                {
-                    int lastTick = worldComp.GetLastEvolveTick(pawn);
-                    string timeLabel = "RPD_Button_SetTime".Translate();
-                    string tooltip = "RPD_Tip_SetTime_Empty".Translate();
-
-                    if (lastTick > 0)
-                    {
-                        int days = (GenTicks.TicksGame - lastTick) / 60000;
-                        timeLabel = "RPD_Button_TimeAgo".Translate(days);
-                        long ageBioYears = worldComp.GetLastEvolveBioAgeTicks(pawn) / 3600000;
-                        tooltip = "RPD_Tip_SetTime_Info".Translate(days, ageBioYears);
-                    }
-
-                    if (Widgets.ButtonText(timeRect, timeLabel))
-                    {
-                        string snapshot = DirectorUtils.BuildCustomCharacterData(pawn, true, false);
-                        worldComp.SetTimestamp(pawn, snapshot);
-                        Messages.Message("RPD_Msg_TimestampUpdated".Translate(), MessageTypeDefOf.PositiveEvent, false);
-                    }
-                    TooltipHandler.TipRegion(timeRect, tooltip);
-                }
+                Widgets.ButtonText(evolveRect, "RPD_Batch_Status_Generating".Translate(), active: false);
             }
+            else
+            {
+                if (Widgets.ButtonText(evolveRect, "RPD_Button_Evolve".Translate()))
+                {
+                    ClearEvolveState();
+                    evolvingPawn = pawn;
+                    var (request, currentPersona) = DirectorUtils.PrepareEvolveRequest(pawn, window);
+
+                    if (request != null)
+                    {
+                        evolveTask = Task.Run(() =>
+                        {
+                            var result = DirectorUtils.ExecuteEvolveTask(request);
+                            if (result != null && !string.IsNullOrEmpty(result.Persona))
+                                return result.Persona.Trim();
+                            return null;
+                        });
+
+                        evolveTask.ContinueWith(task => {
+                            if (task.IsCompleted && !task.IsFaulted)
+                                evolveResult = task.Result;
+                            evolveTask = null;
+                        });
+                    }
+                    else
+                    {
+                        Messages.Message("Failed to prepare data.", MessageTypeDefOf.RejectInput, false);
+                    }
+                }
+                TooltipHandler.TipRegion(evolveRect, "RPD_Tip_Evolve".Translate());
+            }
+
+            var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
+            if (worldComp == null)
+                return;
+
+            int lastTick = worldComp.GetLastEvolveTick(pawn);
+            string timeLabel = "RPD_Button_SetTime".Translate();
+            string tooltipTime = "RPD_Tip_SetTime_Empty".Translate();
+
+            if (lastTick > 0)
+            {
+                int days = (GenTicks.TicksGame - lastTick) / 60000;
+                timeLabel = "RPD_Button_TimeAgo".Translate(days);
+                long ageBioYears = worldComp.GetLastEvolveBioAgeTicks(pawn) / 3600000;
+                tooltipTime = "RPD_Tip_SetTime_Info".Translate(days, ageBioYears);
+            }
+
+            if (Widgets.ButtonText(timeRect, timeLabel))
+            {
+                string snapshot = DirectorUtils.BuildCustomCharacterData(pawn, true, false);
+                worldComp.SetTimestamp(pawn, snapshot);
+                Messages.Message("RPD_Msg_TimestampUpdated".Translate(), MessageTypeDefOf.PositiveEvent, false);
+            }
+            TooltipHandler.TipRegion(timeRect, tooltipTime);
         }
     }
-} 
+}

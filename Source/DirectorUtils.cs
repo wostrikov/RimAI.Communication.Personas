@@ -3,6 +3,7 @@ using Ustas.RimAI.Communication.Client;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
 using Ustas.RimAI.Communication.Service;
+using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using RimWorld.Planet;
@@ -136,7 +137,7 @@ namespace Ustas.RimAI.Communication.Personas
         }
 
 
-        // JSON 清洗辅助方法 
+        // JSON 清洗辅助方法
         private static string ExtractJsonSmart(string text)
         {
             if (string.IsNullOrEmpty(text)) return "";
@@ -275,7 +276,7 @@ namespace Ustas.RimAI.Communication.Personas
                     if (PersonasMod.Settings.EnableDebugLog) Log.Warning($"[Director] Invalid format (no bracket found): {part.Trim()}");
                     continue;
                 }
-                
+
                 // 1. 提取 Key，例如 "[ID:Human123]"
                 // Substring(0, length) -> 从 0 开始，截取到 ']' 为止
                 string keyPart = part.Substring(0, bracketIndex + 1).Trim();
@@ -1075,26 +1076,15 @@ namespace Ustas.RimAI.Communication.Personas
             }
         }
 
-        // --- 反射读写 UI ---
-
-        private static FieldInfo windowTextField;
-
         public static string GetWindowText(Window window)
         {
-            if (window == null) return null;
-            if (windowTextField == null)
-                windowTextField = AccessTools.Field(window.GetType(), "_editingPersonality");
-
-            return (string)windowTextField?.GetValue(window);
+            return window is PersonaEditorWindow editor ? editor.EditingPersonality : null;
         }
 
         public static void SetWindowText(Window window, string text)
         {
-            if (window == null) return;
-            if (windowTextField == null)
-                windowTextField = AccessTools.Field(window.GetType(), "_editingPersonality");
-
-            windowTextField?.SetValue(window, text);
+            if (window is PersonaEditorWindow editor)
+                editor.EditingPersonality = text;
         }
 
         private static Type _hospitalityCompType;
@@ -1263,7 +1253,7 @@ namespace Ustas.RimAI.Communication.Personas
                     sb.AppendLine($"Gender: {p.gender}");
                     sb.AppendLine($"Age: {p.ageTracker.AgeBiologicalYears}");
                     sb.AppendLine($"Current Status: {GetPawnSocialStatus(p)}");
-                    
+
                     if (p.Faction != null)
                     {
                         // 1. 玩家派系 (Player Faction)
@@ -1450,7 +1440,7 @@ namespace Ustas.RimAI.Communication.Personas
                             relation == PawnRelationDefOf.Fiance ||
                             // 2. 牵绊 (人与动物)
                             relation == PawnRelationDefOf.Bond ||
-                            // 3. 机械师主人 (Overseer) 
+                            // 3. 机械师主人 (Overseer)
                             relation.defName == "Overseer";
 
                         if (!isRelevant) continue;
@@ -1672,7 +1662,7 @@ namespace Ustas.RimAI.Communication.Personas
                     }
                 }
 
-                // 新增：常识注入 (最后执行) 
+                // 新增：常识注入 (最后执行)
                 if (ctx.Inc_CommonKnowledge)
                 {
                     // ★ 传入 p ★
@@ -1948,8 +1938,8 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch { }
         }
-        
-        
+
+
         // ★★★ 新增：Scriban 渲染相关的反射缓存 ★★★
         private static Type _contextType;
         private static Type _parserType;
@@ -2030,6 +2020,6 @@ namespace Ustas.RimAI.Communication.Personas
                 return rawText;
             }
         }
-        
+
     }
 }

@@ -1,113 +1,17 @@
-using HarmonyLib;
 using Verse;
 using Ustas.RimAI.Communication.Data;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Reflection;
-using System; // 用于 Exception
+using System;
 
 namespace Ustas.RimAI.Communication.Personas
 {
-    [HarmonyPatch(typeof(Hediff_Persona), "GetOrAddNew")]
     public static class Patch_GetOrAddNew
     {
 	// 最近分配记录：<预设ID, 分配时间>
         private static Dictionary<string, int> recentAssignments = new Dictionary<string, int>();
         private const int CACHE_DURATION_TICKS = 600; // 10秒 = 600 ticks (60 ticks/秒)
         private const int MAX_RETRY_ATTEMPTS = 2; // 最多重试2次，总共3次尝试
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            try
-            {
-                // 1. 精确锁定目标方法 (更稳健的查找)
-                MethodInfo targetMethod = null;
-
-                // 首先尝试常规方式
-                try
-                {
-                    targetMethod = AccessTools.Method(
-                        typeof(GenCollection),
-                        nameof(GenCollection.RandomElement),
-                        generics: new[] { typeof(PersonalityData) },
-                        parameters: new[] { typeof(IEnumerable<PersonalityData>) }
-                    );
-                }
-                catch
-                {
-                    targetMethod = null;
-                }
-
-                // 如果常规方式失败，退回到手动扫描并构造泛型方法
-                if (targetMethod == null)
-                {
-                    var methods = typeof(GenCollection).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-                    foreach (var m in methods)
-                    {
-                        if (m.Name != "RandomElement") continue;
-                        if (!m.IsGenericMethodDefinition) continue;
-                        var pars = m.GetParameters();
-                        if (pars.Length != 1) continue;
-                        var ptype = pars[0].ParameterType;
-                        if (!ptype.IsGenericType) continue;
-                        if (ptype.GetGenericTypeDefinition() != typeof(IEnumerable<>)) continue;
-
-                        try
-                        {
-                            targetMethod = m.MakeGenericMethod(typeof(PersonalityData));
-                            break;
-                        }
-                        catch
-                        {
-                            // 忽略并继续查找
-                        }
-                    }
-                }
-
-                if (targetMethod == null)
-                {
-                    Log.Error("[RimAI.Personas] Transpiler failed: Could not find target method GenCollection.RandomElement<PersonalityData>(IEnumerable). Auto-assignment will be disabled.");
-                    return instructions;
-                }
-
-                // 2. 找到替换方法
-                var replacementMethod = AccessTools.Method(typeof(Patch_GetOrAddNew), nameof(AssignViaRulesOrRandom));
-
-                // 3. 遍历和替换
-                var codes = new List<CodeInstruction>(instructions);
-                bool patched = false;
-                for (int i = 0; i < codes.Count; i++)
-                {
-                    if (codes[i].Calls(targetMethod))
-                    {
-                        // a. 插入 pawn 参数 (GetOrAddNew 的第一个参数)
-                        codes.Insert(i, new CodeInstruction(OpCodes.Ldarg_0)); // pawn
-
-                        // b. 替换调用指令
-                        codes[i + 1] = new CodeInstruction(OpCodes.Call, replacementMethod);
-
-                        patched = true;
-                        break;
-                    }
-                }
-
-                if (!patched)
-                {
-                    Log.Warning("[RimAI.Personas] Transpiler WARNING: Could not find call to RandomElement in Hediff_Persona.GetOrAddNew. Auto-assignment will not work.");
-                }
-
-                return codes.AsEnumerable();
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[RimAI.Personas] Transpiler CRITICAL ERROR: {ex.Message}. Auto-assignment is disabled.");
-                return instructions; // 发生任何错误都返回原始代码，保证游戏能运行
-            }
-        }
-
-        /// <summary>
-        /// 我们的替换方法。它接收原版随机池和 Pawn，返回一个我们选择的 PersonalityData。
-        /// </summary>
         public static PersonalityData AssignViaRulesOrRandom(IEnumerable<PersonalityData> vanillaPool, Pawn pawn)
         {
             // 在我们的规则逻辑执行前，先做一个基础安全检查
@@ -181,7 +85,7 @@ namespace Ustas.RimAI.Communication.Personas
            // 4. 随机抽取（带重试机制避免短时间重复）
             string pickId = null;
             int currentTick = Find.TickManager.TicksGame;
-            
+
             for (int attempt = 0; attempt <= MAX_RETRY_ATTEMPTS; attempt++)
             {
                 // ★ 添加随机扰动，确保RNG状态被推进 ★
@@ -191,14 +95,14 @@ namespace Ustas.RimAI.Communication.Personas
                     Rand.Range(0, 1000); // 推进RNG状态
                 }
                 pickId = candidateIds.RandomElement();
-                
+
                 // 检查是否在最近使用过
                 if (!recentAssignments.ContainsKey(pickId))
                 {
                     // 未被最近使用，可以分配
                     break;
                 }
-                
+
                 // 如果是最后一次尝试，即使重复也接受
                 if (attempt == MAX_RETRY_ATTEMPTS)
                 {
@@ -206,15 +110,15 @@ namespace Ustas.RimAI.Communication.Personas
                         Log.Message($"[Director] Preset '{pickId}' was recently used, but accepting after {MAX_RETRY_ATTEMPTS + 1} attempts (pool size: {candidateIds.Count})");
                     break;
                 }
-                
+
                 // 否则重试
                 if (PersonasMod.Settings.EnableDebugLog)
                     Log.Message($"[Director] Preset '{pickId}' was recently used, retrying... (attempt {attempt + 1}/{MAX_RETRY_ATTEMPTS + 1})");
             }
-            
+
             // 5. 记录本次分配
             recentAssignments[pickId] = currentTick;
-            
+
             return settings.userPresets.Find(x => x.id == pickId);
         }
 
@@ -228,7 +132,7 @@ namespace Ustas.RimAI.Communication.Personas
                 .Where(kvp => currentTick - kvp.Value > CACHE_DURATION_TICKS)
                 .Select(kvp => kvp.Key)
                 .ToList();
-            
+
             foreach (var key in expiredKeys)
             {
                 recentAssignments.Remove(key);
