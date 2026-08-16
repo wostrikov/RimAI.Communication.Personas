@@ -35,7 +35,7 @@ namespace Ustas.RimAI.Communication.Personas
 		public static string BuildCompleteData(Pawn p, bool simpleEquipment = false)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			ContextSettings context = DirectorMod.Settings.Context;
+			ContextSettings context = PersonasMod.Settings.Context;
 			if (context.Inc_Basic)
 			{
 				stringBuilder.AppendLine(GetBasicInfo(p));

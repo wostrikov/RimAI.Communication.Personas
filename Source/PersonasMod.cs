@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq; // 确保引用 Linq
@@ -7,9 +7,9 @@ using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
 {
-    public class DirectorMod : Mod
+    public class PersonasMod : Mod
     {
-        public static DirectorSettings Settings;
+        public static PersonasSettings Settings;
 
         // 全局滚动条的位置状态
         private Vector2 mainScrollPosition = Vector2.zero;
@@ -17,9 +17,9 @@ namespace Ustas.RimAI.Communication.Personas
         // 缓存 RimPsyche 加载状态
         private static bool _isRimPsycheLoaded = false;
 
-        public DirectorMod(ModContentPack content) : base(content)
+        public PersonasMod(ModContentPack content) : base(content)
         {
-            Settings = GetSettings<DirectorSettings>();
+            Settings = GetSettings<PersonasSettings>();
             _isRimPsycheLoaded = AccessTools.TypeByName("Maux36.RimPsyche.CompPsyche") != null;
             LongEventHandler.ExecuteWhenFinished(DirectorStartup.Initialize);
         }
@@ -28,9 +28,7 @@ namespace Ustas.RimAI.Communication.Personas
 
         public override void DoSettingsWindowContents(Rect inRect)
         {
-            AccessTools.TypeByName("Ustas.RimAI.Core.Modules.RimAISettingsNavigation")
-                ?.GetMethod("Open")
-                ?.Invoke(null, new object[] { "communication", "personas" });
+            Ustas.RimAI.Core.Modules.RimAISettingsNavigation.Open("communication", "personas");
             // --- 1. 计算内容总高度 (预估) ---
             // 标题(30) + 按钮(30) + 开关(24*4) + 过滤器(200+) + 模板选择(60) + Prompt编辑(300+)
             // 给一个足够大的高度，或者动态计算。这里给 1200f 足够了。
@@ -157,10 +155,10 @@ namespace Ustas.RimAI.Communication.Personas
             if (Widgets.ButtonText(headerRect.RightPart(0.3f), "RPD_Button_Reset".Translate()))
             {
                 // 重置逻辑
-                if (settings.selectedPresetIndex == 0) { currentPreset.label = "Standard (3 Options)"; currentPreset.text = DirectorSettings.DefaultPrompt_Standard; }
-                else if (settings.selectedPresetIndex == 1) { currentPreset.label = "Simple (One Shot)"; currentPreset.text = DirectorSettings.DefaultPrompt_Simple; }
-                else if (settings.selectedPresetIndex == 2) { currentPreset.label = "Strict (Backstory)"; currentPreset.text = DirectorSettings.DefaultPrompt_Strict; }
-                else if (settings.selectedPresetIndex == 3) { currentPreset.label = "Evolution (Update Only)"; currentPreset.text = DirectorSettings.DefaultPrompt_Evolve; }
+                if (settings.selectedPresetIndex == 0) { currentPreset.label = "Standard (3 Options)"; currentPreset.text = PersonasSettings.DefaultPrompt_Standard; }
+                else if (settings.selectedPresetIndex == 1) { currentPreset.label = "Simple (One Shot)"; currentPreset.text = PersonasSettings.DefaultPrompt_Simple; }
+                else if (settings.selectedPresetIndex == 2) { currentPreset.label = "Strict (Backstory)"; currentPreset.text = PersonasSettings.DefaultPrompt_Strict; }
+                else if (settings.selectedPresetIndex == 3) { currentPreset.label = "Evolution (Update Only)"; currentPreset.text = PersonasSettings.DefaultPrompt_Evolve; }
             }
 
             GUI.color = Color.gray;
@@ -173,7 +171,7 @@ namespace Ustas.RimAI.Communication.Personas
             // 控制行 (Token & Dropdown)
             Rect ctrlRect = list.GetRect(26f);
             int userChar = currentPreset.text?.Length ?? 0;
-            int hiddenChar = DirectorSettings.HiddenTechnicalPrompt_Single.Length;
+            int hiddenChar = PersonasSettings.HiddenTechnicalPrompt_Single.Length;
             int estTokens = (int)((userChar + hiddenChar) / 2.5f);
 
             GUI.color = Color.gray;

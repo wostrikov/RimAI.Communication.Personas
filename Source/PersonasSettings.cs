@@ -82,7 +82,7 @@ namespace Ustas.RimAI.Communication.Personas
         }
     }
 
-    public class DirectorSettings : ModSettings
+    public class PersonasSettings : ModSettings
     {
         // =============================================================
         // Prompt Templates (Default Constants)

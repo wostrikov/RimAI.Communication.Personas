@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data; // 引用以访问 Constant
@@ -11,7 +11,7 @@ namespace Ustas.RimAI.Communication.Personas
         {
             try
             {
-                var settings = DirectorMod.Settings;
+                var settings = PersonasMod.Settings;
                 if (settings == null) return;
 
                 // 防空
@@ -21,12 +21,12 @@ namespace Ustas.RimAI.Communication.Personas
                 // ★★★ 核心修复 C：先备份真·原版数据 ★★★
                 // 在我们做任何同步/覆盖之前，先看看 Constant.Personalities 里有什么
                 // 此时游戏刚加载完，Constant 里肯定是干净的原版数据
-                if (DirectorSettings.OriginalVanillaCache == null && Constant.Personalities != null)
+                if (PersonasSettings.OriginalVanillaCache == null && Constant.Personalities != null)
                 {
                     if (Constant.Personalities is IEnumerable<PersonalityData> list)
                     {
-                        DirectorSettings.OriginalVanillaCache = new List<PersonalityData>(list);
-                        Log.Message($"[RimAI.Personas] Cached {DirectorSettings.OriginalVanillaCache.Count} original vanilla presets.");
+                        PersonasSettings.OriginalVanillaCache = new List<PersonalityData>(list);
+                        Log.Message($"[RimAI.Personas] Cached {PersonasSettings.OriginalVanillaCache.Count} original vanilla presets.");
                     }
                 }
 

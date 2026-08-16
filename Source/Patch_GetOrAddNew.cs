@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Verse;
 using Ustas.RimAI.Communication.Data;
 using System.Linq;
@@ -123,7 +123,7 @@ namespace Ustas.RimAI.Communication.Personas
             // 如果我们的规则找到了一个预设
             if (preset != null)
             {
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Message($"[Director] Auto-assigned '{preset.label}' to {pawn.Name} via rule or global pool.");
 
                 // 返回一个新的 PersonalityData 实例
@@ -131,7 +131,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
 
             // 如果我们的规则系统什么都没找到（比如库是空的），就回退到原版随机池
-            if (DirectorMod.Settings.EnableDebugLog)
+            if (PersonasMod.Settings.EnableDebugLog)
                 Log.Message($"[Director] No presets found for {pawn.Name}. Falling back to vanilla random pool.");
 
             return vanillaPool.RandomElement();
@@ -142,7 +142,7 @@ namespace Ustas.RimAI.Communication.Personas
         /// </summary>
         public static CustomPreset FindPresetFor(Pawn p)
         {
-            var settings = DirectorMod.Settings;
+            var settings = PersonasMod.Settings;
             if (settings.userPresets == null || !settings.userPresets.Any()) return null;
 
             List<string> candidateIds = new List<string>();
@@ -202,13 +202,13 @@ namespace Ustas.RimAI.Communication.Personas
                 // 如果是最后一次尝试，即使重复也接受
                 if (attempt == MAX_RETRY_ATTEMPTS)
                 {
-                    if (DirectorMod.Settings.EnableDebugLog)
+                    if (PersonasMod.Settings.EnableDebugLog)
                         Log.Message($"[Director] Preset '{pickId}' was recently used, but accepting after {MAX_RETRY_ATTEMPTS + 1} attempts (pool size: {candidateIds.Count})");
                     break;
                 }
                 
                 // 否则重试
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Message($"[Director] Preset '{pickId}' was recently used, retrying... (attempt {attempt + 1}/{MAX_RETRY_ATTEMPTS + 1})");
             }
             

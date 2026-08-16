@@ -34,7 +34,7 @@ namespace Ustas.RimAI.Communication.Personas
         public static bool Prefix(Player2Client __instance, ref Task<Payload> __result, string instruction, List<(Role role, string message)> messages)
         {
 
-            if (DirectorMod.Settings.EnableDebugLog)
+            if (PersonasMod.Settings.EnableDebugLog)
                 Log.Message("[RimAI.Personas] Player2 Bypass: Intercepted non-streaming call, rerouting to streaming channel.");
 
             async Task<Payload> BypassAsync()

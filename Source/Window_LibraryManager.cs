@@ -1,4 +1,4 @@
-﻿using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Data;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,13 +31,13 @@ namespace Ustas.RimAI.Communication.Personas
         public override void DoWindowContents(Rect inRect)
         {
             // 在执行任何操作之前，确保列表对象已创建
-            if (DirectorMod.Settings.userPresets == null)
+            if (PersonasMod.Settings.userPresets == null)
             {
-                DirectorMod.Settings.userPresets = new List<CustomPreset>();
+                PersonasMod.Settings.userPresets = new List<CustomPreset>();
             }
-            if (DirectorMod.Settings.assignmentRules == null)
+            if (PersonasMod.Settings.assignmentRules == null)
             {
-                DirectorMod.Settings.assignmentRules = new List<AssignmentRule>();
+                PersonasMod.Settings.assignmentRules = new List<AssignmentRule>();
             }
             // --- 1. 手动定义所有顶层区域 ---
             float topBarHeight = 35f; // 给重置按钮留一行
@@ -64,9 +64,9 @@ namespace Ustas.RimAI.Communication.Personas
             if (Widgets.ButtonText(resetRect, "RPD_Library_ResetDefaults".Translate()))
             {
                 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("RPD_Library_ResetConfirm".Translate(), () => {
-                    DirectorMod.Settings.userPresets.Clear();
-                    DirectorMod.Settings.assignmentRules.Clear();
-                    DirectorMod.Settings.InitLibrary();
+                    PersonasMod.Settings.userPresets.Clear();
+                    PersonasMod.Settings.assignmentRules.Clear();
+                    PersonasMod.Settings.InitLibrary();
                     selectedPreset = null;
                     selectedRule = null;
                 }));
@@ -121,7 +121,7 @@ namespace Ustas.RimAI.Communication.Personas
             if (Widgets.ButtonText(filterRect, "RPD_Library_Category".Translate(selectedCategoryFilter)))
             {
                 List<FloatMenuOption> opts = new List<FloatMenuOption> { new FloatMenuOption("All", () => selectedCategoryFilter = "All") };
-                foreach (var cat in DirectorMod.Settings.userPresets.Select(p => p.category).Distinct())
+                foreach (var cat in PersonasMod.Settings.userPresets.Select(p => p.category).Distinct())
                     opts.Add(new FloatMenuOption(cat, () => selectedCategoryFilter = cat));
                 Find.WindowStack.Add(new FloatMenu(opts));
             }
@@ -130,7 +130,7 @@ namespace Ustas.RimAI.Communication.Personas
             // 列表区：高度扣除搜索、分类和底部的 Add 按钮
             float bottomMargin = 70f; // ★ 两行按钮的高度 (30 + 5 + 30)
             Rect listRect = new Rect(innerLeft.x, topY, innerLeft.width, innerLeft.height - (topY - innerLeft.y) - bottomMargin);
-            var filtered = DirectorMod.Settings.userPresets
+            var filtered = PersonasMod.Settings.userPresets
                 .Where(p => searchWidget.filter.Matches(p.label) && (selectedCategoryFilter == "All" || p.category == selectedCategoryFilter)).ToList();
 
             DrawLeftList(listRect, filtered,
@@ -154,7 +154,7 @@ namespace Ustas.RimAI.Communication.Personas
             if (Widgets.ButtonText(new Rect(bottomRow1.x, bottomRow1.y, btnWidth, 30f), "RPD_Library_CreatePreset".Translate()))
             {
                 var n = new CustomPreset("New Preset", "...") { category = "Custom", enabled = true };
-                DirectorMod.Settings.userPresets.Add(n);
+                PersonasMod.Settings.userPresets.Add(n);
                 selectedPreset = n;
             }
 
@@ -165,7 +165,7 @@ namespace Ustas.RimAI.Communication.Personas
                 GUI.color = new Color(1f, 0.5f, 0.5f);
                 if (Widgets.ButtonText(delRect, "RPD_Library_DeletePreset".Translate()))
                 {
-                    DirectorMod.Settings.userPresets.Remove(selectedPreset);
+                    PersonasMod.Settings.userPresets.Remove(selectedPreset);
                     selectedPreset = null;
                 }
                 GUI.color = Color.white;
@@ -178,7 +178,7 @@ namespace Ustas.RimAI.Communication.Personas
             // 左: Manage Vanilla
             if (Widgets.ButtonText(new Rect(bottomRow2.x, bottomRow2.y, manageBtnWidth, 30f), "RPD_Library_ManageVanilla".Translate()))
             {
-                OpenManageMenu("Vanilla", DirectorSettings.OriginalVanillaCache, null);
+                OpenManageMenu("Vanilla", PersonasSettings.OriginalVanillaCache, null);
             }
 
             // 右: Manage Built-in
@@ -217,7 +217,7 @@ namespace Ustas.RimAI.Communication.Personas
         private void OpenManageMenu(string targetCategory, List<Ustas.RimAI.Communication.Data.PersonalityData> vanillaSource = null, List<CustomPreset> builtInSource = null)
         {
             List<FloatMenuOption> opts = new List<FloatMenuOption>();
-            var userPresets = DirectorMod.Settings.userPresets;
+            var userPresets = PersonasMod.Settings.userPresets;
 
             // --- 1. 添加全部 ---
             opts.Add(new FloatMenuOption("RPD_Library_AddAll".Translate(targetCategory.Translate()), () =>
@@ -342,7 +342,7 @@ namespace Ustas.RimAI.Communication.Personas
             // 列表区：高度扣除搜索、分类和底部的按钮
             float bottomMargin = 70f;
             Rect listRect = new Rect(innerLeft.x, topY, innerLeft.width, innerLeft.height - (topY - innerLeft.y) - bottomMargin);
-            var filtered = DirectorMod.Settings.assignmentRules
+            var filtered = PersonasMod.Settings.assignmentRules
                 .Where(r => searchWidget.filter.Matches(r.targetDefName ?? "")).ToList();
 
             DrawLeftList(listRect, filtered,
@@ -363,7 +363,7 @@ namespace Ustas.RimAI.Communication.Personas
             if (Widgets.ButtonText(addRect, "RPD_Library_CreateRule".Translate()))
             {
                 var n = new AssignmentRule { targetDefName = null, type = RuleType.FactionDef };
-                DirectorMod.Settings.assignmentRules.Add(n);
+                PersonasMod.Settings.assignmentRules.Add(n);
                 selectedRule = n;
             }
 
@@ -374,7 +374,7 @@ namespace Ustas.RimAI.Communication.Personas
                 GUI.color = Color.red;
                 if (Widgets.ButtonText(delRect, "RPD_Library_DeleteRule".Translate()))
                 {
-                    DirectorMod.Settings.assignmentRules.Remove(selectedRule);
+                    PersonasMod.Settings.assignmentRules.Remove(selectedRule);
                     selectedRule = null;
                 }
                 GUI.color = Color.white;
@@ -411,7 +411,7 @@ namespace Ustas.RimAI.Communication.Personas
                 Rect poolRect = editor.GetRect(poolH);
                 Widgets.DrawMenuSection(poolRect);
 
-                var presets = DirectorMod.Settings.userPresets;
+                var presets = PersonasMod.Settings.userPresets;
                 Rect viewRect = new Rect(0, 0, poolRect.width - 16f, presets.Count * 26f);
                 Widgets.BeginScrollView(poolRect, ref poolScroll, viewRect);
                 for (int i = 0; i < presets.Count; i++)

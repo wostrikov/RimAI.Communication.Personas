@@ -1,1 +1,6 @@
-<Project><PropertyGroup><BaseOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk-PersonaDirector\bin\</BaseOutputPath><BaseIntermediateOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk-PersonaDirector\obj\</BaseIntermediateOutputPath></PropertyGroup></Project>
+﻿<Project>
+  <PropertyGroup>
+    <BaseOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

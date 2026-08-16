@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using Ustas.RimAI.Communication.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace Ustas.RimAI.Communication.Personas
     {
         public static void SyncToRimTalk()
         {
-            var settings = DirectorMod.Settings;
+            var settings = PersonasMod.Settings;
             if (settings == null || settings.userPresets == null) return;
 
             try

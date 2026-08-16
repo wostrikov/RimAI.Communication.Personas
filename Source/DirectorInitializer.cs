@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 using RimWorld;
 using Ustas.RimAI.Communication.Data;
 using HarmonyLib; // 用于反射读取 Hediff 内容
@@ -14,7 +14,7 @@ namespace Ustas.RimAI.Communication.Personas
             base.FinalizeInit();
 
             // 2. 执行数据迁移 (Chattiness 2.0 -> 1.0)
-            DirectorMod.Settings.MigrateChattinessValuesIfNeeded();
+            PersonasMod.Settings.MigrateChattinessValuesIfNeeded();
 
             // 3. 应用规则到现有 Pawn (解决中途加 Mod 没人设的问题)
             ApplyRulesToExistingPawns();

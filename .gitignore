@@ -1,0 +1,11 @@
+﻿# Build artifacts
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+*.log
+log.txt
+**/log.txt
+*.tmp
+*.cache

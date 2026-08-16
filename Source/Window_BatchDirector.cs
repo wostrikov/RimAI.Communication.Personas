@@ -1,4 +1,4 @@
-﻿using Ustas.RimAI.Communication.Data; 
+using Ustas.RimAI.Communication.Data; 
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +42,7 @@ namespace Ustas.RimAI.Communication.Personas
             this.absorbInputAroundWindow = false;
             this.closeOnClickedOutside = false;
 
-            if (DirectorMod.Settings.BatchFilters == null) DirectorMod.Settings.InitFilters();
+            if (PersonasMod.Settings.BatchFilters == null) PersonasMod.Settings.InitFilters();
             RefreshPawnCache();
         }
 
@@ -170,15 +170,15 @@ namespace Ustas.RimAI.Communication.Personas
             Widgets.Label(headerRect.LeftPart(0.7f), "RPD_Batch_SceneNotes".Translate());
             if (Widgets.ButtonText(headerRect.RightPart(0.3f), "RPD_Button_Clear".Translate()))
             {
-                DirectorMod.Settings.directorNotes = "";
+                PersonasMod.Settings.directorNotes = "";
             }
-            DirectorMod.Settings.directorNotes = Widgets.TextArea(list.GetRect(60f), DirectorMod.Settings.directorNotes);
+            PersonasMod.Settings.directorNotes = Widgets.TextArea(list.GetRect(60f), PersonasMod.Settings.directorNotes);
         }
 
         private void DrawFilterSection(Listing_Standard list)
         {
             Rect sectionRect = list.GetRect(60f);
-            var filters = DirectorMod.Settings.BatchFilters;
+            var filters = PersonasMod.Settings.BatchFilters;
             float toolY = sectionRect.y;
             float curX = sectionRect.x;
 
@@ -213,7 +213,7 @@ namespace Ustas.RimAI.Communication.Personas
             Rect promptRect = new Rect(sectionRect.xMax - dropdownWidth, toolY, dropdownWidth, 24f);
 
             // 获取当前 Label
-            var settings = DirectorMod.Settings;
+            var settings = PersonasMod.Settings;
             if (settings.presets == null) settings.InitPresets();
             string currentLabel = settings.presets[settings.selectedPresetIndex].label;
             if (currentLabel.Length > 15) currentLabel = currentLabel.Substring(0, 12) + "..."; // 截断过长名字
@@ -550,7 +550,7 @@ namespace Ustas.RimAI.Communication.Personas
             cachedPawns.Clear();
             Map map = Find.CurrentMap;
             if (map == null || map.mapPawns == null) return;
-            var filters = DirectorMod.Settings.BatchFilters;
+            var filters = PersonasMod.Settings.BatchFilters;
             if (filters == null) return;
 
             var pawnsToShow = new List<Pawn>();

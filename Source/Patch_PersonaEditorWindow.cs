@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Ustas.RimAI.Communication.UI;
 using RimWorld;
 using System.Threading.Tasks;
@@ -53,9 +53,9 @@ namespace Ustas.RimAI.Communication.Personas
             Rect timeRect = new Rect(evolveRect.xMax + spacing, footerY, buttonWidth, buttonHeight);
 
             // A. 绘制 Edit Notes (如果开启)
-            if (DirectorMod.Settings.Context.Inc_DirectorNotes)
+            if (PersonasMod.Settings.Context.Inc_DirectorNotes)
             {
-                string currentNotes = DirectorMod.Settings.directorNotes;
+                string currentNotes = PersonasMod.Settings.directorNotes;
                 bool hasNotes = !string.IsNullOrEmpty(currentNotes);
                 Color oldColor = GUI.color;
                 if (hasNotes) GUI.color = Color.cyan;
@@ -75,7 +75,7 @@ namespace Ustas.RimAI.Communication.Personas
                 }
             }
 
-            if (DirectorMod.Settings.enableEvolveFeature)
+            if (PersonasMod.Settings.enableEvolveFeature)
             {
                 // --- Evolve 按钮 ---
                 bool isEvolving = evolveTask != null && !evolveTask.IsCompleted;

@@ -1,4 +1,4 @@
-﻿using Ustas.RimAI.Communication.API;
+using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
 using System;
@@ -43,7 +43,7 @@ namespace Ustas.RimAI.Communication.Personas
             RimTalkPromptAPI.RegisterContextVariable(
                 ModId,
                 "director_notes", 
-                _ => DirectorMod.Settings.directorNotes, 
+                _ => PersonasMod.Settings.directorNotes, 
                 "Global notes from Persona Director" 
             );
             

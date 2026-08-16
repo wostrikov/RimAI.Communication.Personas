@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Verse;
 using RimWorld;
 using System.Linq;
@@ -7,14 +7,14 @@ namespace Ustas.RimAI.Communication.Personas
 {
     public class MainButtonWorker_Director : MainButtonWorker
     {
-        public override bool Visible => DirectorMod.Settings.ShowMainButton;
+        public override bool Visible => PersonasMod.Settings.ShowMainButton;
 
         public override void Activate()
         {
             // 优先级 1: Shift + 左键 打开设置
             if (Event.current.shift)
             {
-                var mod = LoadedModManager.GetMod<DirectorMod>();
+                var mod = LoadedModManager.GetMod<PersonasMod>();
                 if (mod != null) Find.WindowStack.Add(new Dialog_ModSettings(mod));
                 return; // 处理完就退出
             }

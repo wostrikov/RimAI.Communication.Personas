@@ -51,7 +51,7 @@ namespace Ustas.RimAI.Communication.Personas
                 return;
 
             // 3. 检查设置
-            var settings = DirectorMod.Settings;
+            var settings = PersonasMod.Settings;
             if (settings.userPresets == null || !settings.userPresets.Any()) return;
 
             // 4. 匹配规则
@@ -92,7 +92,7 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 DirectorUtils.ApplyPersonalityToPawn(p, new PersonalityData(preset.personaText, preset.chattiness));
 
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Message($"[Director] Auto-assigned preset '{preset.label}' to {p.Name}. ({(candidateIds.Count == settings.userPresets.Count ? "Global Pool" : "Rule-based Pool")})");
             }
         }

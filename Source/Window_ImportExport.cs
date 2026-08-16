@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -186,8 +186,8 @@ namespace Ustas.RimAI.Communication.Personas
         {
             var dataToExport = new TempExportData
             {
-                Presets = DirectorMod.Settings.userPresets,
-                Rules = DirectorMod.Settings.assignmentRules
+                Presets = PersonasMod.Settings.userPresets,
+                Rules = PersonasMod.Settings.assignmentRules
             };
             return Scribe.saver.DebugOutputFor(dataToExport);
         }
@@ -218,16 +218,16 @@ namespace Ustas.RimAI.Communication.Personas
 
                 if (overwrite)
                 {
-                    DirectorMod.Settings.userPresets = loadedData.Presets ?? new List<CustomPreset>();
-                    DirectorMod.Settings.assignmentRules = loadedData.Rules ?? new List<AssignmentRule>();
+                    PersonasMod.Settings.userPresets = loadedData.Presets ?? new List<CustomPreset>();
+                    PersonasMod.Settings.assignmentRules = loadedData.Rules ?? new List<AssignmentRule>();
                 }
                 else
                 {
                     if (loadedData.Presets != null)
-                        DirectorMod.Settings.userPresets.AddRange(loadedData.Presets);
+                        PersonasMod.Settings.userPresets.AddRange(loadedData.Presets);
 
                     if (loadedData.Rules != null)
-                        DirectorMod.Settings.assignmentRules.AddRange(loadedData.Rules);
+                        PersonasMod.Settings.assignmentRules.AddRange(loadedData.Rules);
                 }
 
                 PresetSynchronizer.SyncToRimTalk();

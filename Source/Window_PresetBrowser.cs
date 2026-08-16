@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Verse;
 using RimWorld;
 using System.Collections.Generic;
@@ -24,9 +24,9 @@ namespace Ustas.RimAI.Communication.Personas
             forcePause = true;
             absorbInputAroundWindow = true;
 
-            if (DirectorMod.Settings.userPresets == null)
+            if (PersonasMod.Settings.userPresets == null)
             {
-                DirectorMod.Settings.userPresets = new List<CustomPreset>();
+                PersonasMod.Settings.userPresets = new List<CustomPreset>();
             }
 
         }
@@ -52,7 +52,7 @@ namespace Ustas.RimAI.Communication.Personas
             Widgets.DrawMenuSection(rect);
             Rect innerRect = rect.ContractedBy(5f);
 
-            var allCategories = DirectorMod.Settings.userPresets
+            var allCategories = PersonasMod.Settings.userPresets
                 .Select(p => p.category ?? "Default").Distinct().OrderBy(c => c).ToList();
             allCategories.Insert(0, "All");
 
@@ -113,7 +113,7 @@ namespace Ustas.RimAI.Communication.Personas
             float listHeight = innerRect.height * 0.55f;
             Rect listOutRect = listing.GetRect(listHeight); // 用 Listing 预留空间
 
-            var presetsToShow = DirectorMod.Settings.userPresets
+            var presetsToShow = PersonasMod.Settings.userPresets
                 .Where(p => selectedCategory == "All" || (p.category ?? "Default") == selectedCategory)
                 .ToList();
 

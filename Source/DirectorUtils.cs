@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Ustas.RimAI.Communication.Client;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
@@ -47,12 +47,12 @@ namespace Ustas.RimAI.Communication.Personas
 
         public static string GetFinalPrompt(bool isBatch, string dataContent)
         {
-            string userPrompt = DirectorMod.Settings.GetActivePrompt();
-            if (string.IsNullOrEmpty(userPrompt)) userPrompt = DirectorSettings.DefaultPrompt_Standard;
+            string userPrompt = PersonasMod.Settings.GetActivePrompt();
+            if (string.IsNullOrEmpty(userPrompt)) userPrompt = PersonasSettings.DefaultPrompt_Standard;
 
             string technicalPrompt = isBatch
-                ? DirectorSettings.HiddenTechnicalPrompt_Batch
-                : DirectorSettings.HiddenTechnicalPrompt_Single;
+                ? PersonasSettings.HiddenTechnicalPrompt_Batch
+                : PersonasSettings.HiddenTechnicalPrompt_Single;
 
             return userPrompt.Replace("{LANG}", CurrentLanguage) +
            "\n" + technicalPrompt +
@@ -79,7 +79,7 @@ namespace Ustas.RimAI.Communication.Personas
             catch
             {
                 // 如果失败，返回 null，外部会捕获并回退
-                if (DirectorMod.Settings.EnableDebugLog) Log.Warning("[Director] Failed to create Scriban Context.");
+                if (PersonasMod.Settings.EnableDebugLog) Log.Warning("[Director] Failed to create Scriban Context.");
                 return null;
             }
 
@@ -119,8 +119,8 @@ namespace Ustas.RimAI.Communication.Personas
 
             // D. 注入 JSON 协议
             string technicalProtocol = isBatch
-                ? DirectorSettings.HiddenTechnicalPrompt_Batch
-                : DirectorSettings.HiddenTechnicalPrompt_Single;
+                ? PersonasSettings.HiddenTechnicalPrompt_Batch
+                : PersonasSettings.HiddenTechnicalPrompt_Single;
 
             // 协议追加在 User 内容最后
             userBuilder.AppendLine("\n" + technicalProtocol);
@@ -154,11 +154,11 @@ namespace Ustas.RimAI.Communication.Personas
         {
             try
             {
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Message($"[Director] Gen Data for {pawnNameForLog}...");
 
                 // 优先尝试高级预设
-                string presetName = DirectorMod.Settings.rimTalkPreset_Single;
+                string presetName = PersonasMod.Settings.rimTalkPreset_Single;
                 if (!string.IsNullOrEmpty(presetName) && presetName != "None (Use Internal)")
                 {
                     var result = await GenerateFromPreset(pawn, presetName, false);
@@ -166,10 +166,10 @@ namespace Ustas.RimAI.Communication.Personas
                 }
 
                 // 回退到内置逻辑
-                string userPrompt = DirectorMod.Settings.GetActivePrompt(false);
-                if (string.IsNullOrEmpty(userPrompt)) userPrompt = DirectorSettings.DefaultPrompt_Standard;
+                string userPrompt = PersonasMod.Settings.GetActivePrompt(false);
+                if (string.IsNullOrEmpty(userPrompt)) userPrompt = PersonasSettings.DefaultPrompt_Standard;
 
-                string instruction = userPrompt.Replace("{LANG}", CurrentLanguage) + "\n" + DirectorSettings.HiddenTechnicalPrompt_Single;
+                string instruction = userPrompt.Replace("{LANG}", CurrentLanguage) + "\n" + PersonasSettings.HiddenTechnicalPrompt_Single;
                 string data = $"[Character Data]\n{characterData}";
 
                 // 标准调用：数据在 Prompt，指令在 Context
@@ -194,14 +194,14 @@ namespace Ustas.RimAI.Communication.Personas
         {
             try
             {
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                 {
                     Log.Message($"[Director] Batch Gen Data:\n{combinedData}");
                 }
 
-                string userInstruction = DirectorMod.Settings.GetActivePrompt(false);
-                if (string.IsNullOrEmpty(userInstruction)) userInstruction = DirectorSettings.DefaultPrompt_Standard;
-                string finalInstruction = userInstruction.Replace("{LANG}", CurrentLanguage) + "\n" + DirectorSettings.HiddenTechnicalPrompt_Batch;
+                string userInstruction = PersonasMod.Settings.GetActivePrompt(false);
+                if (string.IsNullOrEmpty(userInstruction)) userInstruction = PersonasSettings.DefaultPrompt_Standard;
+                string finalInstruction = userInstruction.Replace("{LANG}", CurrentLanguage) + "\n" + PersonasSettings.HiddenTechnicalPrompt_Batch;
                 string finalData = $"[Character Data]\n{combinedData}";
 
                 var request = new TalkRequest(finalData, representative)
@@ -272,7 +272,7 @@ namespace Ustas.RimAI.Communication.Personas
                 // 如果没找到方括号，说明格式彻底乱了，跳过
                 if (bracketIndex == -1)
                 {
-                    if (DirectorMod.Settings.EnableDebugLog) Log.Warning($"[Director] Invalid format (no bracket found): {part.Trim()}");
+                    if (PersonasMod.Settings.EnableDebugLog) Log.Warning($"[Director] Invalid format (no bracket found): {part.Trim()}");
                     continue;
                 }
                 
@@ -315,7 +315,7 @@ namespace Ustas.RimAI.Communication.Personas
                 }
                 else
                 {
-                    if (DirectorMod.Settings.EnableDebugLog)
+                    if (PersonasMod.Settings.EnableDebugLog)
                         Log.Warning($"[Director] Could not match result key '{keyPart}' to any pawn.");
                 }
             }
@@ -343,7 +343,7 @@ namespace Ustas.RimAI.Communication.Personas
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("--- Group Context ---");
-            if (!string.IsNullOrEmpty(DirectorMod.Settings.directorNotes)) sb.AppendLine(DirectorMod.Settings.directorNotes);
+            if (!string.IsNullOrEmpty(PersonasMod.Settings.directorNotes)) sb.AppendLine(PersonasMod.Settings.directorNotes);
 
             foreach (var p in pawns)
             {
@@ -527,7 +527,7 @@ namespace Ustas.RimAI.Communication.Personas
 
                 if (_memoryCompType == null || _memoryEntryType == null)
                 {
-                    if (DirectorMod.Settings.EnableDebugLog) Log.Warning("[Director] Memory types not found via reflection.");
+                    if (PersonasMod.Settings.EnableDebugLog) Log.Warning("[Director] Memory types not found via reflection.");
                     return null;
                 }
 
@@ -557,7 +557,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch (Exception ex)
             {
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Warning($"[Director] Critical error reading memories: {ex}");
                 return null;
             }
@@ -621,7 +621,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch (Exception ex)
             {
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Warning($"[Director] CK Injection Reflection failed: {ex.Message}");
             }
             return null;
@@ -688,7 +688,7 @@ namespace Ustas.RimAI.Communication.Personas
                 DirectorDataEngine.TempCurrentPersona = currentPersona;
 
                 // C. 决定使用哪种逻辑
-                string presetName = DirectorMod.Settings.rimTalkPreset_Evolve;
+                string presetName = PersonasMod.Settings.rimTalkPreset_Evolve;
                 string finalPrompt = "";
                 string finalContext = "";
 
@@ -741,12 +741,12 @@ namespace Ustas.RimAI.Communication.Personas
                         }
 
                         // 4. 加上 JSON 协议 (这是硬性要求，必须加在最后)
-                        systemSb.AppendLine("\n" + DirectorSettings.HiddenTechnicalPrompt_Single);
+                        systemSb.AppendLine("\n" + PersonasSettings.HiddenTechnicalPrompt_Single);
 
                         finalContext = systemSb.ToString();
                         finalPrompt = userSb.ToString();
 
-                        if (DirectorMod.Settings.EnableDebugLog)
+                        if (PersonasMod.Settings.EnableDebugLog)
                             Log.Message($"[Director] Advanced Preset Rendered.\nContext Len: {finalContext.Length}\nPrompt Len: {finalPrompt.Length}");
                     }
                     else
@@ -776,7 +776,7 @@ namespace Ustas.RimAI.Communication.Personas
                             timeInfo = $"Time passed since last update: {daysPassed} days.";
                             if (ageNow > ageThen) timeInfo += $" Character aged from {ageThen} to {ageNow}.";
 
-                            if (DirectorMod.Settings.Context.Inc_DataComparison)
+                            if (PersonasMod.Settings.Context.Inc_DataComparison)
                             {
                                 string oldSnapshot = worldComp.GetSnapshot(p);
                                 if (!string.IsNullOrEmpty(oldSnapshot))
@@ -791,7 +791,7 @@ namespace Ustas.RimAI.Communication.Personas
 
                     // 组装数据包
                     StringBuilder contextSb = new StringBuilder();
-                    var ctx = DirectorMod.Settings.Context;
+                    var ctx = PersonasMod.Settings.Context;
 
                     contextSb.AppendLine("[Basic Info]");
                     contextSb.AppendLine($"Name: {p.LabelShortCap}");
@@ -805,8 +805,8 @@ namespace Ustas.RimAI.Communication.Personas
 
                     if (!string.IsNullOrEmpty(comparisonBlock)) contextSb.AppendLine(comparisonBlock);
 
-                    if (ctx.Inc_DirectorNotes && !string.IsNullOrEmpty(DirectorMod.Settings.directorNotes))
-                        contextSb.AppendLine($"[Director's Notes]\n{DirectorMod.Settings.directorNotes}\n");
+                    if (ctx.Inc_DirectorNotes && !string.IsNullOrEmpty(PersonasMod.Settings.directorNotes))
+                        contextSb.AppendLine($"[Director's Notes]\n{PersonasMod.Settings.directorNotes}\n");
 
                     string memories = GetExternalMemories(p, lastTick);
                     if (!string.IsNullOrEmpty(memories))
@@ -821,7 +821,7 @@ namespace Ustas.RimAI.Communication.Personas
                         searchSource.Append($"{GetPawnSocialStatus(p)} ");
                         searchSource.Append($"{currentPersona} ");
                         if (!string.IsNullOrEmpty(memories)) searchSource.Append($"{memories} ");
-                        if (!string.IsNullOrEmpty(DirectorMod.Settings.directorNotes)) searchSource.Append($"{DirectorMod.Settings.directorNotes} ");
+                        if (!string.IsNullOrEmpty(PersonasMod.Settings.directorNotes)) searchSource.Append($"{PersonasMod.Settings.directorNotes} ");
 
                         string ck = GetCommonKnowledge(searchSource.ToString(), p);
                         if (!string.IsNullOrEmpty(ck))
@@ -829,8 +829,8 @@ namespace Ustas.RimAI.Communication.Personas
                     }
 
                     // 组装最终结果
-                    string userInstruction = DirectorMod.Settings.presets[3].text.Replace("{LANG}", Constant.Lang);
-                    string technicalProtocol = DirectorSettings.HiddenTechnicalPrompt_Single;
+                    string userInstruction = PersonasMod.Settings.presets[3].text.Replace("{LANG}", Constant.Lang);
+                    string technicalProtocol = PersonasSettings.HiddenTechnicalPrompt_Single;
 
                     // 指令进 Context
                     finalContext = userInstruction + "\n\n" + technicalProtocol;
@@ -1251,7 +1251,7 @@ namespace Ustas.RimAI.Communication.Personas
         public static string BuildCustomCharacterData(Pawn p, bool isSnapshot = false, bool simpleEquipment = false)
         {
             StringBuilder sb = new StringBuilder();
-            var ctx = DirectorMod.Settings.Context;
+            var ctx = PersonasMod.Settings.Context;
             string data = DirectorDataEngine.BuildCompleteData(p, simpleEquipment);
 
             try
@@ -1593,7 +1593,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch (Exception ex)
             {
-                if (DirectorMod.Settings.EnableDebugLog) Log.Warning($"[Director] Error fetching health data for {p.LabelShort}: {ex.Message}");
+                if (PersonasMod.Settings.EnableDebugLog) Log.Warning($"[Director] Error fetching health data for {p.LabelShort}: {ex.Message}");
             }
 
             try
@@ -1652,10 +1652,10 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 try
                 {
-                    if (ctx.Inc_DirectorNotes && !string.IsNullOrEmpty(DirectorMod.Settings.directorNotes))
+                    if (ctx.Inc_DirectorNotes && !string.IsNullOrEmpty(PersonasMod.Settings.directorNotes))
                     {
                         sb.AppendLine("\n--- Director's Notes (Custom Context) ---");
-                        sb.AppendLine(DirectorMod.Settings.directorNotes);
+                        sb.AppendLine(PersonasMod.Settings.directorNotes);
                     }
                 }
                 catch { }
@@ -1839,7 +1839,7 @@ namespace Ustas.RimAI.Communication.Personas
                     MethodInfo method = AccessTools.Method(utilityType, "GetPersonalityDescriptionWord", new Type[] { typeof(Pawn), typeof(int) });
                     if (method != null)
                     {
-                        int limit = DirectorMod.Settings.Context.Inc_RimPsyche_All ? 0 : 5;
+                        int limit = PersonasMod.Settings.Context.Inc_RimPsyche_All ? 0 : 5;
                         object result = method.Invoke(null, new object[] { p, limit });
                         if (result != null)
                         {
@@ -1880,7 +1880,7 @@ namespace Ustas.RimAI.Communication.Personas
                                 string key = entry.Key.ToString();
                                 float score = Convert.ToSingle(entry.Value);
                                 bool isSignificant = score > 20f || score < -20f;
-                                bool showAll = DirectorMod.Settings.Context.Inc_RimPsyche_All;
+                                bool showAll = PersonasMod.Settings.Context.Inc_RimPsyche_All;
                                 if (showAll || isSignificant)
                                 {
                                     string detail = GetInterestDetails(key);

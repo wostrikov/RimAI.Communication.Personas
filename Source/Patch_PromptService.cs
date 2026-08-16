@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Verse;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Service; // 引用 PromptService
@@ -46,7 +46,7 @@ namespace Ustas.RimAI.Communication.Personas
             catch (Exception ex)
             {
                 // 不做处理，保持原样，避免破坏游戏
-                if (DirectorMod.Settings.EnableDebugLog)
+                if (PersonasMod.Settings.EnableDebugLog)
                     Log.Warning($"[Director] Failed to patch context for {pawn.LabelShort}: {ex.Message}");
             }
             finally

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
@@ -41,12 +41,12 @@ namespace Ustas.RimAI.Communication.Personas
             // 清空按钮
             if (list.ButtonText("RPD_Button_Clear".Translate())) 
             {
-                DirectorMod.Settings.directorNotes = "";
+                PersonasMod.Settings.directorNotes = "";
             }
             list.GapLine();
 
             // Token 估算
-            int notesCharCount = DirectorMod.Settings.directorNotes?.Length ?? 0;
+            int notesCharCount = PersonasMod.Settings.directorNotes?.Length ?? 0;
             int estTokens = (int)(notesCharCount / 2.5f);
 
             GUI.color = Color.gray;
@@ -65,11 +65,11 @@ namespace Ustas.RimAI.Communication.Personas
             float textAreaHeight = inRect.height - list.CurHeight - 40f;
             Rect outRect = list.GetRect(textAreaHeight);
 
-            float contentHeight = Text.CalcHeight(DirectorMod.Settings.directorNotes, outRect.width - 16f);
+            float contentHeight = Text.CalcHeight(PersonasMod.Settings.directorNotes, outRect.width - 16f);
             Rect viewRect = new Rect(0f, 0f, outRect.width - 16f, Mathf.Max(contentHeight, outRect.height));
 
             Widgets.BeginScrollView(outRect, ref scrollPos, viewRect);
-            DirectorMod.Settings.directorNotes = Widgets.TextArea(viewRect, DirectorMod.Settings.directorNotes);
+            PersonasMod.Settings.directorNotes = Widgets.TextArea(viewRect, PersonasMod.Settings.directorNotes);
             Widgets.EndScrollView();
 
             list.End();
@@ -78,7 +78,7 @@ namespace Ustas.RimAI.Communication.Personas
         public override void PreClose()
         {
             base.PreClose();
-            DirectorMod.Settings.Write();
+            PersonasMod.Settings.Write();
         }
     }
 }

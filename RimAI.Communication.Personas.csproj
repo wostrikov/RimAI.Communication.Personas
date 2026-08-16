@@ -8,9 +8,9 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RimWorldDir Condition=" '$(RimWorldDir)' == '' ">$(RIMWORLD_DIR)</RimWorldDir>
     <RimWorldWorkshopDir Condition=" '$(RimWorldWorkshopDir)' == '' ">$(RIMWORLD_WORKSHOP_DIR)</RimWorldWorkshopDir>
-    <RimTalkModDir Condition=" '$(RimTalkModDir)' == '' ">$(RimWorldWorkshopDir)\3551203752</RimTalkModDir>
-    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk-PersonaDirector\bin\</BaseOutputPath>
-    <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimTalk-PersonaDirector\obj\</BaseIntermediateOutputPath>
+    
+    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath Condition=" '$(BaseIntermediateOutputPath)' == '' ">$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas\obj\</BaseIntermediateOutputPath>
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
@@ -25,10 +25,10 @@
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(RimWorldDir)\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UIModule"><HintPath>$(RimWorldDir)\RimWorldWin64_Data\Managed\UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="0Harmony"><HintPath>$(RimWorldWorkshopDir)\2009463077\Current\Assemblies\0Harmony.dll</HintPath><Private>false</Private></Reference>
-    <ProjectReference Include="..\..\RimAI.Communication\RimTalk.csproj">
+    <ProjectReference Include="..\RimAI.Communication\RimAI.Communication.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
+    <ProjectReference Include="..\RimAI.Core\src\RimAI.Core\RimAI.Core.csproj">
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
