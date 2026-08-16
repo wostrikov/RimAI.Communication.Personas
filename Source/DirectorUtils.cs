@@ -5,6 +5,7 @@ using Ustas.RimAI.Communication.Prompt;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
+using Ustas.RimAI.Core.Memory;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -67,25 +68,17 @@ namespace Ustas.RimAI.Communication.Personas
             var targetPreset = presets.FirstOrDefault(x => x.Name == presetName);
             if (targetPreset == null) return null;
 
-            // B. 准备上下文 (反射)
-            object contextObj = null;
+            PromptContext contextObj;
             try
             {
-                Type contextType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.PromptContext");
-                // 尝试最简单的构造函数
-                contextObj = Activator.CreateInstance(contextType, new object[] { p, null });
-                string contextData = Ustas.RimAI.Communication.Service.PromptService.CreatePawnContext(p, Ustas.RimAI.Communication.Service.PromptService.InfoLevel.Normal);
-                AccessTools.Property(contextType, "PawnContext").SetValue(contextObj, contextData);
+                contextObj = new PromptContext(p);
+                contextObj.PawnContext = PromptService.CreatePawnContext(p, PromptService.InfoLevel.Normal);
             }
             catch
             {
-                // 如果失败，返回 null，外部会捕获并回退
                 if (PersonasMod.Settings.EnableDebugLog) Log.Warning("[Director] Failed to create Scriban Context.");
                 return null;
             }
-
-            Type parserType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.ScribanParser");
-            MethodInfo renderMethod = AccessTools.Method(parserType, "Render", new[] { typeof(string), contextObj.GetType(), typeof(bool) });
 
             // C. 扁平化构建 (Flattening)
             StringBuilder systemBuilder = new StringBuilder();
@@ -95,7 +88,7 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 if (!entry.Enabled) continue;
 
-                string renderedText = (string)renderMethod.Invoke(null, new object[] { entry.Content, contextObj, true });
+                string renderedText = ScribanParser.Render(entry.Content, contextObj, true);
                 if (string.IsNullOrWhiteSpace(renderedText)) continue;
 
                 // 逻辑：System 角色放入 Context，其他角色放入 Prompt
@@ -356,46 +349,23 @@ namespace Ustas.RimAI.Communication.Personas
             return sb.ToString();
         }
 
-        //  RimTalk 集成部分 (反射缓存)
-        private static MethodInfo _rimTalkGetPlayerMethod;
-        private static Type _rimTalkWindowType;
-
         public static void OpenRimTalkDialog(Pawn target)
         {
             try
             {
-                // 1. 获取 RimTalk 的 Player Pawn (玩家代理)
-                if (_rimTalkGetPlayerMethod == null)
-                    _rimTalkGetPlayerMethod = AccessTools.Method("Ustas.RimAI.Communication.Data.Cache:GetPlayer");
-
-                // 2. 获取 RimTalk 的对话窗口类型
-                if (_rimTalkWindowType == null)
-                    _rimTalkWindowType = AccessTools.TypeByName("Ustas.RimAI.Communication.UI.CustomDialogueWindow");
-
-                if (_rimTalkGetPlayerMethod == null || _rimTalkWindowType == null)
-                {
-                    Messages.Message("RimTalk not found or incompatible.", MessageTypeDefOf.RejectInput, false);
-                    return;
-                }
-
-                // 3. 决定发起者 (Initiator)
                 Pawn initiator = null;
-
-                // --- 修改点：极度宽松的判定 ---
-                // 只要选中了一个 Pawn，且没死，且在地图上，就让他当发起人。
                 Pawn selectedPawn = Find.Selector.SingleSelectedThing as Pawn;
                 if (selectedPawn != null &&
                             !selectedPawn.Dead &&
                             selectedPawn.Spawned &&
                             selectedPawn != target &&
-                            (!ModsConfig.AnomalyActive || !selectedPawn.def.race.IsAnomalyEntity)) //如果是自己，就跳到 else 用玩家身份
+                            (!ModsConfig.AnomalyActive || !selectedPawn.def.race.IsAnomalyEntity))
                 {
                     initiator = selectedPawn;
                 }
                 else
                 {
-                    // 如果没选中任何 Pawn，或者选中的是石头/建筑，则使用玩家代
-                    initiator = (Pawn)_rimTalkGetPlayerMethod.Invoke(null, null);
+                    initiator = Ustas.RimAI.Communication.Data.Cache.GetPlayer();
                 }
 
                 if (initiator == null || initiator == target)
@@ -404,9 +374,7 @@ namespace Ustas.RimAI.Communication.Personas
                     return;
                 }
 
-                // 4. 打开窗口
-                Window dialogWindow = (Window)Activator.CreateInstance(_rimTalkWindowType, initiator, target);
-                Find.WindowStack.Add(dialogWindow);
+                Find.WindowStack.Add(new CustomDialogueWindow(initiator, target));
             }
             catch (Exception ex)
             {
@@ -414,47 +382,21 @@ namespace Ustas.RimAI.Communication.Personas
             }
         }
 
-        private static FieldInfo contentField;
-        private static FieldInfo timestampField;
-        private static FieldInfo typeField;
-        /// 辅助方法：读取记忆列表，并根据时间戳过滤“新”记忆
-        /// </summary>
-        /// <param name="lastTick">上次更新的时间 (TicksGame)。如果为 -1，则不进行时间过滤，直接取最新的。</param>
-        private static void AppendMemories(StringBuilder sb, IEnumerable list, string header, int limit, int lastTick)
+        private static void AppendMemories(StringBuilder sb, IEnumerable<MemoryContextEntry> list, string header, int limit, int lastTick)
         {
             if (list == null) return;
-            var rawEntries = list.Cast<object>().ToList();
-            if (rawEntries.Count == 0) return;
-
-            var firstEntryType = rawEntries[0].GetType();
-
-            // 初始化反射字段 (保持不变)
-            if (contentField == null) contentField = AccessTools.Field(firstEntryType, "content");
-            if (timestampField == null) timestampField = AccessTools.Field(firstEntryType, "timestamp");
-            if (typeField == null) typeField = AccessTools.Field(firstEntryType, "type");
-
             var newMemoryLines = new List<string>();
 
-            foreach (var entry in rawEntries)
+            foreach (var entry in list)
             {
-                if (newMemoryLines.Count >= limit) break;
-
-                // --- 时间戳过滤 ---
-                int memTick = (timestampField != null) ? (int)timestampField.GetValue(entry) : 0;
+                if (entry == null || newMemoryLines.Count >= limit) break;
+                int memTick = entry.TimestampTicks;
                 if (lastTick > 0 && memTick <= lastTick) break;
 
-                string content = (string)contentField?.GetValue(entry);
+                string content = entry.Text;
                 if (string.IsNullOrEmpty(content)) continue;
 
-                // --- 类型名称 ---
-                string typeName = "Memory";
-                if (typeField != null)
-                {
-                    object typeEnum = typeField.GetValue(entry);
-                    if (typeEnum != null) typeName = typeEnum.ToString();
-                }
-
-                // ★★★ 核心修复：自己计算时间，生成英文描述 ★★★
+                string typeName = string.IsNullOrEmpty(entry.Category) ? "Memory" : entry.Category;
                 string timeAgo = "";
                 if (memTick > 0)
                 {
@@ -470,90 +412,44 @@ namespace Ustas.RimAI.Communication.Personas
                     else timeAgo = $"A long time ago({daysElapsed} days)";
                 }
 
-                // --- 最终拼接 ---
                 string line = $"[{typeName.CapitalizeFirst()}] {content}";
                 if (!string.IsNullOrEmpty(timeAgo))
-                {
                     line += $" ({timeAgo})";
-                }
                 newMemoryLines.Add($"- {line}");
             }
 
             if (newMemoryLines.Count > 0)
             {
                 sb.AppendLine($"\n[{header}]:");
-                // 翻转，让时间正序
                 newMemoryLines.Reverse();
                 foreach (var line in newMemoryLines)
-                {
                     sb.AppendLine(line);
-                }
             }
         }
-
-        private static Type _memoryCompType;
-        private static Type _memoryEntryType;
-        private static PropertyInfo longTermProp, midTermProp, shortTermProp;
-        private static FieldInfo _contentField;
-        private static PropertyInfo _timeAgoProp; // TimeAgoString 是属性
-        private static PropertyInfo _typeNameProp; // TypeName 是属性
 
         public static string GetExternalMemories(Pawn p, int lastTick)
         {
             if (!ModsConfig.IsActive("ustas.rimai.communication.memory")) return null;
+            var provider = MemoryContextAccess.Current;
+            if (provider == null) return null;
 
             try
             {
-                // 1. 初始化反射 (只做一次)
-                if (_memoryCompType == null)
+                var result = provider.GetContext(new MemoryContextRequest
                 {
-                    _memoryCompType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.FourLayerMemoryComp");
-                    _memoryEntryType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.MemoryEntry");
-
-                    if (_memoryCompType != null)
-                    {
-                        // 使用 Property (根据源码，它们是 public 属性)
-                        longTermProp = AccessTools.Property(_memoryCompType, "ArchiveMemories");
-                        midTermProp = AccessTools.Property(_memoryCompType, "EventLogMemories");
-                        shortTermProp = AccessTools.Property(_memoryCompType, "SituationalMemories");
-                    }
-
-                    if (_memoryEntryType != null)
-                    {
-                        _contentField = AccessTools.Field(_memoryEntryType, "content");
-                        _timeAgoProp = AccessTools.Property(_memoryEntryType, "TimeAgoString");
-                        _typeNameProp = AccessTools.Property(_memoryEntryType, "TypeName");
-                    }
-                }
-
-                if (_memoryCompType == null || _memoryEntryType == null)
-                {
-                    if (PersonasMod.Settings.EnableDebugLog) Log.Warning("[Director] Memory types not found via reflection.");
-                    return null;
-                }
-
-                // 2. 获取组件
-                // 使用 Find 以支持子类，这是最稳妥的
-                var comp = p.AllComps.FirstOrDefault(c => _memoryCompType.IsAssignableFrom(c.GetType()));
-
-                if (comp == null)
-                {
-                    // 很多新生成的小人确实没有这个 Comp，这是正常的
-                    return null;
-                }
+                    Pawn = p,
+                    PawnId = p?.ThingID,
+                    SinceTick = lastTick,
+                    PerLayerLimit = 5,
+                    LayeredPawnMemories = true
+                });
+                var memories = result?.Memories;
+                if (memories == null || memories.Count == 0) return null;
 
                 StringBuilder sb = new StringBuilder();
-
-                // 3. 直接读取列表并格式化
-                if (longTermProp != null)
-                    AppendMemories(sb, longTermProp.GetValue(comp, null) as IEnumerable, "Long-Term (Archive)", 5, lastTick);
-
-                if (midTermProp != null)
-                    AppendMemories(sb, midTermProp.GetValue(comp, null) as IEnumerable, "Mid-Term (Recent Events)", 5, lastTick);
-
-                if (shortTermProp != null)
-                    AppendMemories(sb, shortTermProp.GetValue(comp, null) as IEnumerable, "Short-Term (Immediate)", 5, lastTick);
-
+                AppendMemories(sb, memories.Where(m => m.Kind == "Archive"), "Long-Term (Archive)", 5, lastTick);
+                AppendMemories(sb, memories.Where(m => m.Kind == "EventLog"), "Mid-Term (Recent Events)", 5, lastTick);
+                AppendMemories(sb, memories.Where(m => m.Kind == "Situational"), "Short-Term (Immediate)", 5, lastTick);
                 return sb.Length > 0 ? sb.ToString().Trim() : null;
             }
             catch (Exception ex)
@@ -564,112 +460,29 @@ namespace Ustas.RimAI.Communication.Personas
             }
         }
 
-        // ★★★ 注入常识库 ★★★
-        private static Type _knowledgeLibType;
-        private static MethodInfo _injectDetailedMethod;
-        private static Type _listScoreType;
-        private static Type _memoryManagerType;
-
         public static string GetCommonKnowledge(string context, Pawn p)
         {
-            // 1. 检查 Mod 是否激活
             if (!ModsConfig.IsActive("ustas.rimai.communication.memory")) return null;
+            var provider = MemoryContextAccess.Knowledge;
+            if (provider == null) return null;
 
             try
             {
-                // 2. 初始化反射信息 (只做一次)
-                if (_injectDetailedMethod == null)
+                var result = provider.GetKnowledge(new MemoryContextRequest
                 {
-                    _memoryManagerType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.MemoryManager");
-                    _knowledgeLibType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.CommonKnowledgeLibrary");
-                    Type scoreType = AccessTools.TypeByName("Ustas.RimAI.Communication.Memory.KnowledgeScore");
-
-                    if (_knowledgeLibType != null && scoreType != null)
-                    {
-                        _listScoreType = typeof(List<>).MakeGenericType(scoreType);
-
-                        // 目标签名：(string context, int maxEntries, out List<KnowledgeScore> scores, Pawn currentPawn, Pawn targetPawn)
-                        _injectDetailedMethod = AccessTools.Method(_knowledgeLibType, "InjectKnowledgeWithDetails",
-                            new Type[] {
-                                typeof(string),
-                                typeof(int),
-                                _listScoreType.MakeByRefType(),
-                                typeof(Pawn),
-                                typeof(Pawn)
-                            });
-                    }
-                }
-
-                if (_injectDetailedMethod == null || _memoryManagerType == null) return null;
-
-                // 3. ★★★ 核心修复：直接使用 GetComponent(Type) ★★★
-                // 这是一个公开方法，不需要反射，也不需要遍历列表
-                object manager = Find.World.GetComponent(_memoryManagerType);
-
-                if (manager == null) return null;
-
-                // 4. 获取 CommonKnowledgeLibrary 实例
-                PropertyInfo libProp = AccessTools.Property(_memoryManagerType, "CommonKnowledge");
-                object lib = libProp?.GetValue(manager, null);
-
-                if (lib != null)
-                {
-                    // 5. 调用注入方法
-                    object[] parameters = new object[] { context, 5, null, p, null };
-                    string result = (string)_injectDetailedMethod.Invoke(lib, parameters);
-                    return result;
-                }
+                    Query = context,
+                    Pawn = p,
+                    PawnId = p?.ThingID,
+                    MaxEntries = 5
+                });
+                return string.IsNullOrEmpty(result?.Projection) ? null : result.Projection;
             }
             catch (Exception ex)
             {
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Warning($"[Director] CK Injection Reflection failed: {ex.Message}");
+                    Log.Warning($"[Director] CK injection failed: {ex.Message}");
             }
             return null;
-        }
-
-        private static MethodInfo _addRequestMethod;
-        private static MethodInfo _addResponseMethod;
-        private static bool _logReflectionInit = false;
-
-        private static void InitLogReflection()
-        {
-            if (_logReflectionInit) return;
-            _logReflectionInit = true;
-
-            try
-            {
-                var apiHistoryType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.ApiHistory");
-                if (apiHistoryType != null)
-                {
-                    // 1. 查找 AddRequest (尝试新版签名: TalkRequest, Channel)
-                    var channelType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.Channel"); // 注意命名空间
-                    if (channelType != null)
-                    {
-                        _addRequestMethod = AccessTools.Method(apiHistoryType, "AddRequest", new[] { typeof(TalkRequest), channelType });
-                    }
-                    // 如果找不到新版，尝试找旧版 (TalkRequest) - 兼容旧版 RimTalk
-                    if (_addRequestMethod == null)
-                    {
-                        _addRequestMethod = AccessTools.Method(apiHistoryType, "AddRequest", new[] { typeof(TalkRequest) });
-                    }
-
-                    // 2. 查找 AddResponse (尝试新版签名: Guid, string, string, string, Payload, int)
-                    _addResponseMethod = AccessTools.Method(apiHistoryType, "AddResponse",
-                        new[] { typeof(Guid), typeof(string), typeof(string), typeof(string), typeof(Payload), typeof(int) });
-
-                    // 如果找不到新版，尝试旧版 (Guid, string, string, string, Payload)
-                    if (_addResponseMethod == null)
-                    {
-                        _addResponseMethod = AccessTools.Method(apiHistoryType, "AddResponse",
-                            new[] { typeof(Guid), typeof(string), typeof(string), typeof(string), typeof(Payload) });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning($"[Director] Log reflection failed: {ex.Message}");
-            }
         }
 
         public static (TalkRequest request, string currentPersona) PrepareEvolveRequest(Pawn p, Window editorWindow)
@@ -703,23 +516,15 @@ namespace Ustas.RimAI.Communication.Personas
                     if (targetPreset != null)
                     {
                         // 2. 准备渲染上下文 (利用反射创建 Context)
-                        Type contextType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.PromptContext");
-                        Type parserType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.ScribanParser");
-
-                        // 创建 Context: new PromptContext(pawn, null)
-                        object contextObj = Activator.CreateInstance(contextType, new object[] { p, null });
-                        MethodInfo renderMethod = AccessTools.Method(parserType, "Render", new[] { typeof(string), contextType, typeof(bool) });
-
+                        PromptContext contextObj = new PromptContext(p);
                         StringBuilder systemSb = new StringBuilder();
                         StringBuilder userSb = new StringBuilder();
 
-                        // 3. ★★★ 核心修复：遍历所有条目并渲染 ★★★
                         foreach (var entry in targetPreset.Entries)
                         {
                             if (!entry.Enabled) continue;
 
-                            // 渲染这一条的内容
-                            string renderedText = (string)renderMethod.Invoke(null, new object[] { entry.Content, contextObj, true });
+                            string renderedText = ScribanParser.Render(entry.Content, contextObj, true);
 
                             if (string.IsNullOrWhiteSpace(renderedText)) continue;
 
@@ -901,43 +706,18 @@ namespace Ustas.RimAI.Communication.Personas
         }
 
         // ★★★ 新增辅助方法：安全地向 RimTalk 写入错误日志 ★★★
-        private static MethodInfo addRequestMethod;
-        private static bool apiHistoryReflectionFailed = false;
-
         public static void TryLogErrorToApiHistory(TalkRequest request, Exception ex)
         {
-            if (apiHistoryReflectionFailed) return;
-
             try
             {
-                // 初始化
-                if (addRequestMethod == null)
-                {
-                    var apiHistoryType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.ApiHistory");
-                    if (apiHistoryType != null)
-                    {
-                        var channelType = AccessTools.TypeByName("Ustas.RimAI.Communication.Data.Channel");
-                        if (channelType != null)
-                        {
-                            addRequestMethod = AccessTools.Method(apiHistoryType, "AddRequest", new[] { typeof(TalkRequest), channelType });
-                        }
-                    }
-                    if (addRequestMethod == null) { apiHistoryReflectionFailed = true; return; }
-                }
-
-                // 记录请求
-                object channelQuery = Enum.Parse(AccessTools.TypeByName("Ustas.RimAI.Communication.Data.Channel"), "Query");
-                object apiLog = addRequestMethod.Invoke(null, new object[] { request, channelQuery });
-
+                var apiLog = ApiHistory.AddRequest(request, Channel.Query);
                 if (apiLog != null)
                 {
-                    // 设置错误状态
-                    var logType = apiLog.GetType();
-                    AccessTools.Property(logType, "IsError")?.SetValue(apiLog, true);
-                    AccessTools.Property(logType, "Response")?.SetValue(apiLog, $"[Director] Task failed: {ex.Message}");
+                    apiLog.IsError = true;
+                    apiLog.Response = $"[Director] Task failed: {ex.Message}";
                 }
             }
-            catch { apiHistoryReflectionFailed = true; }
+            catch { }
         }
 
 
@@ -1940,83 +1720,30 @@ namespace Ustas.RimAI.Communication.Personas
         }
 
 
-        // ★★★ 新增：Scriban 渲染相关的反射缓存 ★★★
-        private static Type _contextType;
-        private static Type _parserType;
-        private static MethodInfo _renderMethod;
-
-        // ★★★ 新增：通用渲染方法 ★★★
-        // 放在类的任意位置，建议放在最后
         public static string RenderScribanText(string rawText, Pawn p)
         {
-            // 如果文本为空或不包含 {{，直接返回，省性能
             if (string.IsNullOrEmpty(rawText) || !rawText.Contains("{{")) return rawText;
 
             try
             {
-                // 1. 初始化反射 (只做一次)
-                if (_contextType == null)
-                {
-                    _contextType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.PromptContext");
-                    _parserType = AccessTools.TypeByName("Ustas.RimAI.Communication.Prompt.ScribanParser");
-
-                    if (_parserType != null && _contextType != null)
-                    {
-                        // Render(string template, PromptContext context, bool logErrors)
-                        _renderMethod = AccessTools.Method(_parserType, "Render", new[] { typeof(string), _contextType, typeof(bool) });
-                    }
-                }
-
-                if (_renderMethod == null) return rawText;
-
-                // 2. 准备上下文数据
-                object contextObj = null;
-
-                // 尝试从 Tracker 获取当前所有在场角色 (支持 {{ for p in pawns }})
                 List<Pawn> allPawns = DirectorContextTracker.GetPawns();
-
-                // 3. 创建 PromptContext 实例
+                PromptContext contextObj;
                 if (allPawns != null && allPawns.Contains(p))
                 {
-                    // 场景 A: 上下文中有其他人 (例如正在对话)
-                    // 构造函数: public PromptContext(List<Pawn> pawns, VariableStore store = null)
-                    try
+                    contextObj = new PromptContext(allPawns)
                     {
-                        // 传入 null 让它使用默认 VariableStore
-                        contextObj = Activator.CreateInstance(_contextType, new object[] { allPawns, null });
-
-                        // ★ 强制指定 CurrentPawn 为当前要渲染的 p ★
-                        // 否则默认可能是列表第一个人 (Initiator)，导致渲染错误
-                        AccessTools.Property(_contextType, "CurrentPawn").SetValue(contextObj, p);
-                    }
-                    catch { }
+                        CurrentPawn = p
+                    };
                 }
-
-                if (contextObj == null)
+                else
                 {
-                    // 场景 B: 只有自己 (例如单体生成) 或 构造失败
-                    // 构造函数: public PromptContext(Pawn pawn, VariableStore store = null)
-                    try
-                    {
-                        contextObj = Activator.CreateInstance(_contextType, new object[] { p, null });
-                    }
-                    catch
-                    {
-                        // 最后的保底：无参构造 + 属性赋值
-                        contextObj = Activator.CreateInstance(_contextType);
-                        AccessTools.Property(_contextType, "CurrentPawn").SetValue(contextObj, p);
-                    }
+                    contextObj = new PromptContext(p);
                 }
 
-                // 4. 调用 Render
-                // false = 不打印错误日志 (防止用户写错语法刷屏红字)
-                string result = (string)_renderMethod.Invoke(null, new object[] { rawText, contextObj, false });
-
-                return result;
+                return ScribanParser.Render(rawText, contextObj, false) ?? rawText;
             }
             catch (Exception)
             {
-                // 如果解析崩了，返回原文，保证游戏不崩
                 return rawText;
             }
         }

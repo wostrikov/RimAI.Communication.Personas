@@ -1,14 +1,11 @@
-using HarmonyLib;
 using Ustas.RimAI.Communication.Personas;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.UI;
 using Ustas.RimAI.Communication.Util;
 using RimWorld;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Verse;
 
@@ -22,14 +19,6 @@ namespace Ustas.RimAI.Communication.Personas
     }
     public static class DirectorDataEngine
 	{
-		private static MethodInfo getPawnSocialStatusMethod;
-
-		private static MethodInfo getVSEPassionDefMethod;
-
-		private static MethodInfo getPassionInfoHardcodedMethod;
-
-		private static MethodInfo getPawnShortStatusMethod;
-
 		public static string TempCurrentPersona = "";
 
 		public static string BuildCompleteData(Pawn p, bool simpleEquipment = false)
@@ -104,16 +93,8 @@ namespace Ustas.RimAI.Communication.Personas
 			stringBuilder.AppendLine("Name: " + p.LabelShortCap);
 			stringBuilder.AppendLine($"Gender: {p.gender}");
 			stringBuilder.AppendLine($"Age: {p.ageTracker.AgeBiologicalYears}");
-			if (getPawnSocialStatusMethod == null)
-			{
-				Type typeFromHandle = typeof(DirectorUtils);
-				getPawnSocialStatusMethod = AccessTools.Method(typeFromHandle, "GetPawnSocialStatus", new Type[1] { typeof(Pawn) }, (Type[])null);
-			}
-			if (getPawnSocialStatusMethod != null)
-			{
-				string text = (string)getPawnSocialStatusMethod.Invoke(null, new object[1] { p });
-				stringBuilder.AppendLine("Status: " + text);
-			}
+			string text = DirectorUtils.GetPawnSocialStatus(p);
+			stringBuilder.AppendLine("Status: " + text);
 			if (p.Faction != null)
 			{
 				if (p.Faction.IsPlayer)
@@ -294,16 +275,7 @@ namespace Ustas.RimAI.Communication.Personas
 						text = mostImportantRelation.label;
 					}
 					text = text.CapitalizeFirst();
-					if (getPawnShortStatusMethod == null)
-					{
-						Type typeFromHandle = typeof(DirectorUtils);
-						getPawnShortStatusMethod = AccessTools.Method(typeFromHandle, "GetPawnShortStatus", new Type[1] { typeof(Pawn) }, (Type[])null);
-					}
-					string text2 = "";
-					if (getPawnShortStatusMethod != null)
-					{
-						text2 = (string)getPawnShortStatusMethod.Invoke(null, new object[1] { relatedPawn });
-					}
+					string text2 = DirectorUtils.GetPawnShortStatus(relatedPawn) ?? "";
 					stringBuilder2.AppendLine(("- " + text + ": " + relatedPawn.Name.ToStringShort + " " + text2).Trim());
 				}
 			}
@@ -382,30 +354,15 @@ namespace Ustas.RimAI.Communication.Personas
 					stringBuilder.Append(skill.Level);
 					if (includeDesc && skill.passion != Passion.None)
 					{
-						if (getVSEPassionDefMethod == null)
-						{
-							getVSEPassionDefMethod = AccessTools.Method(typeof(DirectorUtils), "GetVSEPassionDef", new Type[1] { typeof(SkillRecord) }, (Type[])null);
-						}
-						Def def = null;
-						if (getVSEPassionDefMethod != null)
-						{
-							def = (Def)getVSEPassionDefMethod.Invoke(null, new object[1] { skill });
-						}
+						Def def = DirectorUtils.GetVSEPassionDef(skill);
 						if (def != null)
 						{
 							stringBuilder.Append(" [" + def.label.CapitalizeFirst() + "]: " + def.description);
 						}
 						else
 						{
-							if (getPassionInfoHardcodedMethod == null)
-							{
-								getPassionInfoHardcodedMethod = AccessTools.Method(typeof(DirectorUtils), "GetPassionInfoHardcoded", new Type[1] { typeof(Passion) }, (Type[])null);
-							}
-							if (getPassionInfoHardcodedMethod != null)
-							{
-								string text = (string)getPassionInfoHardcodedMethod.Invoke(null, new object[1] { skill.passion });
-								stringBuilder.Append(" " + text);
-							}
+							string text = DirectorUtils.GetPassionInfoHardcoded(skill.passion);
+							stringBuilder.Append(" " + text);
 						}
 					}
 				}
@@ -571,9 +528,6 @@ namespace Ustas.RimAI.Communication.Personas
 			return info;
 		}
 
-
-        private static FieldInfo _rawHistoryDictField;
-
         public static string GetSmartHistory(Pawn currentPawn, List<Pawn> allPawns, bool isMonologue)
         {
             if (currentPawn == null) return "";
@@ -649,81 +603,57 @@ namespace Ustas.RimAI.Communication.Personas
             var activeNames = new HashSet<string>();
             foreach (var cp in contextPawns) activeNames.Add(cp.LabelShort);
 
-            // ... (反射获取 historyDict 和 fullList 的代码，保持不变) ...
-            if (_rawHistoryDictField == null)
-                _rawHistoryDictField = AccessTools.Field(typeof(TalkHistory), "MessageHistory");
-            if (_rawHistoryDictField == null) return null;
-
-            var historyDict = _rawHistoryDictField.GetValue(null) as IDictionary;
-            if (historyDict == null || !historyDict.Contains(p.thingIDNumber)) return null;
-            var fullList = historyDict[p.thingIDNumber] as IEnumerable;
-            if (fullList == null) return null;
-
-            List<object> snapshotList;
-            lock (fullList) { snapshotList = fullList.Cast<object>().ToList(); }
+            var history = TalkHistory.GetMessageHistory(p, simplified: false);
+            if (history == null || history.Count == 0) return null;
 
             var resultLines = new List<string>();
 
-            // 倒序扫描
-            for (int i = snapshotList.Count - 1; i >= 0; i--)
+            for (int i = history.Count - 1; i >= 0; i--)
             {
                 if (resultLines.Count >= limit) break;
 
-                object entry = snapshotList[i];
-                var type = entry.GetType();
+                var entry = history[i];
+                if (entry.role != Role.AI)
+                    continue;
 
-                // 这里的反射稍微优化一下，避免重复获取 FieldInfo，但这里先保持原样
-                string rawContent = (string)type.GetField("Item2").GetValue(entry);
-                string roleName = type.GetField("Item1").GetValue(entry).ToString();
+                string rawContent = entry.message;
+                if (processedDialogues.Contains(rawContent))
+                    continue;
 
-                if (roleName == "AI")
+                try
                 {
-                    // ★★★ 核心修复：去重检查 ★★★
-                    // 如果这段 JSON 已经在之前的 Pawn (比如 Initiator) 那里处理过了，
-                    // 就直接跳过，继续往回找更早的记录。
-                    if (processedDialogues.Contains(rawContent))
+                    var lines = JsonUtil.DeserializeFromJson<List<HistoryLine>>(rawContent);
+                    if (lines != null && lines.Count > 0)
                     {
-                        continue;
-                    }
+                        StringBuilder sessionSb = new StringBuilder();
+                        bool isRelevant = false;
 
-                    try
-                    {
-                        var lines = JsonUtil.DeserializeFromJson<List<HistoryLine>>(rawContent);
-                        if (lines != null && lines.Count > 0)
+                        foreach (var line in lines)
                         {
-                            StringBuilder sessionSb = new StringBuilder();
-                            bool isRelevant = false;
+                            bool nameInContext = activeNames.Contains(line.name);
+                            bool targetInContext = !string.IsNullOrEmpty(line.target) && activeNames.Contains(line.target);
 
-                            foreach (var line in lines)
+                            if (nameInContext || targetInContext)
                             {
-                                bool nameInContext = activeNames.Contains(line.name);
-                                bool targetInContext = !string.IsNullOrEmpty(line.target) && activeNames.Contains(line.target);
-
-                                if (nameInContext || targetInContext)
-                                {
-                                    isRelevant = true;
-                                }
-
-                                string targetInfo = "";
-                                if (!string.IsNullOrEmpty(line.target) && line.target != "None" && line.target != "自己" && line.target != line.name)
-                                {
-                                    targetInfo = $" (to {line.target})";
-                                }
-                                sessionSb.AppendLine($"{line.name}{targetInfo}: {line.text}");
+                                isRelevant = true;
                             }
 
-                            if (isRelevant)
+                            string targetInfo = "";
+                            if (!string.IsNullOrEmpty(line.target) && line.target != "None" && line.target != "自己" && line.target != line.name)
                             {
-                                // 插入结果
-                                resultLines.Insert(0, sessionSb.ToString().TrimEnd());
-
-                                // ★★★ 标记为已处理 ★★★
-                                processedDialogues.Add(rawContent);
+                                targetInfo = $" (to {line.target})";
                             }
+                            sessionSb.AppendLine($"{line.name}{targetInfo}: {line.text}");
+                        }
+
+                        if (isRelevant)
+                        {
+                            resultLines.Insert(0, sessionSb.ToString().TrimEnd());
+                            processedDialogues.Add(rawContent);
                         }
                     }
-                    catch { }
                 }
+                catch { }
             }
 
             return resultLines;
@@ -743,19 +673,13 @@ namespace Ustas.RimAI.Communication.Personas
 
                 if (window != null)
                 {
-                    // 检查这个窗口是不是正在编辑当前的 Pawn
-                    // (防止多个人物窗口重叠时的混淆，虽然 RimTalk 通常只开一个)
-                    var windowPawn = AccessTools.Field(typeof(PersonaEditorWindow), "_pawn").GetValue(window) as Pawn;
-
-                    if (windowPawn == p)
+                    if (window.EditedPawn == p)
                     {
-                        // 反射读取文本框字段 _editingPersonality
-                        var text = AccessTools.Field(typeof(PersonaEditorWindow), "_editingPersonality").GetValue(window) as string;
-                        return text ?? "";
+                        return window.EditingPersonality ?? "";
                     }
                 }
             }
-            catch 
+            catch
             {
                 // 静默失败，不要崩
             }

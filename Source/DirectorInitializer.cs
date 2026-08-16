@@ -1,7 +1,6 @@
 using Verse;
 using RimWorld;
 using Ustas.RimAI.Communication.Data;
-using HarmonyLib; // 用于反射读取 Hediff 内容
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -37,17 +36,9 @@ namespace Ustas.RimAI.Communication.Personas
                 bool hasPersona = false;
                 var hediff = p.health.hediffSet.GetFirstHediffOfDef(personaDef);
 
-                if (hediff != null)
+                if (hediff is Hediff_Persona persona && !string.IsNullOrWhiteSpace(persona.Personality))
                 {
-                    // 使用反射读取内容，确保不是空壳
-                    // (因为 Hediff_Persona 是 RimTalk 的类，这里解耦处理)
-                    var contentField = AccessTools.Field(hediff.GetType(), "Personality");
-                    string content = contentField?.GetValue(hediff) as string;
-
-                    if (!string.IsNullOrWhiteSpace(content))
-                    {
-                        hasPersona = true;
-                    }
+                    hasPersona = true;
                 }
 
                 // 如果没有人格，尝试应用我们的规则
