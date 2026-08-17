@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Ustas.RimAI.Communication.Personas.Integration;
+using Ustas.RimAI.Core.Handshake;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
@@ -9,9 +10,15 @@ namespace Ustas.RimAI.Communication.Personas
     {
         static Patcher()
         {
+            if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
+            {
+                return;
+            }
+
             var harmony = new Harmony("ustas.rimai.communication.personas");
             harmony.PatchAll();
             CommunicationBridge.Register();
+            RimAiHandshakeRegistry.Current.MarkActivated(RimAiModuleIds.Personas);
         }
     }
 }

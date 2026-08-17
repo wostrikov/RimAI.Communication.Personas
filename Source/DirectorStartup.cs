@@ -2,6 +2,7 @@ using Verse;
 using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Communication.Data; // 引用以访问 Constant
+using Ustas.RimAI.Core.Handshake;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -11,6 +12,11 @@ namespace Ustas.RimAI.Communication.Personas
         {
             try
             {
+                if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
+                {
+                    return;
+                }
+
                 var settings = PersonasMod.Settings;
                 if (settings == null) return;
 

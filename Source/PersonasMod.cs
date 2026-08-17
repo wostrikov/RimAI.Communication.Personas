@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq; // 确保引用 Linq
 using UnityEngine;
+using Ustas.RimAI.Core.Handshake;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
 {
     public class PersonasMod : Mod
     {
+        public const string HandshakeModuleVersion = "1.0.0";
         public static PersonasSettings Settings;
 
         // 全局滚动条的位置状态
@@ -21,6 +23,15 @@ namespace Ustas.RimAI.Communication.Personas
         {
             Settings = GetSettings<PersonasSettings>();
             _isRimPsycheLoaded = AccessTools.TypeByName("Maux36.RimPsyche.CompPsyche") != null;
+            RimAiHandshake.Register(RimAiHandshakeDescriptor.Current(
+                RimAiModuleIds.Personas,
+                HandshakeModuleVersion,
+                isOptional: true));
+            if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
+            {
+                return;
+            }
+
             LongEventHandler.ExecuteWhenFinished(DirectorStartup.Initialize);
         }
 
