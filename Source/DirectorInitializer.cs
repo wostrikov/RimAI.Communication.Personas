@@ -1,6 +1,7 @@
 using Verse;
 using RimWorld;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Core.Handshake;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -11,6 +12,10 @@ namespace Ustas.RimAI.Communication.Personas
         public override void FinalizeInit()
         {
             base.FinalizeInit();
+            if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
+            {
+                return;
+            }
 
             // 2. 执行数据迁移 (Chattiness 2.0 -> 1.0)
             PersonasMod.Settings.MigrateChattinessValuesIfNeeded();

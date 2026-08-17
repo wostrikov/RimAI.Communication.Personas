@@ -3,6 +3,7 @@ using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
 using System;
 using System.Collections.Generic;
+using Ustas.RimAI.Core.Handshake;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
@@ -19,6 +20,11 @@ namespace Ustas.RimAI.Communication.Personas
 
         private static void RegisterAll()
         {
+            if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
+            {
+                return;
+            }
+
             try
             {
                 if (typeof(RimTalkPromptAPI) == null) return;
