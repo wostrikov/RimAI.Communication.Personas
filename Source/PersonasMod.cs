@@ -29,12 +29,7 @@ namespace Ustas.RimAI.Communication.Personas
                     HandshakeModuleVersion,
                     isOptional: true),
                 PersonasComposition.Current.Start);
-            if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
-            {
-                return;
-            }
-
-            LongEventHandler.ExecuteWhenFinished(DirectorStartup.Initialize);
+            // DirectorStartup + Scriban surface are scheduled from PersonasComposition.Start.
         }
 
         public override string SettingsCategory() => Content?.Name ?? "RimAI.Communication.Personas";

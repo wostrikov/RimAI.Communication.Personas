@@ -239,13 +239,20 @@ Also: PostLoadInit null-collection → empty list shape.
 
 ---
 
-## Wave B–D backlog (blocked until Wave A+ green)
+## Wave B status (composition + resolution)
 
-1. Real Start/Stop ownership (bridge, Scriban register, library sync; clear hooks on Stop) — **must keep lifecycle + isolation tests green** (update goldens only with intentional semantic decision).
-2. One PersonaResolver; converge SelectPersonality / backfill / sync.
-3. Precompute PersonaProjection onto prompt context; remove late Transform / Override divergence (**semantic**; characterization must stay empty-diff until then).
-4. Delete dead RuleExecutor / empty provider / unused GetDataByKey.
-5. Decide MainButtonDef restore vs drop ShowMainButton.
-6. Touch-site logging already RimAiLog; burn DOMAIN catch when touching.
-7. Align Director Memory access with 7.5.9 typed projections (or document intentional separate path).
-8. Wave C must not rewrite persistence ownership without empty-diff on Wave A+ Scribe label tests.
+Implemented:
+
+- `PersonasComposition.Start/Stop` owns bridge + schedules DirectorStartup + DirectorApiAdapter surface (LongEvent timing preserved).
+- `CommunicationBridge.Unregister` clears Personas-owned TalkLifecycle/chrome hooks, OverrideGenerator, SelectPersonality; clears ThreadStatic tracker.
+- `DirectorApiAdapter` no longer `[StaticConstructorOnStartup]`; `RegisterSurface` / `UnregisterSurface` (`UnregisterAllHooks("director")`); deferred callbacks no-op if composition already Stopped.
+- `PersonaResolver` is authoritative assignment path; `Patch_GetOrAddNew` is a thin façade; `DirectorInitializer` calls PersonaResolver.
+- Deleted dead `RuleExecutor.cs`, `DirectorVariableProvider.cs`, unused `GetDataByKey` / `AddMenu`.
+- Stage7510 lifecycle goldens **intentionally updated** for real Stop (not empty-diff).
+
+Not in Wave B (deferred):
+
+- Talk Transform / typed PersonaProjection (semantic; Wave C / substage).
+- TempCurrentPersona / ThreadStatic isolation redesign.
+- MainButtonDef decision.
+- Director Memory typed-projection alignment.

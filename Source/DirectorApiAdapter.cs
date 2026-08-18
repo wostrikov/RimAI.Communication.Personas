@@ -1,42 +1,41 @@
 using Ustas.RimAI.Communication.API;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
-using System;
 using System.Collections.Generic;
-using Ustas.RimAI.Core.Handshake;
-using Verse;
 using Ustas.RimAI.Core.Diagnostics;
+using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
 {
-    [StaticConstructorOnStartup]
+    /// <summary>
+    /// Director Scriban surface (d_* vars, director_notes, personality Override).
+    /// Owned by <see cref="PersonasComposition"/> — not StaticConstructorOnStartup.
+    /// </summary>
     public static class DirectorApiAdapter
     {
         private const string ModId = "director";
+        static bool _surfaceRegistered;
 
-        static DirectorApiAdapter()
+        /// <summary>Idempotent registration of Director prompt variables and Personality Override.</summary>
+        public static void RegisterSurface()
         {
-            LongEventHandler.ExecuteWhenFinished(RegisterAll);
-        }
+            if (_surfaceRegistered)
+                return;
+            if (!PersonasComposition.Current.IsStarted)
+                return;
 
-        private static void RegisterAll()
-        {
-            if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
+            try
+            {
+                if (typeof(RimTalkPromptAPI) == null)
+                    return;
+            }
+            catch
             {
                 return;
             }
 
-            try
-            {
-                if (typeof(RimTalkPromptAPI) == null) return;
-            }
-            catch { return; }
-
             RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] Registering variables for Scriban engine...");
 
-            // 变量注册
-
-            // --- 核心聚合 ---
             Reg("d_full_profile", p => DirectorDataEngine.BuildCompleteData(p), "Complete Profile with Mod Setting");
             Reg("d_memories", p => DirectorDataEngine.GetMemoryInfo(p), "Recent Memories");
             Reg("d_status_diff", p => DirectorDataEngine.GetDailyStatusDiff(p), "Daily Status Changes");
@@ -46,60 +45,44 @@ namespace Ustas.RimAI.Communication.Personas
                 p => DirectorDataEngine.GetEvolveStatusDiff(p),
                 "Evolve: Status changes since 'Set Time'");
 
-            
             RimTalkPromptAPI.RegisterContextVariable(
                 ModId,
-                "director_notes", 
-                _ => PersonasMod.Settings.directorNotes, 
-                "Global notes from Persona Director" 
+                "director_notes",
+                _ => PersonasMod.Settings.directorNotes,
+                "Global notes from Persona Director"
             );
-            
 
             RimTalkPromptAPI.RegisterContextVariable(ModId, "smart_history",
-                            ctx => DirectorDataEngine.GetSmartHistory(ctx.CurrentPawn, ctx.Pawns, ctx.IsMonologue),
-                            "Smart history: Dynamic quota & formatting based on context (Monologue/Dialogue).");
+                ctx => DirectorDataEngine.GetSmartHistory(ctx.CurrentPawn, ctx.Pawns, ctx.IsMonologue),
+                "Smart history: Dynamic quota & formatting based on context (Monologue/Dialogue).");
 
             try
-                {
-                    // 1. 注册一个“覆盖”钩子
-                    RimTalkPromptAPI.RegisterPawnHook(
-                        ModId,
-                        ContextCategories.Pawn.Personality,
-                        ContextHookRegistry.HookOperation.Override,
-                        (pawn, originalValue) =>
-                        {
+            {
+                RimTalkPromptAPI.RegisterPawnHook(
+                    ModId,
+                    ContextCategories.Pawn.Personality,
+                    ContextHookRegistry.HookOperation.Override,
+                    (pawn, originalValue) =>
+                    {
+                        string personaTemplate = Hediff_Persona.GetOrAddNew(pawn)?.Personality;
+                        if (string.IsNullOrEmpty(personaTemplate))
+                            return originalValue;
 
-                            string personaTemplate = Hediff_Persona.GetOrAddNew(pawn)?.Personality;
-                            if (string.IsNullOrEmpty(personaTemplate)) return originalValue;
+                        List<Pawn> allPawns = DirectorContextTracker.GetPawns();
 
-                            // ★★★ 核心修复：尝试获取捕获的完整 Pawn 列表 ★★★
-                            List<Pawn> allPawns = DirectorContextTracker.GetPawns();
+                        if (allPawns == null || !allPawns.Contains(pawn))
+                            allPawns = new List<Pawn> { pawn };
 
-                            // 如果捕获到了列表，且当前 Pawn 在列表里，就用这个列表
-                            // 否则（比如单体生成时），就只用当前 Pawn
-                            if (allPawns == null || !allPawns.Contains(pawn))
-                            {
-                                allPawns = new List<Pawn> { pawn };
-                            }
+                        var tempContext = new PromptContext(allPawns);
+                        tempContext.CurrentPawn = pawn;
+                        return ScribanParser.Render(personaTemplate, tempContext);
+                    }
+                );
+            }
+            catch
+            {
+            }
 
-                            // ★★★ 使用完整列表创建 Context ★★★
-                            // 我们使用反射或直接调用 PromptContext(List<Pawn>) 构造函数
-                            var globalStore = Ustas.RimAI.Communication.Prompt.PromptManager.Instance.VariableStore;
-                            var tempContext = new Ustas.RimAI.Communication.Prompt.PromptContext(allPawns);
-
-                            // 确保 CurrentPawn 是当前正在处理的这个 pawn
-                            tempContext.CurrentPawn = pawn;
-
-                            // 渲染
-                            return Ustas.RimAI.Communication.Prompt.ScribanParser.Render(personaTemplate, tempContext);
-                        }
-                    );
-                }
-                catch
-                {
-             }
-
-            // --- 基础信息 ---
             Reg("d_basic_name", p => p.LabelShortCap);
             Reg("d_basic_fullname", p => p.Name?.ToStringFull ?? p.LabelShortCap);
             Reg("d_basic_gender", p => p.gender.ToString());
@@ -108,17 +91,14 @@ namespace Ustas.RimAI.Communication.Personas
             Reg("d_basic_faction_label", p => p.Faction?.Name ?? "None");
             Reg("d_basic_faction_desc", p => p.Faction?.def?.description?.StripTags() ?? "");
 
-            // --- 种族 ---
             Reg("d_race_label", p => p.def.label);
             Reg("d_race_desc", p => p.def.description.StripTags());
             Reg("d_race_xenotype", p => p.genes?.XenotypeLabel ?? "Baseliner");
             Reg("d_race_xenotype_desc", p => p.genes?.Xenotype?.description.StripTags() ?? "");
 
-            // --- 基因 (Genes) ---
             Reg("d_genes_list", p => DirectorDataEngine.GetGenesInfo(p, includeDesc: false));
             Reg("d_genes_list_with_desc", p => DirectorDataEngine.GetGenesInfo(p, includeDesc: true));
 
-            // --- 列表与描述 ---
             Reg("d_backstory_childhood_title", p => p.story?.Childhood?.TitleCapFor(p.gender) ?? "");
             Reg("d_backstory_childhood_desc", p => p.story?.Childhood?.FullDescriptionFor(p).Resolve().StripTags() ?? "");
             Reg("d_backstory_adulthood_title", p => p.story?.Adulthood?.TitleCapFor(p.gender) ?? "");
@@ -138,24 +118,21 @@ namespace Ustas.RimAI.Communication.Personas
             Reg("d_rimpsyche", p => DirectorDataEngine.GetRimPsycheInfo(p));
 
             Reg("d_common_knowledge", p => DirectorDataEngine.GetCommonKnowledgeInfo(p, DirectorDataEngine.BuildCompleteData(p)));
+
+            _surfaceRegistered = true;
+        }
+
+        public static void UnregisterSurface()
+        {
+            if (!_surfaceRegistered)
+                return;
+            RimTalkPromptAPI.UnregisterAllHooks(ModId);
+            _surfaceRegistered = false;
         }
 
         private static void Reg(string name, System.Func<Pawn, string> provider, string desc = null)
         {
             RimTalkPromptAPI.RegisterPawnVariable(ModId, name, provider, desc);
-        }
-
-        private static void AddMenu(string name, string content)
-        {
-            var entry = RimTalkPromptAPI.CreatePromptEntry(
-                name,
-                content,
-                PromptRole.System,
-                PromptPosition.Relative,
-                0,
-                ModId
-            );
-            RimTalkPromptAPI.AddPromptEntry(entry);
         }
     }
 }

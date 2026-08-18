@@ -9,17 +9,25 @@ using Verse;
 
 namespace Ustas.RimAI.Communication.Personas.Integration;
 
+/// <summary>
+/// Owns Communication hook wiring for Personas. Register/Unregister are idempotent
+/// and only remove Personas-owned handlers (never TalkLifecycle.Clear()).
+/// </summary>
 public static class CommunicationBridge
 {
     static bool _registered;
+    static IPersonaGenerator _ownedGenerator;
+    static System.Func<System.Collections.Generic.IEnumerable<PersonalityData>, Pawn, PersonalityData> _ownedSelectPersonality;
 
     public static void Register()
     {
         if (_registered)
             return;
         _registered = true;
-        PersonaService.OverrideGenerator = new DirectorPersonaGenerator();
-        Hediff_Persona.SelectPersonality = Patch_GetOrAddNew.AssignViaRulesOrRandom;
+        _ownedGenerator = new DirectorPersonaGenerator();
+        _ownedSelectPersonality = PersonaResolver.AssignViaRulesOrRandom;
+        PersonaService.OverrideGenerator = _ownedGenerator;
+        Hediff_Persona.SelectPersonality = _ownedSelectPersonality;
         TalkLifecycle.ScribanRenderStarted += OnScribanRenderStarted;
         TalkLifecycle.ContextBuildStarted += OnContextBuildStarted;
         TalkLifecycle.ContextBuildCompleted += OnContextBuildCompleted;
@@ -28,6 +36,35 @@ public static class CommunicationBridge
         TalkLifecycle.PawnContextTransformed += OnPawnContextTransformed;
         PersonaEditorChrome.DrawFooter += Patch_PersonaEditorWindow_DirectorFeatures.DrawFooter;
         PersonaEditorChrome.TryHandleRollGen += HandleRollGen;
+    }
+
+    /// <summary>
+    /// Unsubscribes Personas-owned handlers only. Does not call TalkLifecycle.Clear()
+    /// (that would wipe Memory/Voices/Relations subscribers).
+    /// </summary>
+    public static void Unregister()
+    {
+        if (!_registered)
+            return;
+
+        TalkLifecycle.ScribanRenderStarted -= OnScribanRenderStarted;
+        TalkLifecycle.ContextBuildStarted -= OnContextBuildStarted;
+        TalkLifecycle.ContextBuildCompleted -= OnContextBuildCompleted;
+        TalkLifecycle.PromptDecorateStarted -= OnPromptDecorateStarted;
+        TalkLifecycle.PromptDecorated -= OnPromptDecorated;
+        TalkLifecycle.PawnContextTransformed -= OnPawnContextTransformed;
+        PersonaEditorChrome.DrawFooter -= Patch_PersonaEditorWindow_DirectorFeatures.DrawFooter;
+        PersonaEditorChrome.TryHandleRollGen -= HandleRollGen;
+
+        if (ReferenceEquals(PersonaService.OverrideGenerator, _ownedGenerator))
+            PersonaService.OverrideGenerator = null;
+        if (Hediff_Persona.SelectPersonality == _ownedSelectPersonality)
+            Hediff_Persona.SelectPersonality = null;
+
+        _ownedGenerator = null;
+        _ownedSelectPersonality = null;
+        DirectorContextTracker.Clear();
+        _registered = false;
     }
 
     static void OnScribanRenderStarted(object context)

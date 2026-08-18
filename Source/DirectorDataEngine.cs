@@ -376,48 +376,5 @@ namespace Ustas.RimAI.Communication.Personas
             var hediff = Hediff_Persona.GetOrAddNew(p);
             return hediff?.Personality ?? "";
         }
-
-        public static string GetDataByKey(Pawn p, string key)
-		{
-			if (p == null) return "";
-
-			switch (key)
-			{
-				case "full_profile": return DirectorDataEngine.BuildCompleteData(p);
-				case "basic.name": return p.LabelShortCap;
-				case "basic.fullname": return p.Name?.ToStringFull ?? p.LabelShortCap;
-				case "basic.gender": return p.gender.ToString();
-				case "basic.age": return p.ageTracker.AgeBiologicalYears.ToString();
-				case "basic.status": return DirectorUtils.GetPawnSocialStatus(p);
-				case "basic.faction.label": return p.Faction?.Name ?? "None";
-				case "basic.faction.desc": return p.Faction?.def?.description?.StripTags() ?? "";
-				case "race.label": return p.def.label;
-				case "race.desc": return p.def.description.StripTags();
-				case "race.xenotype.label": return p.genes?.Xenotype?.label ?? "Baseliner";
-				case "race.xenotype.desc": return p.genes?.Xenotype?.description.StripTags() ?? "";
-				case "genes.list": return DirectorDataEngine.GetGenesInfo(p, includeDesc: false);
-				case "genes.list_with_desc": return DirectorDataEngine.GetGenesInfo(p, includeDesc: true);
-				case "backstory.childhood.title": return p.story?.Childhood?.TitleCapFor(p.gender) ?? "";
-				case "backstory.childhood.desc": return p.story?.Childhood?.FullDescriptionFor(p).Resolve().StripTags() ?? "";
-				case "backstory.adulthood.title": return p.story?.Adulthood?.TitleCapFor(p.gender) ?? "";
-				case "backstory.adulthood.desc": return p.story?.Adulthood?.FullDescriptionFor(p).Resolve().StripTags() ?? "";
-				case "traits.list": return DirectorDataEngine.GetTraitsInfo(p, includeDesc: false);
-				case "traits.list_with_desc": return DirectorDataEngine.GetTraitsInfo(p, includeDesc: true);
-				case "ideology.list": return DirectorDataEngine.GetIdeologyInfo(p, includeDesc: false);
-				case "ideology.list_with_desc": return DirectorDataEngine.GetIdeologyInfo(p, includeDesc: true);
-				case "skills.list": return DirectorDataEngine.GetSkillsInfo(p, includeDesc: false);
-				case "skills.list_with_desc": return DirectorDataEngine.GetSkillsInfo(p, includeDesc: true);
-				case "health.list": return DirectorDataEngine.GetHealthInfo(p, includeDesc: false);
-				case "health.list_with_desc": return DirectorDataEngine.GetHealthInfo(p, includeDesc: true);
-				case "relations": return DirectorDataEngine.GetRelationsInfo(p);
-				case "equipment": return DirectorDataEngine.GetEquipmentInfo(p);
-				case "inventory": return DirectorDataEngine.GetInventoryInfo(p);
-				case "rimpsyche": return DirectorDataEngine.GetRimPsycheInfo(p);
-				case "memories": return DirectorDataEngine.GetMemoryInfo(p);
-				case "common_knowledge": return DirectorDataEngine.GetCommonKnowledgeInfo(p, DirectorDataEngine.BuildCompleteData(p));
-				default:
-					return ""; // 或者返回 $"{{Unknown: {key}}}"
-			}
-		}
 	}
 }

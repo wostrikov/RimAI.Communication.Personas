@@ -13,6 +13,8 @@ namespace Ustas.RimAI.Communication.Personas
         {
             try
             {
+                if (!PersonasComposition.Current.IsStarted)
+                    return;
                 if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
                 {
                     return;

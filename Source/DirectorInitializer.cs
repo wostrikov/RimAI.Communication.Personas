@@ -3,6 +3,7 @@ using RimWorld;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Core.Handshake;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Core.Personas;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -28,7 +29,7 @@ namespace Ustas.RimAI.Communication.Personas
         private void ApplyRulesToExistingPawns()
         {
             // 确保 Def 已加载
-            HediffDef personaDef = DefDatabase<HediffDef>.GetNamed("RimTalk_PersonaData", false);
+            HediffDef personaDef = DefDatabase<HediffDef>.GetNamed(PersonaScribeLabels.Hediff.DefName, false);
             if (personaDef == null) return;
 
             int count = 0;
@@ -51,7 +52,7 @@ namespace Ustas.RimAI.Communication.Personas
                 if (!hasPersona)
                 {
                     // 调用 Patch_GetOrAddNew 里的查找逻辑
-                    CustomPreset preset = Patch_GetOrAddNew.FindPresetFor(p);
+                    CustomPreset preset = PersonaResolver.FindPresetFor(p);
 
                     if (preset != null)
                     {
