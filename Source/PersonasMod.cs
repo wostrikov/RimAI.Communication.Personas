@@ -23,10 +23,12 @@ namespace Ustas.RimAI.Communication.Personas
         {
             Settings = GetSettings<PersonasSettings>();
             _isRimPsycheLoaded = AccessTools.TypeByName("Maux36.RimPsyche.CompPsyche") != null;
-            RimAiHandshake.Register(RimAiHandshakeDescriptor.Current(
-                RimAiModuleIds.Personas,
-                HandshakeModuleVersion,
-                isOptional: true));
+            RimAiHandshake.TryActivate(
+                RimAiHandshakeDescriptor.Current(
+                    RimAiModuleIds.Personas,
+                    HandshakeModuleVersion,
+                    isOptional: true),
+                PersonasComposition.Current.Start);
             if (!RimAiHandshake.IsApproved(RimAiModuleIds.Personas))
             {
                 return;
