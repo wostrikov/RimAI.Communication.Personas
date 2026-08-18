@@ -54,6 +54,7 @@ public sealed class PersonasComposition : IRimAiModuleComposition
         CommunicationBridge.Unregister();
         DirectorApiAdapter.UnregisterSurface();
         PersonaResolver.ClearAssignmentCache();
+        Ustas.RimAI.Core.Personas.PersonaProjectionAccess.Clear();
         IsStarted = false;
     }
 }

@@ -232,10 +232,11 @@ Also: PostLoadInit null-collection → empty list shape.
 - §11 LocalStorage / §16 Verse logging already green (`File.*` = 0, Verse `Log.*` = 0) — do not spend Waves B–D on them.
 - Projection fix (`PersonaProjection` → PromptContext) is a **semantic** change; prefer explicit substage after composition/resolution ownership (do not silently "fix" Transform in Wave B).
 
-### Pre–Wave B hardening (audit follow-up)
+### Pre–Wave C hardening (projection contract)
 
-1. **LocalStorage ambient flake** — `LocalStorageAmbient` xUnit collection (`DisableParallelization`) serializes binders/readers of `LocalStorage.Current` / `RimAiLog.Current` (Stage756/757/758 + RuntimeLoader/stress/7H). Latent since 7.5.6 `Bind`; Wave A+ only reshuffled scheduling.
-2. **Scribe labels bound to production** — Core `PersonaScribeLabels` (`Personas/PersonaPersistenceContracts.cs`) is shared by Personas/Communication `ExposeData` and Stage7510 persistence tests. Changing a label without updating the constant fails characterization; Wave C cannot silently diverge.
+- Core `PersonaProjectionContracts.cs`: `PersonaProjection` DTO, `PersonaProjectionDefaults` (incl. `UseTypedPersonaProjection = false`), `PersonaTalkTransform.ApplyLateReplace`, `PersonaProjectionAccess`.
+- Production binds: `PromptService` uses `FormatTalkPersonalityLine`; `Patch_PromptService` uses `PersonaTalkTransform` and no-ops when flag flips; `PromptContext.TypedPersonaProjections` bag exists but `TryGet` gated by flag.
+- Stage7510 projection tests assert against Core contract (not local tautologies). Wave C must flip `UseTypedPersonaProjection` and/or register `IPersonaProjectionProvider` or tests fail.
 
 ---
 
