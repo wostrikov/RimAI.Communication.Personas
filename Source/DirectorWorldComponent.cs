@@ -2,6 +2,7 @@
 using RimWorld.Planet;
 using System.Collections.Generic;
 using Verse;
+using Ustas.RimAI.Core.Personas;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -20,12 +21,12 @@ namespace Ustas.RimAI.Communication.Personas
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Collections.Look(ref _lastEvolveTicks, "lastEvolveTicks", LookMode.Value, LookMode.Value);
-            Scribe_Collections.Look(ref _lastEvolveBioAgeTicks, "lastEvolveBioAgeTicks", LookMode.Value, LookMode.Value);
-            Scribe_Collections.Look(ref _dataSnapshots, "dataSnapshots", LookMode.Value, LookMode.Value);
-            Scribe_Collections.Look(ref _dailySnapshots, "dailySnapshots", LookMode.Value, LookMode.Value);
-            Scribe_Collections.Look(ref _dailySnapshotDays, "dailySnapshotDays", LookMode.Value, LookMode.Value);
-            Scribe_Values.Look(ref lastRuleCheckTick, "lastRuleCheckTick", 0);
+            Scribe_Collections.Look(ref _lastEvolveTicks, PersonaScribeLabels.WorldComponent.LastEvolveTicks, LookMode.Value, LookMode.Value);
+            Scribe_Collections.Look(ref _lastEvolveBioAgeTicks, PersonaScribeLabels.WorldComponent.LastEvolveBioAgeTicks, LookMode.Value, LookMode.Value);
+            Scribe_Collections.Look(ref _dataSnapshots, PersonaScribeLabels.WorldComponent.DataSnapshots, LookMode.Value, LookMode.Value);
+            Scribe_Collections.Look(ref _dailySnapshots, PersonaScribeLabels.WorldComponent.DailySnapshots, LookMode.Value, LookMode.Value);
+            Scribe_Collections.Look(ref _dailySnapshotDays, PersonaScribeLabels.WorldComponent.DailySnapshotDays, LookMode.Value, LookMode.Value);
+            Scribe_Values.Look(ref lastRuleCheckTick, PersonaScribeLabels.WorldComponent.LastRuleCheckTick, 0);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {

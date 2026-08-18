@@ -6,6 +6,7 @@ using Verse;
 using System.Linq;
 using Ustas.RimAI.Core.Storage;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Core.Personas;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -107,7 +108,7 @@ namespace Ustas.RimAI.Communication.Personas
             Rect importFileRect = new Rect(buttonRowRect.x + (btnWidth + 10f) * 3, buttonRowRect.y, btnWidth, 30f);
             if (Widgets.ButtonText(importFileRect, "RPD_IO_ImportFile".Translate()))
             {
-                string dirPath = Path.Combine(GenFilePaths.SaveDataFolderPath, "PersonaDirector");
+                string dirPath = Path.Combine(GenFilePaths.SaveDataFolderPath, PersonaScribeLabels.LibraryExport.FolderName);
                 if (!LocalStorage.Current.DirectoryExists(dirPath))
                 {
                     Messages.Message("RPD_IO_MsgNoFolder".Translate(), MessageTypeDefOf.RejectInput, false);
@@ -165,10 +166,10 @@ namespace Ustas.RimAI.Communication.Personas
             try
             {
                 string xml = GenerateExportXml();
-                string dirPath = Path.Combine(GenFilePaths.SaveDataFolderPath, "PersonaDirector");
+                string dirPath = Path.Combine(GenFilePaths.SaveDataFolderPath, PersonaScribeLabels.LibraryExport.FolderName);
                 LocalStorage.Current.CreateDirectory(dirPath);
 
-                string filename = $"Persona_Library_{System.DateTime.Now:yyyyMMdd_HHmmss}.xml";
+                string filename = $"{PersonaScribeLabels.LibraryExport.FilenamePrefix}{System.DateTime.Now:yyyyMMdd_HHmmss}{PersonaScribeLabels.LibraryExport.FilenameExtension}";
                 string fullPath = Path.Combine(dirPath, filename);
 
                 LocalStorage.Current.WriteAllText(fullPath, xml);
@@ -251,8 +252,8 @@ namespace Ustas.RimAI.Communication.Personas
 
             public void ExposeData()
             {
-                Scribe_Collections.Look(ref Presets, "UserPresets", LookMode.Deep);
-                Scribe_Collections.Look(ref Rules, "AssignmentRules", LookMode.Deep);
+                Scribe_Collections.Look(ref Presets, PersonaScribeLabels.LibraryExport.UserPresets, LookMode.Deep);
+                Scribe_Collections.Look(ref Rules, PersonaScribeLabels.LibraryExport.AssignmentRules, LookMode.Deep);
             }
         }
     }

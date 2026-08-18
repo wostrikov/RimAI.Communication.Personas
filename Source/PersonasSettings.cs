@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Core.Personas;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -26,8 +27,8 @@ namespace Ustas.RimAI.Communication.Personas
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref label, "label");
-            Scribe_Values.Look(ref text, "text");
+            Scribe_Values.Look(ref label, PersonaScribeLabels.PromptPreset.Label);
+            Scribe_Values.Look(ref text, PersonaScribeLabels.PromptPreset.Text);
         }
     }
 
@@ -53,12 +54,12 @@ namespace Ustas.RimAI.Communication.Personas
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref id, "id");
-            Scribe_Values.Look(ref label, "label");
-            Scribe_Values.Look(ref personaText, "personaText");
-            Scribe_Values.Look(ref chattiness, "chattiness", 1.0f);
-            Scribe_Values.Look(ref category, "category", "Default");
-            Scribe_Values.Look(ref enabled, "enabled", true);
+            Scribe_Values.Look(ref id, PersonaScribeLabels.CustomPreset.Id);
+            Scribe_Values.Look(ref label, PersonaScribeLabels.CustomPreset.Label);
+            Scribe_Values.Look(ref personaText, PersonaScribeLabels.CustomPreset.PersonaText);
+            Scribe_Values.Look(ref chattiness, PersonaScribeLabels.CustomPreset.Chattiness, PersonaScribeLabels.CustomPreset.DefaultChattiness);
+            Scribe_Values.Look(ref category, PersonaScribeLabels.CustomPreset.Category, PersonaScribeLabels.CustomPreset.DefaultCategory);
+            Scribe_Values.Look(ref enabled, PersonaScribeLabels.CustomPreset.Enabled, PersonaScribeLabels.CustomPreset.DefaultEnabled);
         }
     }
 
@@ -75,11 +76,11 @@ namespace Ustas.RimAI.Communication.Personas
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref enabled, "enabled", true);
-            Scribe_Values.Look(ref targetDefName, "targetDefName");
-            Scribe_Values.Look(ref type, "type");
-            Scribe_Values.Look(ref priority, "priority", 0);
-            Scribe_Collections.Look(ref allowedPresetIds, "allowedPresetIds", LookMode.Value);
+            Scribe_Values.Look(ref enabled, PersonaScribeLabels.AssignmentRule.Enabled, PersonaScribeLabels.AssignmentRule.DefaultEnabled);
+            Scribe_Values.Look(ref targetDefName, PersonaScribeLabels.AssignmentRule.TargetDefName);
+            Scribe_Values.Look(ref type, PersonaScribeLabels.AssignmentRule.Type);
+            Scribe_Values.Look(ref priority, PersonaScribeLabels.AssignmentRule.Priority, PersonaScribeLabels.AssignmentRule.DefaultPriority);
+            Scribe_Collections.Look(ref allowedPresetIds, PersonaScribeLabels.AssignmentRule.AllowedPresetIds, LookMode.Value);
         }
     }
 
@@ -285,31 +286,31 @@ namespace Ustas.RimAI.Communication.Personas
         public override void ExposeData()
         {
             // 读取旧数据
-            Scribe_Values.Look(ref activePrompt, "activePrompt", "", true);
+            Scribe_Values.Look(ref activePrompt, PersonaScribeLabels.Settings.ActivePrompt, "", true);
 
             // 读取新数据
-            Scribe_Values.Look(ref selectedPresetIndex, "selectedPresetIndex", 0);
-            Scribe_Collections.Look(ref presets, "presets", LookMode.Deep);
+            Scribe_Values.Look(ref selectedPresetIndex, PersonaScribeLabels.Settings.SelectedPresetIndex, 0);
+            Scribe_Collections.Look(ref presets, PersonaScribeLabels.Settings.Presets, LookMode.Deep);
 
             // 其他设置
-            Scribe_Values.Look(ref EnableDebugLog, "EnableDebugLog", false);
-            Scribe_Values.Look(ref directorNotes, "directorNotes", "");
-            Scribe_Values.Look(ref ShowMainButton, "ShowMainButton", true);
-            Scribe_Values.Look(ref enableEvolveFeature, "enableEvolveFeature", true);
+            Scribe_Values.Look(ref EnableDebugLog, PersonaScribeLabels.Settings.EnableDebugLog, false);
+            Scribe_Values.Look(ref directorNotes, PersonaScribeLabels.Settings.DirectorNotes, "");
+            Scribe_Values.Look(ref ShowMainButton, PersonaScribeLabels.Settings.ShowMainButton, true);
+            Scribe_Values.Look(ref enableEvolveFeature, PersonaScribeLabels.Settings.EnableEvolveFeature, true);
 
-            Scribe_Deep.Look(ref Context, "Context");
+            Scribe_Deep.Look(ref Context, PersonaScribeLabels.Settings.Context);
             if (Context == null) Context = new ContextSettings();
 
-            Scribe_Collections.Look(ref BatchFilters, "BatchFilters", LookMode.Value, LookMode.Value);
+            Scribe_Collections.Look(ref BatchFilters, PersonaScribeLabels.Settings.BatchFilters, LookMode.Value, LookMode.Value);
             // 库数据
-            Scribe_Collections.Look(ref userPresets, "userPresets", LookMode.Deep);
-            Scribe_Collections.Look(ref assignmentRules, "assignmentRules", LookMode.Deep);
+            Scribe_Collections.Look(ref userPresets, PersonaScribeLabels.Settings.UserPresets, LookMode.Deep);
+            Scribe_Collections.Look(ref assignmentRules, PersonaScribeLabels.Settings.AssignmentRules, LookMode.Deep);
             // 保存初始化标记
-            Scribe_Values.Look(ref _libraryInitialized, "libraryInitialized", false);
-            Scribe_Values.Look(ref _chattinessMigratedV2, "chattinessMigratedV2", false);
+            Scribe_Values.Look(ref _libraryInitialized, PersonaScribeLabels.Settings.LibraryInitialized, false);
+            Scribe_Values.Look(ref _chattinessMigratedV2, PersonaScribeLabels.Settings.ChattinessMigratedV2, false);
 
-            Scribe_Values.Look(ref rimTalkPreset_Single, "rimTalkPreset_Single", "");
-            Scribe_Values.Look(ref rimTalkPreset_Evolve, "rimTalkPreset_Evolve", "");
+            Scribe_Values.Look(ref rimTalkPreset_Single, PersonaScribeLabels.Settings.RimTalkPresetSingle, "");
+            Scribe_Values.Look(ref rimTalkPreset_Evolve, PersonaScribeLabels.Settings.RimTalkPresetEvolve, "");
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
@@ -668,30 +669,30 @@ namespace Ustas.RimAI.Communication.Personas
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref Inc_Basic, "Inc_Basic", true);
-            Scribe_Values.Look(ref Inc_Race, "Inc_Race", true);
-            Scribe_Values.Look(ref Inc_Race_Desc, "Inc_Race_Desc", false);
-            Scribe_Values.Look(ref Inc_Genes, "Inc_Genes", true);
-            Scribe_Values.Look(ref Inc_Genes_Desc, "Inc_Genes_Desc", false);
-            Scribe_Values.Look(ref Inc_Backstory, "Inc_Backstory", true);
-            Scribe_Values.Look(ref Inc_Backstory_Desc, "Inc_Backstory_Desc", true);
-            Scribe_Values.Look(ref Inc_Relations, "Inc_Relations", true);
-            Scribe_Values.Look(ref Inc_DirectorNotes, "Inc_DirectorNotes", true);
-            Scribe_Values.Look(ref Inc_Traits, "Inc_Traits", true);
-            Scribe_Values.Look(ref Inc_Traits_Desc, "Inc_Traits_Desc", true);
-            Scribe_Values.Look(ref Inc_Ideology, "Inc_Ideology", false);
-            Scribe_Values.Look(ref Inc_Ideology_Desc, "Inc_Ideology_Desc", false);
-            Scribe_Values.Look(ref Inc_Skills, "Inc_Skills", true);
-            Scribe_Values.Look(ref Inc_Skills_Desc, "Inc_Skills_Desc", true);
-            Scribe_Values.Look(ref Inc_Health, "Inc_Health", false);
-            Scribe_Values.Look(ref Inc_Health_Desc, "Inc_Health_Desc", false);
-            Scribe_Values.Look(ref Inc_Equipment, "Inc_Equipment", false);
-            Scribe_Values.Look(ref Inc_Inventory, "Inc_Inventory", false);
-            Scribe_Values.Look(ref Inc_RimPsyche, "Inc_RimPsyche", false);
-            Scribe_Values.Look(ref Inc_RimPsyche_All, "Inc_RimPsyche_All", false);
-            Scribe_Values.Look(ref Inc_Memories, "Inc_Memories", false);
-            Scribe_Values.Look(ref Inc_CommonKnowledge, "Inc_CommonKnowledge", false);
-            Scribe_Values.Look(ref Inc_DataComparison, "Inc_DataComparison", false);
+            Scribe_Values.Look(ref Inc_Basic, PersonaScribeLabels.Context.IncBasic, true);
+            Scribe_Values.Look(ref Inc_Race, PersonaScribeLabels.Context.IncRace, true);
+            Scribe_Values.Look(ref Inc_Race_Desc, PersonaScribeLabels.Context.IncRaceDesc, false);
+            Scribe_Values.Look(ref Inc_Genes, PersonaScribeLabels.Context.IncGenes, true);
+            Scribe_Values.Look(ref Inc_Genes_Desc, PersonaScribeLabels.Context.IncGenesDesc, false);
+            Scribe_Values.Look(ref Inc_Backstory, PersonaScribeLabels.Context.IncBackstory, true);
+            Scribe_Values.Look(ref Inc_Backstory_Desc, PersonaScribeLabels.Context.IncBackstoryDesc, true);
+            Scribe_Values.Look(ref Inc_Relations, PersonaScribeLabels.Context.IncRelations, true);
+            Scribe_Values.Look(ref Inc_DirectorNotes, PersonaScribeLabels.Context.IncDirectorNotes, true);
+            Scribe_Values.Look(ref Inc_Traits, PersonaScribeLabels.Context.IncTraits, true);
+            Scribe_Values.Look(ref Inc_Traits_Desc, PersonaScribeLabels.Context.IncTraitsDesc, true);
+            Scribe_Values.Look(ref Inc_Ideology, PersonaScribeLabels.Context.IncIdeology, false);
+            Scribe_Values.Look(ref Inc_Ideology_Desc, PersonaScribeLabels.Context.IncIdeologyDesc, false);
+            Scribe_Values.Look(ref Inc_Skills, PersonaScribeLabels.Context.IncSkills, true);
+            Scribe_Values.Look(ref Inc_Skills_Desc, PersonaScribeLabels.Context.IncSkillsDesc, true);
+            Scribe_Values.Look(ref Inc_Health, PersonaScribeLabels.Context.IncHealth, false);
+            Scribe_Values.Look(ref Inc_Health_Desc, PersonaScribeLabels.Context.IncHealthDesc, false);
+            Scribe_Values.Look(ref Inc_Equipment, PersonaScribeLabels.Context.IncEquipment, false);
+            Scribe_Values.Look(ref Inc_Inventory, PersonaScribeLabels.Context.IncInventory, false);
+            Scribe_Values.Look(ref Inc_RimPsyche, PersonaScribeLabels.Context.IncRimPsyche, false);
+            Scribe_Values.Look(ref Inc_RimPsyche_All, PersonaScribeLabels.Context.IncRimPsycheAll, false);
+            Scribe_Values.Look(ref Inc_Memories, PersonaScribeLabels.Context.IncMemories, false);
+            Scribe_Values.Look(ref Inc_CommonKnowledge, PersonaScribeLabels.Context.IncCommonKnowledge, false);
+            Scribe_Values.Look(ref Inc_DataComparison, PersonaScribeLabels.Context.IncDataComparison, false);
         }
     }
 
