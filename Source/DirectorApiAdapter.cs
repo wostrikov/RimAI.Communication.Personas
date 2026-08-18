@@ -1,9 +1,7 @@
 using Ustas.RimAI.Communication.API;
-using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Prompt;
 using System.Collections.Generic;
 using Ustas.RimAI.Core.Diagnostics;
-using Ustas.RimAI.Core.Personas;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
@@ -65,35 +63,17 @@ namespace Ustas.RimAI.Communication.Personas
                     ContextHookRegistry.HookOperation.Override,
                     (pawn, originalValue) =>
                     {
-                        // Wave C: typed path already rendered into TypedPersonaProjections;
-                        // Override must not run a second Scriban pass (Memory 7.5.9 lesson).
-                        if (PersonaProjectionDefaults.UseTypedPersonaProjection
-                            && PersonaProjectionDefaults.ScribanOverridePassThroughWhenTyped)
+                        // Typed path: pass through precomputed bag — no second Scriban render.
+                        if (PromptManager.LastContext != null
+                            && pawn != null
+                            && !string.IsNullOrEmpty(pawn.ThingID)
+                            && PromptManager.LastContext.TryGetTypedPersonaProjection(pawn.ThingID, out var precomputed)
+                            && precomputed != null)
                         {
-                            if (PromptManager.LastContext != null
-                                && pawn != null
-                                && !string.IsNullOrEmpty(pawn.ThingID)
-                                && PromptManager.LastContext.TryGetTypedPersonaProjection(pawn.ThingID, out var precomputed)
-                                && precomputed != null)
-                            {
-                                return precomputed;
-                            }
-
-                            return originalValue;
+                            return precomputed;
                         }
 
-                        string personaTemplate = Hediff_Persona.GetOrAddNew(pawn)?.Personality;
-                        if (string.IsNullOrEmpty(personaTemplate))
-                            return originalValue;
-
-                        List<Pawn> allPawns = DirectorContextTracker.GetPawns();
-
-                        if (allPawns == null || !allPawns.Contains(pawn))
-                            allPawns = new List<Pawn> { pawn };
-
-                        var tempContext = new PromptContext(allPawns);
-                        tempContext.CurrentPawn = pawn;
-                        return ScribanParser.Render(personaTemplate, tempContext);
+                        return originalValue;
                     }
                 );
             }

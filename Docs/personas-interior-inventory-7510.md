@@ -234,23 +234,25 @@ Also: PostLoadInit null-collection → empty list shape.
 
 ### Pre–Wave C hardening (projection contract)
 
-- Core `PersonaProjectionContracts.cs`: `PersonaProjection` DTO, `PersonaProjectionDefaults` (incl. `UseTypedPersonaProjection = false`), `PersonaTalkTransform.ApplyLateReplace`, `PersonaProjectionAccess`.
-- Production binds: `PromptService` uses `FormatTalkPersonalityLine`; `Patch_PromptService` uses `PersonaTalkTransform` and no-ops when flag flips; `PromptContext.TypedPersonaProjections` bag exists but `TryGet` gated by flag.
-- Stage7510 projection tests assert against Core contract (not local tautologies). Wave C must flip `UseTypedPersonaProjection` and/or register `IPersonaProjectionProvider` or tests fail.
+- Core `PersonaProjectionContracts.cs`: DTO, defaults, TalkTransform (legacy), ProjectionAccess.
+- Production bound to FormatTalkPersonalityLine / provider Access before semantic switch.
 
 ---
 
-## Wave C status (typed PersonaProjection — done; Wave D not started)
+## Wave C status (typed PersonaProjection)
 
-Implemented OPTION A:
+OPTION A: Attach before BuildContext; Talk/Scriban present bag; Override pass-through; provider registered at Start.
 
-- `PersonaProjectionDefaults.UseTypedPersonaProjection = true`
-- `PromptManager.AttachTypedPersonaContext` before `BuildContext`; fills `TypedPersonaProjections`
-- Talk `CreatePawnContext` presents bag (fallback to provider)
-- Scriban `{{pawn.personality}}` presents bag via `ResolvePersonalityForScriban`
-- Director Personality Override pass-through when typed (no second Scriban render)
-- `DirectorPersonaProjectionProvider` registered from `PersonasComposition.Start`
-- Late `Patch_PromptService.Transform` remains no-op under the flag
-- Stage7510 projection goldens updated intentionally for Wave C
+Pre-D fix: balanced ContextBuildStarted/Completed around Attach publish (later removed in Wave D).
 
-Wave D backlog (not started): integration cleanup, dead façade trim, TempCurrentPersona/ThreadStatic ownership, MainButtonDef, Director Memory typed alignment, guards, roadmap close.
+---
+
+## Wave D status (integration cleanup — CLOSED with stage)
+
+- `IPersonaProjectionProvider.GetProjection(..., object pawnHint)` — Attach passes Pawn; **no** TalkLifecycle publish in Attach.
+- Removed dual-path `UseTypedPersonaProjection` flag and dead `!typed` branches.
+- `Patch_PromptService.Transform` is identity (no late replace / no `_isPatching` ThreadStatic).
+- `TempCurrentPersona` cleared on `PersonasComposition.Stop` (evolve already clears in finally).
+- `DirectorContextTracker` remains for Scriban `d_*` / PromptComposer multi-pawn (lifecycle events unchanged).
+- Persistence formats/labels unchanged; MainButtonDef / Director Memory typed alignment deferred follow-ups.
+- Stage7510 goldens updated; `verify-all PASS`; roadmap advances to 7.5.11.
