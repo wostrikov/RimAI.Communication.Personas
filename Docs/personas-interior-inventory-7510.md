@@ -198,12 +198,49 @@ Rule: goldens snapshot today. Suspected bugs are listed above — not corrected 
 
 ---
 
-## Wave B–D backlog (blocked pending review)
+## Wave A+ (independent audit gaps — closed before Wave B)
 
-1. Real Start/Stop ownership (bridge, Scriban register, library sync; clear hooks on Stop).
+Independent audit after Wave A found three coverage holes. Wave A+ freezes them in:
+
+Core: `Stage7510PersonaPersistenceLifecycleCharacterizationTests`
+
+### Persistence (three carriers)
+
+| Carrier | What is frozen |
+| --- | --- |
+| `PersonasSettings` / nested presets / rules / `Context` Inc_* | Scribe label sets + defaults |
+| `DirectorWorldComponent` | Scribe label set; `_processedPawnIds` not scribed |
+| Library export | folder `PersonaDirector`, prefix `Persona_Library_`, XML roots `UserPresets` / `AssignmentRules`, LocalStorage-only |
+| Communication `Hediff_Persona` | `Personality`, `TalkInitiationWeight`, `SpokenThoughtTicks`; Def `RimTalk_PersonaData` |
+
+Also: PostLoadInit null-collection → empty list shape.
+
+### Behavioral isolation (not merely "is static")
+
+- `TempCurrentPersona` **leaks** across pawns while set (GetActiveUIText returns ambient for any pawn).
+- `DirectorContextTracker` overwrite + Clear prevent prior-pawn list reads after clear.
+- Per-pawn Talk Transform Replace does **not** cross pawn blocks (same preset text OK).
+- Talk Transform **silently keeps raw `{{...}}`** if upstream mutates embedded text (`Contains` miss).
+
+### Lifecycle
+
+- `Start` / `Register` idempotent via flags.
+- `Stop` today flag-only — does **not** unregister bridge / clear generators (Wave B will change this; characterization locks pre-change semantics).
+
+### Scope exclusions confirmed by audit
+
+- §11 LocalStorage / §16 Verse logging already green (`File.*` = 0, Verse `Log.*` = 0) — do not spend Waves B–D on them.
+- Projection fix (`PersonaProjection` → PromptContext) is a **semantic** change; prefer explicit substage after composition/resolution ownership (do not silently "fix" Transform in Wave B).
+
+---
+
+## Wave B–D backlog (blocked until Wave A+ green)
+
+1. Real Start/Stop ownership (bridge, Scriban register, library sync; clear hooks on Stop) — **must keep lifecycle + isolation tests green** (update goldens only with intentional semantic decision).
 2. One PersonaResolver; converge SelectPersonality / backfill / sync.
-3. Precompute PersonaProjection onto prompt context; remove late Transform / Override divergence.
+3. Precompute PersonaProjection onto prompt context; remove late Transform / Override divergence (**semantic**; characterization must stay empty-diff until then).
 4. Delete dead RuleExecutor / empty provider / unused GetDataByKey.
 5. Decide MainButtonDef restore vs drop ShowMainButton.
 6. Touch-site logging already RimAiLog; burn DOMAIN catch when touching.
 7. Align Director Memory access with 7.5.9 typed projections (or document intentional separate path).
+8. Wave C must not rewrite persistence ownership without empty-diff on Wave A+ Scribe label tests.
