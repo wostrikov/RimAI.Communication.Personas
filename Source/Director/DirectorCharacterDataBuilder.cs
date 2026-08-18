@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -368,7 +369,7 @@ public static class DirectorCharacterDataBuilder
             }
             catch (Exception ex)
             {
-                if (PersonasMod.Settings.EnableDebugLog) Log.Warning($"[Director] Error fetching health data for {p.LabelShort}: {ex.Message}");
+                if (PersonasMod.Settings.EnableDebugLog) RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Error fetching health data for {p.LabelShort}: {ex.Message}");
             }
 
             try

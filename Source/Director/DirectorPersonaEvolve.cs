@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -91,11 +92,11 @@ public static class DirectorPersonaEvolve
                         finalPrompt = userSb.ToString();
 
                         if (PersonasMod.Settings.EnableDebugLog)
-                            Log.Message($"[Director] Advanced Preset Rendered.\nContext Len: {finalContext.Length}\nPrompt Len: {finalPrompt.Length}");
+                            RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Advanced Preset Rendered.\nContext Len: {finalContext.Length}\nPrompt Len: {finalPrompt.Length}");
                     }
                     else
                     {
-                        Log.Warning($"[Director] Preset '{presetName}' not found. Falling back to internal.");
+                        RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Preset '{presetName}' not found. Falling back to internal.");
                     }
                 }
 
@@ -193,7 +194,7 @@ public static class DirectorPersonaEvolve
             }
             catch (Exception ex)
             {
-                Log.Error($"[Director] PrepareEvolveRequest failed: {ex}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] PrepareEvolveRequest failed: {ex}");
                 return (null, null);
             }
             finally
@@ -213,7 +214,7 @@ public static class DirectorPersonaEvolve
             }
             catch (Exception ex)
             {
-                Log.Error($"[Director] AI Request failed: {ex.Message}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] AI Request failed: {ex.Message}");
                 return null;
             }
         }
@@ -236,7 +237,7 @@ public static class DirectorPersonaEvolve
             catch (Exception ex)
             {
                 // 后台线程记录错误
-                Log.Error($"[Director] Evolve execution failed: {ex.Message}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Evolve execution failed: {ex.Message}");
                 // (可选) 调用 TryLogErrorToApiHistory
             }
             return null;

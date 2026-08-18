@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -131,7 +132,7 @@ namespace Ustas.RimAI.Communication.Personas
                     }
                     else
                     {
-                        Log.Error($"[Director] Task failed for {pawn.LabelShortCap}: {task.Exception}");
+                        RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Task failed for {pawn.LabelShortCap}: {task.Exception}");
                     }
                 }
             }
@@ -157,7 +158,7 @@ namespace Ustas.RimAI.Communication.Personas
                 }
                 else
                 {
-                    Log.Error($"[Director] Batch Task failed: {batchTask.Exception}");
+                    RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Batch Task failed: {batchTask.Exception}");
                 }
                 batchTask = null;
                 batchTaskPawns = null;

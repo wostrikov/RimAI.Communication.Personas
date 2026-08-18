@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -96,7 +97,7 @@ public static class DirectorMemoryContext
             catch (Exception ex)
             {
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Warning($"[Director] Critical error reading memories: {ex}");
+                    RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Critical error reading memories: {ex}");
                 return null;
             }
         }
@@ -121,7 +122,7 @@ public static class DirectorMemoryContext
             catch (Exception ex)
             {
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Warning($"[Director] CK injection failed: {ex.Message}");
+                    RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] CK injection failed: {ex.Message}");
             }
             return null;
         }

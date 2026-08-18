@@ -1,6 +1,7 @@
 using Verse;
 using Ustas.RimAI.Communication.Data;
 using System;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -31,7 +32,7 @@ namespace Ustas.RimAI.Communication.Personas
             catch (Exception ex)
             {
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Warning($"[Director] Failed to patch context for {pawn.LabelShort}: {ex.Message}");
+                    RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Failed to patch context for {pawn.LabelShort}: {ex.Message}");
                 return result;
             }
             finally

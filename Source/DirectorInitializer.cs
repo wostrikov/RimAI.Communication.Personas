@@ -2,6 +2,7 @@ using Verse;
 using RimWorld;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Core.Handshake;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -62,7 +63,7 @@ namespace Ustas.RimAI.Communication.Personas
 
             if (count > 0)
             {
-                Log.Message($"[RimAI.Personas] Initialization: Applied rules to {count} existing pawns.");
+                RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] Initialization: Applied rules to {count} existing pawns.");
             }
         }
     }

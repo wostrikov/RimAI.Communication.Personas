@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -38,7 +39,7 @@ public static class DirectorPersonalityGenerator
             }
             catch
             {
-                if (PersonasMod.Settings.EnableDebugLog) Log.Warning("[Director] Failed to create Scriban Context.");
+                if (PersonasMod.Settings.EnableDebugLog) RimAiLog.Warning(RimAiLogCategory.Personas, "[Director] Failed to create Scriban Context.");
                 return null;
             }
 
@@ -108,7 +109,7 @@ public static class DirectorPersonalityGenerator
             try
             {
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Message($"[Director] Gen Data for {pawnNameForLog}...");
+                    RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Gen Data for {pawnNameForLog}...");
 
                 // 优先尝试高级预设
                 string presetName = PersonasMod.Settings.rimTalkPreset_Single;
@@ -136,7 +137,7 @@ public static class DirectorPersonalityGenerator
             }
             catch (Exception e)
             {
-                Log.Error($"[Director] Generation failed: {e.Message}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Generation failed: {e.Message}");
                 return new PersonalityData("Error generating persona.", 0.5f);
             }
         }
@@ -147,7 +148,7 @@ public static class DirectorPersonalityGenerator
             {
                 if (PersonasMod.Settings.EnableDebugLog)
                 {
-                    Log.Message($"[Director] Batch Gen Data:\n{combinedData}");
+                    RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Batch Gen Data:\n{combinedData}");
                 }
 
                 string userInstruction = PersonasMod.Settings.GetActivePrompt(false);
@@ -164,7 +165,7 @@ public static class DirectorPersonalityGenerator
             }
             catch (Exception e)
             {
-                Log.Error($"[Director] Batch Gen failed: {e.Message}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Batch Gen failed: {e.Message}");
                 return null;
             }
         }
@@ -202,7 +203,7 @@ public static class DirectorPersonalityGenerator
             }
             catch (Exception e)
             {
-                Log.Error($"[Director] Failed to apply personality: {e.Message}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Failed to apply personality: {e.Message}");
             }
         }
 
@@ -221,7 +222,7 @@ public static class DirectorPersonalityGenerator
                 // 如果没找到方括号，说明格式彻底乱了，跳过
                 if (bracketIndex == -1)
                 {
-                    if (PersonasMod.Settings.EnableDebugLog) Log.Warning($"[Director] Invalid format (no bracket found): {part.Trim()}");
+                    if (PersonasMod.Settings.EnableDebugLog) RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Invalid format (no bracket found): {part.Trim()}");
                     continue;
                 }
 
@@ -265,7 +266,7 @@ public static class DirectorPersonalityGenerator
                 else
                 {
                     if (PersonasMod.Settings.EnableDebugLog)
-                        Log.Warning($"[Director] Could not match result key '{keyPart}' to any pawn.");
+                        RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Could not match result key '{keyPart}' to any pawn.");
                 }
             }
             return appliedCount;
@@ -330,7 +331,7 @@ public static class DirectorPersonalityGenerator
             }
             catch (Exception ex)
             {
-                Log.Error($"[Director] Failed to open RimTalk window: {ex}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Failed to open RimTalk window: {ex}");
             }
         }
 }

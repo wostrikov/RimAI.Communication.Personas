@@ -5,6 +5,7 @@ using UnityEngine;
 using Verse;
 using System.Linq;
 using Ustas.RimAI.Core.Storage;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -155,7 +156,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch (System.Exception ex)
             {
-                Log.Error($"Export failed: {ex}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"Export failed: {ex}");
             }
         }
 
@@ -173,13 +174,13 @@ namespace Ustas.RimAI.Communication.Personas
                 LocalStorage.Current.WriteAllText(fullPath, xml);
 
                 Messages.Message("RPD_IO_MsgExportFile".Translate(fullPath), MessageTypeDefOf.PositiveEvent, false);
-                Log.Message($"[RimAI.Personas] Library exported to: {fullPath}");
+                RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] Library exported to: {fullPath}");
 
                 _text = xml;
             }
             catch (System.Exception ex)
             {
-                Log.Error($"Export to file failed: {ex}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"Export to file failed: {ex}");
             }
         }
 
@@ -238,7 +239,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch (System.Exception ex)
             {
-                Log.Error($"Import failed: {ex}");
+                RimAiLog.Error(RimAiLogCategory.Personas, $"Import failed: {ex}");
                 Messages.Message("RPD_IO_MsgImportFail".Translate(ex.Message), MessageTypeDefOf.RejectInput, false);
             }
         }

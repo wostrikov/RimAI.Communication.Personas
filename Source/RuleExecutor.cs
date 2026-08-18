@@ -6,6 +6,7 @@ using RimWorld;
 using Ustas.RimAI.Communication.Data;
 using System.Linq;
 using System.Collections.Generic;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -93,7 +94,7 @@ namespace Ustas.RimAI.Communication.Personas
                 DirectorUtils.ApplyPersonalityToPawn(p, new PersonalityData(preset.personaText, preset.chattiness));
 
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Message($"[Director] Auto-assigned preset '{preset.label}' to {p.Name}. ({(candidateIds.Count == settings.userPresets.Count ? "Global Pool" : "Rule-based Pool")})");
+                    RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Auto-assigned preset '{preset.label}' to {p.Name}. ({(candidateIds.Count == settings.userPresets.Count ? "Global Pool" : "Rule-based Pool")})");
             }
         }
 

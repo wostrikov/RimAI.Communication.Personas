@@ -3,6 +3,7 @@ using Ustas.RimAI.Communication.Data;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -28,7 +29,7 @@ namespace Ustas.RimAI.Communication.Personas
             if (preset != null)
             {
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Message($"[Director] Auto-assigned '{preset.label}' to {pawn.Name} via rule or global pool.");
+                    RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Auto-assigned '{preset.label}' to {pawn.Name} via rule or global pool.");
 
                 // 返回一个新的 PersonalityData 实例
                 return new PersonalityData(preset.personaText, preset.chattiness);
@@ -36,7 +37,7 @@ namespace Ustas.RimAI.Communication.Personas
 
             // 如果我们的规则系统什么都没找到（比如库是空的），就回退到原版随机池
             if (PersonasMod.Settings.EnableDebugLog)
-                Log.Message($"[Director] No presets found for {pawn.Name}. Falling back to vanilla random pool.");
+                RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] No presets found for {pawn.Name}. Falling back to vanilla random pool.");
 
             return vanillaPool.RandomElement();
         }
@@ -107,13 +108,13 @@ namespace Ustas.RimAI.Communication.Personas
                 if (attempt == MAX_RETRY_ATTEMPTS)
                 {
                     if (PersonasMod.Settings.EnableDebugLog)
-                        Log.Message($"[Director] Preset '{pickId}' was recently used, but accepting after {MAX_RETRY_ATTEMPTS + 1} attempts (pool size: {candidateIds.Count})");
+                        RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Preset '{pickId}' was recently used, but accepting after {MAX_RETRY_ATTEMPTS + 1} attempts (pool size: {candidateIds.Count})");
                     break;
                 }
 
                 // 否则重试
                 if (PersonasMod.Settings.EnableDebugLog)
-                    Log.Message($"[Director] Preset '{pickId}' was recently used, retrying... (attempt {attempt + 1}/{MAX_RETRY_ATTEMPTS + 1})");
+                    RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Preset '{pickId}' was recently used, retrying... (attempt {attempt + 1}/{MAX_RETRY_ATTEMPTS + 1})");
             }
 
             // 5. 记录本次分配

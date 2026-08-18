@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -346,17 +347,17 @@ namespace Ustas.RimAI.Communication.Personas
                 }
             }
             _chattinessMigratedV2 = true;
-            Log.Message($"[RimAI.Personas] Migrated {count} user presets to new chattiness scale (v2).");
+            RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] Migrated {count} user presets to new chattiness scale (v2).");
         }
 
         public void InitLibrary()
         {
-            Log.Message("[RimAI.Personas] -> InitLibrary: Starting...");
+            RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] -> InitLibrary: Starting...");
             if (userPresets == null) userPresets = new List<CustomPreset>();
             else userPresets.Clear();
             if (assignmentRules == null) assignmentRules = new List<AssignmentRule>();
             else assignmentRules.Clear();
-            Log.Message("[RimAI.Personas] -> InitLibrary: Cleared existing lists. Loading built-in presets...");
+            RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] -> InitLibrary: Cleared existing lists. Loading built-in presets...");
             // 填充预设库
             // 1. 内置库
             int builtInCount = 0;
@@ -377,7 +378,7 @@ namespace Ustas.RimAI.Communication.Personas
                 });
                 builtInCount++;
             }
-            Log.Message($"[RimAI.Personas] -> InitLibrary: Loaded {builtInCount} built-in presets. Loading vanilla presets...");
+            RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] -> InitLibrary: Loaded {builtInCount} built-in presets. Loading vanilla presets...");
             // 2. 填充原版
             int vanillaCount = 0;
             IEnumerable<Ustas.RimAI.Communication.Data.PersonalityData> sourceList = null;
@@ -420,15 +421,15 @@ namespace Ustas.RimAI.Communication.Personas
                     }
                 }
             }
-            Log.Message($"[RimAI.Personas] -> InitLibrary: Loaded {vanillaCount} vanilla presets. Loading default rules...");
+            RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] -> InitLibrary: Loaded {vanillaCount} vanilla presets. Loading default rules...");
             _chattinessMigratedV2 = true;
 
             // 3. 填充规则库
             AddDefaultRules();
-            Log.Message("[RimAI.Personas] -> InitLibrary: Default rules loaded. Syncing to Ustas.RimAI.Communication...");
+            RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] -> InitLibrary: Default rules loaded. Syncing to Ustas.RimAI.Communication...");
             PresetSynchronizer.SyncToRimTalk();
-            Log.Message("[RimAI.Personas] -> InitLibrary: Sync complete.");
-            Log.Message("[RimAI.Personas] Library reset/initialized to defaults.");
+            RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] -> InitLibrary: Sync complete.");
+            RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] Library reset/initialized to defaults.");
 
         }
 

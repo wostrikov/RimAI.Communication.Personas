@@ -2,6 +2,7 @@ using Verse;
 using Ustas.RimAI.Communication.Data;
 using System.Collections.Generic;
 using System;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -37,7 +38,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch (Exception ex)
             {
-                Log.Warning($"[RimAI.Personas] Sync failed: {ex.Message}");
+                RimAiLog.Warning(RimAiLogCategory.Personas, $"[RimAI.Personas] Sync failed: {ex.Message}");
             }
         }
     }

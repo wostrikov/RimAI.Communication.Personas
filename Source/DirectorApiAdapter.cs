@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Ustas.RimAI.Core.Handshake;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -31,7 +32,7 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch { return; }
 
-            Log.Message("[RimAI.Personas] Registering variables for Scriban engine...");
+            RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] Registering variables for Scriban engine...");
 
             // 变量注册
 
