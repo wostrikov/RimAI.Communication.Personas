@@ -3,6 +3,7 @@ using Ustas.RimAI.Communication.Personas.Integration;
 using Ustas.RimAI.Core.Composition;
 using Ustas.RimAI.Core.Handshake;
 using Ustas.RimAI.Core.Modules;
+using Ustas.RimAI.Core.Personas;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas;
@@ -30,6 +31,7 @@ public sealed class PersonasComposition : IRimAiModuleComposition
         _harmony = new Harmony("ustas.rimai.communication.personas");
         _harmony.PatchAll();
         CommunicationBridge.Register();
+        PersonaProjectionAccess.Register(new DirectorPersonaProjectionProvider());
         RimAIModuleRegistry.Current.Register(new RimAIModuleDescriptor(
             "personas",
             "RimAI.Communication.Personas",

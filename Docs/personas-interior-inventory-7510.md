@@ -240,20 +240,17 @@ Also: PostLoadInit null-collection → empty list shape.
 
 ---
 
-## Wave B status (composition + resolution)
+## Wave C status (typed PersonaProjection — done; Wave D not started)
 
-Implemented:
+Implemented OPTION A:
 
-- `PersonasComposition.Start/Stop` owns bridge + schedules DirectorStartup + DirectorApiAdapter surface (LongEvent timing preserved).
-- `CommunicationBridge.Unregister` clears Personas-owned TalkLifecycle/chrome hooks, OverrideGenerator, SelectPersonality; clears ThreadStatic tracker.
-- `DirectorApiAdapter` no longer `[StaticConstructorOnStartup]`; `RegisterSurface` / `UnregisterSurface` (`UnregisterAllHooks("director")`); deferred callbacks no-op if composition already Stopped.
-- `PersonaResolver` is authoritative assignment path; `Patch_GetOrAddNew` is a thin façade; `DirectorInitializer` calls PersonaResolver.
-- Deleted dead `RuleExecutor.cs`, `DirectorVariableProvider.cs`, unused `GetDataByKey` / `AddMenu`.
-- Stage7510 lifecycle goldens **intentionally updated** for real Stop (not empty-diff).
+- `PersonaProjectionDefaults.UseTypedPersonaProjection = true`
+- `PromptManager.AttachTypedPersonaContext` before `BuildContext`; fills `TypedPersonaProjections`
+- Talk `CreatePawnContext` presents bag (fallback to provider)
+- Scriban `{{pawn.personality}}` presents bag via `ResolvePersonalityForScriban`
+- Director Personality Override pass-through when typed (no second Scriban render)
+- `DirectorPersonaProjectionProvider` registered from `PersonasComposition.Start`
+- Late `Patch_PromptService.Transform` remains no-op under the flag
+- Stage7510 projection goldens updated intentionally for Wave C
 
-Not in Wave B (deferred):
-
-- Talk Transform / typed PersonaProjection (semantic; Wave C / substage).
-- TempCurrentPersona / ThreadStatic isolation redesign.
-- MainButtonDef decision.
-- Director Memory typed-projection alignment.
+Wave D backlog (not started): integration cleanup, dead façade trim, TempCurrentPersona/ThreadStatic ownership, MainButtonDef, Director Memory typed alignment, guards, roadmap close.
