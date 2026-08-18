@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using Verse;
 using System.Linq;
+using Ustas.RimAI.Core.Storage;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -106,13 +107,13 @@ namespace Ustas.RimAI.Communication.Personas
             if (Widgets.ButtonText(importFileRect, "RPD_IO_ImportFile".Translate()))
             {
                 string dirPath = Path.Combine(GenFilePaths.SaveDataFolderPath, "PersonaDirector");
-                if (!Directory.Exists(dirPath))
+                if (!LocalStorage.Current.DirectoryExists(dirPath))
                 {
                     Messages.Message("RPD_IO_MsgNoFolder".Translate(), MessageTypeDefOf.RejectInput, false);
                 }
                 else
                 {
-                    var files = Directory.GetFiles(dirPath, "*.xml").OrderByDescending(f => File.GetCreationTime(f)).ToList();
+                    var files = LocalStorage.Current.GetFiles(dirPath, "*.xml").OrderByDescending(f => LocalStorage.Current.GetCreationTime(f)).ToList();
                     List<FloatMenuOption> opts = new List<FloatMenuOption>();
                     foreach (var f in files)
                     {
@@ -122,12 +123,12 @@ namespace Ustas.RimAI.Communication.Personas
                         // 这里的 (Append)/(Overwrite) 比较通用，可以保留英文，或者再加 Key
                         opts.Add(new FloatMenuOption($"{fname} (Append)", () =>
                         {
-                            _text = File.ReadAllText(path);
+                            _text = LocalStorage.Current.ReadAllText(path);
                             ImportFromText(false);
                         }));
                         opts.Add(new FloatMenuOption($"{fname} (Overwrite)", () =>
                         {
-                            _text = File.ReadAllText(path);
+                            _text = LocalStorage.Current.ReadAllText(path);
                             ImportFromText(true);
                         }));
                     }
@@ -164,12 +165,12 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 string xml = GenerateExportXml();
                 string dirPath = Path.Combine(GenFilePaths.SaveDataFolderPath, "PersonaDirector");
-                Directory.CreateDirectory(dirPath);
+                LocalStorage.Current.CreateDirectory(dirPath);
 
                 string filename = $"Persona_Library_{System.DateTime.Now:yyyyMMdd_HHmmss}.xml";
                 string fullPath = Path.Combine(dirPath, filename);
 
-                File.WriteAllText(fullPath, xml);
+                LocalStorage.Current.WriteAllText(fullPath, xml);
 
                 Messages.Message("RPD_IO_MsgExportFile".Translate(fullPath), MessageTypeDefOf.PositiveEvent, false);
                 Log.Message($"[RimAI.Personas] Library exported to: {fullPath}");
@@ -203,16 +204,16 @@ namespace Ustas.RimAI.Communication.Personas
                 try
                 {
                     tempPath = Path.Combine(Path.GetTempPath(), $"RPD_Import_{System.DateTime.Now:yyyyMMdd_HHmmssfff}.xml");
-                    File.WriteAllText(tempPath, _text);
+                    LocalStorage.Current.WriteAllText(tempPath, _text);
                     Scribe.loader.InitLoading(tempPath);
                     loadedData.ExposeData();
                     Scribe.loader.FinalizeLoading();
                 }
                 finally
                 {
-                    if (!string.IsNullOrEmpty(tempPath) && File.Exists(tempPath))
+                    if (!string.IsNullOrEmpty(tempPath) && LocalStorage.Current.FileExists(tempPath))
                     {
-                        try { File.Delete(tempPath); } catch { }
+                        try { LocalStorage.Current.DeleteFile(tempPath); } catch { }
                     }
                 }
 
