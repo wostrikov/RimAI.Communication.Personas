@@ -239,20 +239,17 @@ internal static class DirectorPawnInfoFormatter
             var sb = new StringBuilder();
 			bool hasContent = false;
 
-			// 武器
 			if (p.equipment != null)
 			{
 				foreach (var eq in p.equipment.AllEquipmentListForReading)
 				{
 					if (!hasContent) { sb.AppendLine("--- Equipment ---"); hasContent = true; }
 
-					// 根据模式选择标签生成方式
 					string label = simpleMode ? GetStableThingLabel(eq) : eq.LabelCap;
 					sb.AppendLine($"- [Weapon]: {label}");
 				}
 			}
 
-			// 服装
 			if (p.apparel != null)
 			{
 				foreach (var app in p.apparel.WornApparel)
@@ -388,21 +385,16 @@ internal static class DirectorPawnInfoFormatter
 			return info;
 		}
 
-		// ★★★ 核心：构建不受耐久度/磨损影响的稳定标签 ★★★
-		// 只包含：材质 + 物品名 + 品质 (例如：传奇级 合成纤维T恤衫)
 		internal static string GetStableThingLabel(Thing t)
 		{
             if (t == null) return "";
-            // GenLabel.ThingLabel 基础生成 (材质+名字)
             string baseLabel = GenLabel.ThingLabel(t.def, t.Stuff).CapitalizeFirst();
 
-			// 手动拼接品质 (如果存在)
 			if (t.TryGetComp<CompQuality>() is CompQuality qc)
 			{
 				baseLabel += $" ({qc.Quality.GetLabel()})";
 			}
 
-			// 忽略耐久度 (HitPoints) 和 磨损前缀 (Tattered/Worn out)
 			return baseLabel;
 		}
 }

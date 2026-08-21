@@ -28,13 +28,11 @@ public static class DirectorModCompat
 
         public static Def GetVSEPassionDef(SkillRecord skill)
         {
-            // 1. 检查 VSE 是否激活
             if (!ModsConfig.IsActive("vanillaexpanded.skills") || vseReflectionFailed)
                 return null;
 
             try
             {
-                // 2. 初始化反射 (只执行一次)
                 if (vseMethodCache == null)
                 {
                     Type managerType = AccessTools.TypeByName("VSE.Passions.PassionManager");
@@ -62,12 +60,10 @@ public static class DirectorModCompat
                     }
                 }
 
-                // 3. 执行调用
                 return (Def)vseMethodCache.Invoke(null, new object[] { skill.passion });
             }
             catch
             {
-                // 生产环境保持静默，避免骚扰用户
                 vseReflectionFailed = true;
             }
 

@@ -12,7 +12,6 @@ using Ustas.RimAI.Core.Personas;
 
 namespace Ustas.RimAI.Communication.Personas
 {
-    // 新增：预设数据结构
     public class PromptPreset : IExposable
     {
         public string label;
@@ -32,7 +31,6 @@ namespace Ustas.RimAI.Communication.Personas
         }
     }
 
-    // 单个预设
     public class CustomPreset : IExposable
     {
         public string id;
@@ -65,11 +63,10 @@ namespace Ustas.RimAI.Communication.Personas
 
     public enum RuleType { FactionDef, RaceDef, XenotypeDef }
 
-    // 分配规则
     public class AssignmentRule : IExposable
     {
         public bool enabled = true;
-        public string targetDefName; // 只存字符串，防崩坏
+        public string targetDefName;
         public RuleType type;
         public int priority = 0;
         public List<string> allowedPresetIds = new List<string>();
@@ -90,7 +87,6 @@ namespace Ustas.RimAI.Communication.Personas
         // Prompt Templates (Default Constants)
         // =============================================================
 
-        // 1. 标准模式 (原版三选一)
         public const string DefaultPrompt_Standard = @"# Роль: режисер особистості Rimworld
 # Мова: {LANG}
 
@@ -129,7 +125,6 @@ namespace Ustas.RimAI.Communication.Personas
 [Інший підхід...]
 ";
 
-        // 2. 故事模式 （3选1变单选）
         public const string DefaultPrompt_Simple = @"# Роль: письменник художніх історій Rimworld
 # Мова: {LANG}
 
@@ -166,7 +161,6 @@ namespace Ustas.RimAI.Communication.Personas
 [2–4 слова для стилю]
 [Почни з розкриття унікальної історії або таємниці, яка пояснює його минуле. Пов'яжи цю історію з тим, чому він став виконувати свою нинішню роль. Вигадай конкретну короткострокову психологічну мету, зумовлену цією історією. Явно опиши, як ця історія впливає на темп його мовлення, словниковий запас і ставлення. Усе має бути одним суцільним абзацом.]";
 
-        // 3. 背景模式
         public const string DefaultPrompt_Strict = @"# Роль: Профілер поведінки Rimworld
 # Мова: {LANG}
 
@@ -200,7 +194,6 @@ namespace Ustas.RimAI.Communication.Personas
 [Стиль із 2–4 слів]
 [Опишіть логічний життєвий шлях персонажа на основі даних. Поясніть переломний момент, що привів його до нинішньої ролі. Визначте короткострокову психологічну мету, що відповідає його рисам. Явно опишіть темп мовлення, словниковий запас і ставлення як результат його життєвого досвіду. Викладіть усе в одному суцільному абзаці.]";
 
-        // 4. 演变/更新模式 (专用)
         public const string DefaultPrompt_Evolve = @"# Роль: аналітик розвитку персонажа Rimworld
 # Мова: {LANG}
 
@@ -255,10 +248,8 @@ namespace Ustas.RimAI.Communication.Personas
         // Settings Fields
         // =============================================================
 
-        // 旧数据 (保留用于迁移)
         public string activePrompt = "";
 
-        // 新数据：预设列表
         public List<PromptPreset> presets;
         public int selectedPresetIndex = 0;
 
@@ -269,30 +260,22 @@ namespace Ustas.RimAI.Communication.Personas
         public ContextSettings Context = new ContextSettings();
         public Dictionary<string, bool> BatchFilters;
 
-        public string rimTalkPreset_Single = ""; // 单体生成用的预设名
-        public string rimTalkPreset_Evolve = ""; // 演变生成用的预设名
+        public string rimTalkPreset_Single = "";
+        public string rimTalkPreset_Evolve = "";
 
-        //  新增字段：预设库和规则库
         public List<CustomPreset> userPresets = new List<CustomPreset>();
         public List<AssignmentRule> assignmentRules = new List<AssignmentRule>();
-        // 初始化状态标记
         public bool _libraryInitialized = false;
-        // 缓存 (不保存)
         public static List<PersonalityData> OriginalVanillaCache;
-        //  新增：迁移标记 (默认为 false)
         private bool _chattinessMigratedV2 = false;
-        // ★★★ 新增：目标 RimTalk 预设名称 ★★★
         public string rimTalkPresetName = "Director";
         public override void ExposeData()
         {
-            // 读取旧数据
             Scribe_Values.Look(ref activePrompt, PersonaScribeLabels.Settings.ActivePrompt, "", true);
 
-            // 读取新数据
             Scribe_Values.Look(ref selectedPresetIndex, PersonaScribeLabels.Settings.SelectedPresetIndex, 0);
             Scribe_Collections.Look(ref presets, PersonaScribeLabels.Settings.Presets, LookMode.Deep);
 
-            // 其他设置
             Scribe_Values.Look(ref EnableDebugLog, PersonaScribeLabels.Settings.EnableDebugLog, false);
             Scribe_Values.Look(ref directorNotes, PersonaScribeLabels.Settings.DirectorNotes, "");
             Scribe_Values.Look(ref ShowMainButton, PersonaScribeLabels.Settings.ShowMainButton, true);
@@ -302,10 +285,8 @@ namespace Ustas.RimAI.Communication.Personas
             if (Context == null) Context = new ContextSettings();
 
             Scribe_Collections.Look(ref BatchFilters, PersonaScribeLabels.Settings.BatchFilters, LookMode.Value, LookMode.Value);
-            // 库数据
             Scribe_Collections.Look(ref userPresets, PersonaScribeLabels.Settings.UserPresets, LookMode.Deep);
             Scribe_Collections.Look(ref assignmentRules, PersonaScribeLabels.Settings.AssignmentRules, LookMode.Deep);
-            // 保存初始化标记
             Scribe_Values.Look(ref _libraryInitialized, PersonaScribeLabels.Settings.LibraryInitialized, false);
             Scribe_Values.Look(ref _chattinessMigratedV2, PersonaScribeLabels.Settings.ChattinessMigratedV2, false);
 
@@ -314,11 +295,9 @@ namespace Ustas.RimAI.Communication.Personas
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                InitPresets(); // Prompt 1-4 初始化 (这个是安全的，因为只涉及我们自己的类)
-                InitFilters(); // 过滤器初始化 (安全)
+                InitPresets();
+                InitFilters();
 
-                // ★★★ 核心修复：不要在这里调用 InitLibrary() ★★★
-                // 我们只确保 List 对象不为 null，防止 UI 报错
                 if (userPresets == null) userPresets = new List<CustomPreset>();
                 if (assignmentRules == null) assignmentRules = new List<AssignmentRule>();
                 if (!_libraryInitialized && userPresets.Count > 0)
@@ -339,8 +318,6 @@ namespace Ustas.RimAI.Communication.Personas
             int count = 0;
             foreach (var preset in userPresets)
             {
-                // 旧版逻辑是 0-2.0，新版是 0-1.0
-                // 直接除以 2，进行无损压缩
                 if (preset.chattiness > 0)
                 {
                     preset.chattiness = Mathf.Clamp(preset.chattiness / 2.0f, 0.1f, 1.0f);
@@ -359,15 +336,12 @@ namespace Ustas.RimAI.Communication.Personas
             if (assignmentRules == null) assignmentRules = new List<AssignmentRule>();
             else assignmentRules.Clear();
             RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] -> InitLibrary: Cleared existing lists. Loading built-in presets...");
-            // 填充预设库
-            // 1. 内置库
             int builtInCount = 0;
             foreach (var def in PresetLibrary.Defaults)
             {
                 string translatedText = def.personaText.Translate().Resolve();
                 string smartLabel = ExtractLabelFromText(translatedText) ?? def.label;
 
-                // 如果提取失败(比如没有横杠)，就用原来的英文 Label 做保底
                 if (string.IsNullOrEmpty(smartLabel)) smartLabel = def.label;
 
                 userPresets.Add(new CustomPreset
@@ -380,7 +354,6 @@ namespace Ustas.RimAI.Communication.Personas
                 builtInCount++;
             }
             RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] -> InitLibrary: Loaded {builtInCount} built-in presets. Loading vanilla presets...");
-            // 2. 填充原版
             int vanillaCount = 0;
             IEnumerable<Ustas.RimAI.Communication.Data.PersonalityData> sourceList = null;
 
@@ -402,7 +375,6 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 foreach (var p in sourceList)
                 {
-                    // 保护翻译和提取过程
                     string translatedText = p.Persona;
                     try { translatedText = p.Persona.Translate().Resolve(); } catch { }
                     bool isBuiltIn = PresetLibrary.Defaults.Any(d => d.personaText == translatedText);
@@ -425,7 +397,6 @@ namespace Ustas.RimAI.Communication.Personas
             RimAiLog.Info(RimAiLogCategory.Personas, $"[RimAI.Personas] -> InitLibrary: Loaded {vanillaCount} vanilla presets. Loading default rules...");
             _chattinessMigratedV2 = true;
 
-            // 3. 填充规则库
             AddDefaultRules();
             RimAiLog.Info(RimAiLogCategory.Personas, "[RimAI.Personas] -> InitLibrary: Default rules loaded. Syncing to Ustas.RimAI.Communication...");
             PresetSynchronizer.SyncToRimTalk();
@@ -434,18 +405,16 @@ namespace Ustas.RimAI.Communication.Personas
 
         }
 
-        // ★★★ 辅助方法：智能提取标题 ★★★
         public string ExtractLabelFromText(string text)
         {
             if (string.IsNullOrEmpty(text)) return null;
 
-            // ★★★ 支持更多分隔符: –, —, :, ： ★★★
             string[] separators = new[] { " - ", " – ", " — ", "：", ": " };
 
             foreach (var sep in separators)
             {
                 int index = text.IndexOf(sep);
-                if (index > 0 && index < 30) // 限制标题长度
+                if (index > 0 && index < 30)
                 {
                     return text.Substring(0, index).Trim();
                 }
@@ -455,33 +424,26 @@ namespace Ustas.RimAI.Communication.Personas
 
         private void AddDefaultRules()
         {
-            // --- 规则 1: 海盗 (Pirate) ---
-            // 对应预设：废土狂徒, 反社会, 强盗, 混乱邪恶类
             var pirateRule = new AssignmentRule
             {
                 enabled = false,
                 type = RuleType.FactionDef,
-                targetDefName = "Pirate", // 原版海盗
+                targetDefName = "Pirate",
                 priority = 10
             };
-            // 查找合适的预设并加入池子
             AddIdsToRule(pirateRule, "Apocalypse", "Sociopath", "Machiavellian", "Narcissist", "Troll");
             assignmentRules.Add(pirateRule);
 
-            // --- 规则 2: 部落 (Tribe) ---
-            // 对应预设：原始本能, 萨满(Monk/Daoist代替), 猎人
             var tribeRule = new AssignmentRule
             {
                 enabled = false,
                 type = RuleType.FactionDef,
-                targetDefName = "TribeRough", // 狂暴部落
+                targetDefName = "TribeRough",
                 priority = 10
             };
             AddIdsToRule(tribeRule, "Primal", "Monk", "Daoist", "Weary Survivor");
             assignmentRules.Add(tribeRule);
 
-            // --- 规则 3: 帝国 (Empire - DLC) ---
-            // 对应预设：贵族, 骑士, 官僚
             if (ModsConfig.RoyaltyActive)
             {
                 var empireRule = new AssignmentRule
@@ -495,8 +457,6 @@ namespace Ustas.RimAI.Communication.Personas
                 assignmentRules.Add(empireRule);
             }
 
-            // --- 规则 4: 污秽人 (Waster - DLC) ---
-            // 对应预设：废土风
             if (ModsConfig.BiotechActive)
             {
                 var wasterRule = new AssignmentRule
@@ -504,7 +464,7 @@ namespace Ustas.RimAI.Communication.Personas
                     enabled = false,
                     type = RuleType.XenotypeDef,
                     targetDefName = "Waster",
-                    priority = 50 // 种族优先级高于派系
+                    priority = 50
                 };
                 AddIdsToRule(wasterRule, "Apocalypse", "Doomer", "Grindset");
                 assignmentRules.Add(wasterRule);
@@ -515,7 +475,6 @@ namespace Ustas.RimAI.Communication.Personas
         {
             foreach (var label in searchLabels)
             {
-                // 模糊匹配预设名称
                 var preset = userPresets.FirstOrDefault(p => p.label.Contains(label));
                 if (preset != null && !rule.allowedPresetIds.Contains(preset.id))
                 {
@@ -528,7 +487,6 @@ namespace Ustas.RimAI.Communication.Personas
             bool migratedLegacyDefault = false;
             if (presets == null) presets = new List<PromptPreset>();
 
-            // 1. 确保至少有3个槽位
             while (presets.Count < 4)
             {
                 presets.Add(new PromptPreset("", ""));
@@ -552,19 +510,16 @@ namespace Ustas.RimAI.Communication.Personas
             }
             if (IsLegacyEnglishDefault(activePrompt, 0)) activePrompt = "";
 
-            // 2. 数据迁移：如果旧 activePrompt 存在且不是默认值，迁移到 Slot 1
             if (!string.IsNullOrEmpty(activePrompt) && activePrompt != DefaultPrompt_Standard)
             {
-                // 只有当 Slot 1 还没被初始化或被修改时才覆盖
                 if (string.IsNullOrEmpty(presets[0].text) || presets[0].text == DefaultPrompt_Standard)
                 {
                     presets[0].text = activePrompt;
                     presets[0].label = "Custom (Migrated)";
                 }
-                activePrompt = ""; // 清除旧数据标记完成
+                activePrompt = "";
             }
 
-            // 3. 填充默认值 (如果槽位为空)
             if (string.IsNullOrEmpty(presets[0].text))
             {
                 presets[0].label = localizedLabels[0];
@@ -610,15 +565,12 @@ namespace Ustas.RimAI.Communication.Personas
             }
         }
 
-        // 获取当前激活的 Prompt 内容
         public string GetActivePrompt(bool isEvolveMode = false)
         {
             if (presets == null || presets.Count == 0) InitPresets();
 
             int indexToUse = selectedPresetIndex;
 
-            // 如果不是 Evolve 调用，但用户不小心选中了 Evolve 专用槽位 (索引3)，
-            // 那么强制使用标准槽位 (索引0) 来防止错误。
             if (!isEvolveMode && selectedPresetIndex == 3)
             {
                 indexToUse = 0;

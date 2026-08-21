@@ -23,11 +23,9 @@ namespace Ustas.RimAI.Communication.Personas
             Listing_Standard list = new Listing_Standard();
             list.Begin(inRect);
 
-            // 标题栏：左边标题，右边切换按钮
             Rect headerRect = list.GetRect(30f);
             Widgets.Label(headerRect.LeftPart(0.6f), "RPD_Notes_Title".Translate());
 
-            // ★ 切换按钮 ★
             if (Widgets.ButtonText(headerRect.RightPart(0.4f), "RPD_Mode_SwitchToAdvanced".Translate()))
             {
                 this.Close();
@@ -38,14 +36,12 @@ namespace Ustas.RimAI.Communication.Personas
             list.Label("RPD_Notes_Description".Translate());
             list.Gap(5f);
 
-            // 清空按钮
             if (list.ButtonText("RPD_Button_Clear".Translate())) 
             {
                 PersonasMod.Settings.directorNotes = "";
             }
             list.GapLine();
 
-            // Token 估算
             int notesCharCount = PersonasMod.Settings.directorNotes?.Length ?? 0;
             int estTokens = (int)(notesCharCount / 2.5f);
 
@@ -61,7 +57,6 @@ namespace Ustas.RimAI.Communication.Personas
             Text.Font = GameFont.Small;
             list.Gap(-5f);
 
-            // 文本框
             float textAreaHeight = inRect.height - list.CurHeight - 40f;
             Rect outRect = list.GetRect(textAreaHeight);
 

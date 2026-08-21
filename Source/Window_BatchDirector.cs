@@ -15,17 +15,14 @@ namespace Ustas.RimAI.Communication.Personas
         private List<Pawn> cachedPawns = new List<Pawn>();
         private Vector2 scrollPos = Vector2.zero;
 
-        // ★ 核心字典：Value 类型明确为 Task<PersonalityData>
         private Dictionary<Pawn, Task<PersonalityData>> generationTasks = new Dictionary<Pawn, Task<PersonalityData>>();
 
-        // 批量任务状态
         private Task<PersonalityData> batchTask = null;
         private List<Pawn> batchTaskPawns = null;
 
         private HashSet<Pawn> selectedPawns = new HashSet<Pawn>();
         private string _searchText = "";
 
-        // 滑动多选状态
         private bool _isDragging = false;
         private int _dragStartIndex = -1;
         private bool _dragState;
@@ -51,7 +48,7 @@ namespace Ustas.RimAI.Communication.Personas
 
         public override void PostClose()
         {
-            // 清空任务引用，这样后台线程跑完后结果会被直接丢弃
+            // Threading/concurrency constraint — do not race this state.
             generationTasks.Clear();
             batchTask = null;
             batchTaskPawns = null;
@@ -71,7 +68,6 @@ namespace Ustas.RimAI.Communication.Personas
             Listing_Standard list = new Listing_Standard();
             list.Begin(inRect);
 
-            // 顶部切换按钮
             Rect topRect = list.GetRect(30f);
             Widgets.Label(topRect.LeftPart(0.6f), "RPD_Batch_Title".Translate());
             if (Widgets.ButtonText(topRect.RightPart(0.4f), "RPD_Mode_SwitchToSimple".Translate()))
@@ -95,7 +91,6 @@ namespace Ustas.RimAI.Communication.Personas
 
             list.End();
 
-            // 拖拽结束逻辑
             if (_isDragging && !UnityEngine.Input.GetMouseButton(0))
             {
                 _isDragging = false;
@@ -103,10 +98,8 @@ namespace Ustas.RimAI.Communication.Personas
             }
         }
 
-        // ★ 核心：轮询任务并应用结果
         private void UpdateAsyncTasks()
         {
-            // 1. 处理单体任务
             var keys = generationTasks.Keys.ToList();
             foreach (var pawn in keys)
             {
@@ -114,7 +107,7 @@ namespace Ustas.RimAI.Communication.Personas
 
                 if (task.IsCompleted)
                 {
-                    generationTasks.Remove(pawn); // 移除任务
+                    generationTasks.Remove(pawn);
 
                     if (task.Status == TaskStatus.RanToCompletion)
                     {
@@ -126,7 +119,6 @@ namespace Ustas.RimAI.Communication.Personas
                         }
                         else
                         {
-                            // 失败或 Pawn 已不存在
                             if (pawn != null) Messages.Message("RPD_Message_GeneratedFail".Translate(pawn.LabelShortCap), MessageTypeDefOf.NegativeEvent, false);
                         }
                     }
@@ -137,7 +129,6 @@ namespace Ustas.RimAI.Communication.Personas
                 }
             }
 
-            // 2. 处理批量任务
             if (batchTask != null && batchTask.IsCompleted)
             {
                 if (batchTask.Status == TaskStatus.RanToCompletion)
@@ -183,7 +174,6 @@ namespace Ustas.RimAI.Communication.Personas
             float toolY = sectionRect.y;
             float curX = sectionRect.x;
 
-            // 全选/反选
             if (Widgets.ButtonText(new Rect(curX, toolY, 80f, 24f), "RPD_Batch_SelectAll".Translate()))
             {
                 bool anyUnchecked = filters.Values.Any(v => !v);
@@ -193,7 +183,6 @@ namespace Ustas.RimAI.Communication.Personas
             }
             curX += 85f;
 
-            // 搜索框
             Rect searchRect = new Rect(curX, toolY, 180f, 24f);
             string newSearch = Widgets.TextField(searchRect, _searchText);
             if (newSearch != _searchText)
@@ -203,7 +192,6 @@ namespace Ustas.RimAI.Communication.Personas
             }
             curX += 185f;
 
-            // 刷新按钮
             if (Widgets.ButtonText(new Rect(curX, toolY, 80f, 24f), "RPD_Batch_Refresh".Translate()))
             {
                 RefreshPawnCache();
@@ -213,11 +201,10 @@ namespace Ustas.RimAI.Communication.Personas
             float dropdownWidth = 150f;
             Rect promptRect = new Rect(sectionRect.xMax - dropdownWidth, toolY, dropdownWidth, 24f);
 
-            // 获取当前 Label
             var settings = PersonasMod.Settings;
             if (settings.presets == null) settings.InitPresets();
             string currentLabel = settings.presets[settings.selectedPresetIndex].label;
-            if (currentLabel.Length > 15) currentLabel = currentLabel.Substring(0, 12) + "..."; // 截断过长名字
+            if (currentLabel.Length > 15) currentLabel = currentLabel.Substring(0, 12) + "...";
 
             if (Widgets.ButtonText(promptRect, currentLabel))
             {
@@ -322,16 +309,13 @@ namespace Ustas.RimAI.Communication.Personas
 
                 if (_isDragging)
                 {
-                    // 只在鼠标当前悬停的那一行触发计算，节省性能
                     if (Mouse.IsOver(rowRect))
                     {
                         int start = Mathf.Min(i, _dragStartIndex);
                         int end = Mathf.Max(i, _dragStartIndex);
 
-                        // 将起点到当前鼠标位置之间的所有项，都设置为与起始点击相同的状态
                         for (int j = start; j <= end; j++)
                         {
-                            // 防止数组越界 (安全检查)
                             if (j >= 0 && j < cachedPawns.Count)
                             {
                                 if (_dragState) selectedPawns.Add(cachedPawns[j]);
@@ -386,7 +370,6 @@ namespace Ustas.RimAI.Communication.Personas
                 // Actions
                 Rect actionRect = new Rect(viewRect.width - colActionWidth, rowRect.y, colActionWidth, rowRect.height);
 
-                // ★ 修正后的逻辑：使用 ContainsKey 检查任务
                 bool isSingleGen = generationTasks.ContainsKey(p) && !generationTasks[p].IsCompleted;
                 bool isBatchGen = batchTask != null && !batchTask.IsCompleted && batchTaskPawns != null && batchTaskPawns.Contains(p);
 
@@ -396,32 +379,25 @@ namespace Ustas.RimAI.Communication.Personas
                 }
                 else
                 {
-                    // 将区域分为 3 份，间隔 5px
                     float btnWidth = (actionRect.width - 10f) / 3f;
 
                     Rect btn1 = new Rect(actionRect.x, actionRect.y, btnWidth, 24f);
                     Rect btn2 = new Rect(btn1.xMax + 5f, actionRect.y, btnWidth, 24f);
                     Rect btn3 = new Rect(btn2.xMax + 5f, actionRect.y, btnWidth, 24f);
 
-                    // 按钮 3: Talk (直接调用 RimTalk)
-                    // 允许对任何东西说话，只要它是 Pawn
                     if (Widgets.ButtonText(btn3, "RPD_Batch_Button_Talk".Translate()))
                     {
                         DirectorUtils.OpenRimTalkDialog(p);
                     }
 
-                    // 按钮 1: Quick Gen
                     if (Widgets.ButtonText(btn1, "RPD_Batch_Button_QuickGen".Translate()))
                     {
-                        // 只准备数据
                         string data = DirectorUtils.BuildCustomCharacterData(p);
                         string safeName = p.LabelShortCap;
 
-                        // 调用 GeneratePersonalityTask，传入 Pawn 
                         generationTasks[p] = DirectorUtils.GeneratePersonalityTask(data, safeName, p);
                     }
 
-                    // 按钮 2: Edit (Deep Edit)
                     if (Widgets.ButtonText(btn2, "RPD_Batch_Button_DeepEdit".Translate()))
                     {
                         Find.WindowStack.Add(new Ustas.RimAI.Communication.UI.PersonaEditorWindow(p));
@@ -517,7 +493,6 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 if (batchSendMode)
                 {
-                    // 批量模式
                     if (batchTask == null && selectedPawns.Any())
                     {
                         batchTaskPawns = selectedPawns.ToList();
@@ -528,7 +503,6 @@ namespace Ustas.RimAI.Communication.Personas
                 }
                 else
                 {
-                    // 单体循环模式
                     foreach (var pawn in selectedPawns)
                     {
                         if (!generationTasks.ContainsKey(pawn))

@@ -35,18 +35,14 @@ namespace Ustas.RimAI.Communication.Personas
 
         public override void DoWindowContents(Rect inRect)
         {
-            // --- 主布局 ---
             Rect leftRect = inRect.LeftPart(0.3f).Rounded();
             Rect rightRect = inRect.RightPart(0.68f).Rounded();
 
-            // --- 左侧：分类列表 ---
             DrawCategoryList(leftRect);
 
-            // --- 右侧：预设列表与描述 ---
             DrawPresetArea(rightRect);
         }
 
-        // ★★★ 重写：使用 Listing_Standard + 手动 ScrollView ★★★
         private void DrawCategoryList(Rect rect)
         {
             Widgets.DrawMenuSection(rect);
@@ -67,7 +63,6 @@ namespace Ustas.RimAI.Communication.Personas
                 string cat = allCategories[i];
                 Rect rowRect = new Rect(0f, i * rowHeight, viewRect.width, rowHeight);
 
-                // 使用我们自己的高亮按钮
                 if (DrawHighlightButton(rowRect, cat, selectedCategory == cat))
                 {
                     selectedCategory = cat;
@@ -78,7 +73,6 @@ namespace Ustas.RimAI.Communication.Personas
             Widgets.EndScrollView();
         }
 
-        // ★★★ 辅助方法：手动绘制带高亮的按钮 ★★★
         private bool DrawHighlightButton(Rect rect, string label, bool highlighted)
         {
             if (highlighted)
@@ -90,28 +84,23 @@ namespace Ustas.RimAI.Communication.Personas
                 Widgets.DrawHighlight(rect);
             }
 
-            // 绘制文本
             Text.Anchor = TextAnchor.MiddleLeft;
             Widgets.Label(rect.ContractedBy(5f), label);
             Text.Anchor = TextAnchor.UpperLeft;
 
-            // 检测点击
             return Widgets.ButtonInvisible(rect);
         }
 
-        // ★★★ 重写：同样使用 Listing_Standard + 手动 ScrollView ★★★
         private void DrawPresetArea(Rect rect)
         {
             Widgets.DrawMenuSection(rect);
             Rect innerRect = rect.ContractedBy(8f);
 
-            // 主 Listing
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(innerRect);
 
-            // 1. 预设列表区
             float listHeight = innerRect.height * 0.55f;
-            Rect listOutRect = listing.GetRect(listHeight); // 用 Listing 预留空间
+            Rect listOutRect = listing.GetRect(listHeight);
 
             var presetsToShow = PersonasMod.Settings.userPresets
                 .Where(p => selectedCategory == "All" || (p.category ?? "Default") == selectedCategory)
@@ -127,7 +116,6 @@ namespace Ustas.RimAI.Communication.Personas
                 Rect row = new Rect(0f, i * rowHeight, viewRect.width, rowHeight);
                 if (selectedPreset == p) Widgets.DrawHighlightSelected(row);
                 if (Widgets.ButtonInvisible(row)) selectedPreset = p;
-                // 如果预设被禁用，文字显示为灰色 
                 string label = p.label;
                 if (!p.enabled)
                 {
@@ -135,13 +123,12 @@ namespace Ustas.RimAI.Communication.Personas
                 }
 
                 Widgets.Label(row.ContractedBy(4f), p.label);
-                GUI.color = Color.white; // 还原颜色
+                GUI.color = Color.white;
             }
             Widgets.EndScrollView();
 
             listing.Gap(5f);
 
-            // 2. 描述区
             float descHeight = innerRect.height - listing.CurHeight - 45f;
             Rect descRect = listing.GetRect(descHeight);
             Widgets.DrawMenuSection(descRect);
@@ -152,12 +139,10 @@ namespace Ustas.RimAI.Communication.Personas
 
             listing.End();
 
-            // 3. 底部按钮
             Rect bottomRow = new Rect(rect.x, rect.yMax - 40f, rect.width, 30f);
-            float btnWidth = Mathf.Min(200f, (bottomRow.width - 10f) / 2f); // 按钮最大宽度 200px
-            float startX = bottomRow.x + (bottomRow.width - (btnWidth * 2 + 10f)) / 2f; // 居中
+            float btnWidth = Mathf.Min(200f, (bottomRow.width - 10f) / 2f);
+            float startX = bottomRow.x + (bottomRow.width - (btnWidth * 2 + 10f)) / 2f;
 
-            // 应用选中
             Rect applyRect = new Rect(startX, bottomRow.y, btnWidth, 30f);
             bool originalGUIState = GUI.enabled;
             if (selectedPreset == null) GUI.enabled = false;
@@ -167,11 +152,9 @@ namespace Ustas.RimAI.Communication.Personas
             }
             GUI.enabled = originalGUIState;
 
-            // 随机应用
             Rect randomRect = new Rect(applyRect.xMax + 10f, bottomRow.y, btnWidth, 30f);
             if (Widgets.ButtonText(randomRect, "RPD_Browser_ApplyRandom".Translate()))
             {
-                // ★★★ 随机时也使用实时过滤的列表 ★★★
                 if (presetsToShow.Any())
                 {
                     ApplyAndClose(presetsToShow.RandomElement());
@@ -181,10 +164,8 @@ namespace Ustas.RimAI.Communication.Personas
 
         private void ApplyAndClose(CustomPreset preset)
         {
-            // 1. 应用数据到 Hediff
             DirectorUtils.ApplyPersonalityToPawn(pawnToApply, new PersonalityData(preset.personaText, preset.chattiness));
 
-            // 2. 刷新编辑器 UI
             DirectorUtils.SetWindowText(editorWindow, preset.personaText);
 
             LongEventHandler.ExecuteWhenFinished(() => this.Close());

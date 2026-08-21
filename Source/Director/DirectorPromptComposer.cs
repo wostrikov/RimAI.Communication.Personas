@@ -33,7 +33,7 @@ public static class DirectorPromptComposer
                         return LanguageDatabase.activeLanguage.info.friendlyNameNative;
                 }
                 catch { }
-                return "English"; // 保底默认值
+                return "English";
             }
         }
 

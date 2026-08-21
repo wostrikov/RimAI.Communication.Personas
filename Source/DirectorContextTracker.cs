@@ -6,7 +6,6 @@ namespace Ustas.RimAI.Communication.Personas
 {
     public static class DirectorContextTracker
     {
-        // 确保使用 ThreadStatic，防止后台生成任务干扰前台 UI 渲染
         [ThreadStatic]
         private static List<Pawn> _currentPawns;
 

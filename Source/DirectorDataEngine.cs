@@ -145,8 +145,6 @@ namespace Ustas.RimAI.Communication.Personas
 		}
 
 
-		// ★★★ 核心：构建不受耐久度/磨损影响的稳定标签 ★★★
-		// 只包含：材质 + 物品名 + 品质 (例如：传奇级 合成纤维T恤衫)
 		private static string GetStableThingLabel(Thing t)
 		{
 		    return DirectorPawnInfoFormatter.GetStableThingLabel(t);
@@ -183,16 +181,14 @@ namespace Ustas.RimAI.Communication.Personas
             var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
 			if (worldComp == null) return "";
 
-			string oldSnapshot = worldComp.GetSnapshot(p); // 这是一个 Detailed 快照
+			string oldSnapshot = worldComp.GetSnapshot(p);
 			if (string.IsNullOrEmpty(oldSnapshot)) return "No previous snapshot.";
 
-			// ★ 生成当前的 Detailed 快照进行对比 ★
 			string currentSnapshot = DirectorUtils.BuildCustomCharacterData(p, isSnapshot: true, simpleEquipment: false);
 
 			return DirectorUtils.GenerateDiffReport(oldSnapshot, currentSnapshot);
 		}
 
-		// GetDailyStatusDiff 逻辑已经在 WorldComponent 里封装好了，直接调用即可
 		public static string GetDailyStatusDiff(Pawn p)
 		{
 			var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
@@ -205,8 +201,6 @@ namespace Ustas.RimAI.Communication.Personas
             var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
 			int lastTick = worldComp?.GetLastEvolveTick(p) ?? -1;
 
-			// 传入 lastTick，DirectorUtils.GetExternalMemories 会自动过滤掉旧记忆
-			// 如果 lastTick 是 -1，它会返回最近的几条（作为保底）
 			return DirectorUtils.GetExternalMemories(p, lastTick) ?? "No new memories.";
 		}
 
@@ -220,16 +214,13 @@ namespace Ustas.RimAI.Communication.Personas
         {
             if (currentPawn == null) return "";
 
-            // 1. 获取预算
             int totalBudget = 5;
             try { totalBudget = Ustas.RimAI.Communication.Settings.Get().Context.ConversationHistoryCount; } catch { }
             if (isMonologue) totalBudget = Math.Min(totalBudget, 3);
 
-            // 2. 确定人员
             var participants = allPawns ?? new List<Pawn>();
             if (!participants.Contains(currentPawn)) participants.Insert(0, currentPawn);
 
-            // 3. 配额分配
             Dictionary<Pawn, int> pawnQuotas = new Dictionary<Pawn, int>();
             int pawnCount = participants.Count;
 
@@ -250,19 +241,15 @@ namespace Ustas.RimAI.Communication.Personas
                 }
             }
 
-            // 4. 执行提取
             StringBuilder finalSb = new StringBuilder();
             bool hasContent = false;
 
-            // ★★★ 新增：全局去重池 (存储已处理过的原始 JSON 字符串) ★★★
-            // 这样就能跨 Pawn 去重了
             HashSet<string> processedDialogues = new HashSet<string>();
 
             foreach (var p in participants)
             {
                 if (!pawnQuotas.TryGetValue(p, out int quota) || quota <= 0) continue;
 
-                // ★★★ 传入去重池 ★★★
                 List<string> historyLines = ExtractHistoryForPawn(p, participants, quota, processedDialogues);
 
                 if (historyLines != null && historyLines.Count > 0)
@@ -285,7 +272,6 @@ namespace Ustas.RimAI.Communication.Personas
             return "";
         }
 
-        // ★★★ 修改：返回 List<string> 而不是 string ★★★
         private static List<string> ExtractHistoryForPawn(Pawn p, List<Pawn> contextPawns, int limit, HashSet<string> processedDialogues)
         {
             var activeNames = new HashSet<string>();
@@ -350,13 +336,10 @@ namespace Ustas.RimAI.Communication.Personas
 
         public static string GetActiveUIText(Pawn p)
         {
-            // 1. 优先读取我们手动设置的缓存 (给 Evolve 功能用)
             if (!string.IsNullOrEmpty(TempCurrentPersona)) return TempCurrentPersona;
 
-            // 2. 如果缓存为空，尝试从当前打开的窗口里抓取
             try
             {
-                // 获取当前最顶层的窗口
                 var window = Find.WindowStack.WindowOfType<PersonaEditorWindow>();
 
                 if (window != null)
@@ -369,10 +352,8 @@ namespace Ustas.RimAI.Communication.Personas
             }
             catch
             {
-                // 静默失败，不要崩
             }
 
-            // 3. 如果 UI 没打开，或者读不到，回退到读取 Hediff (已保存的数据)
             var hediff = Hediff_Persona.GetOrAddNew(p);
             return hediff?.Personality ?? "";
         }

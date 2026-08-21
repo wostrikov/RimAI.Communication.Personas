@@ -33,13 +33,11 @@ namespace Ustas.RimAI.Communication.Personas
                 if (_lastEvolveTicks == null) _lastEvolveTicks = new Dictionary<int, int>();
                 if (_lastEvolveBioAgeTicks == null) _lastEvolveBioAgeTicks = new Dictionary<int, long>();
                 if (_dataSnapshots == null) _dataSnapshots = new Dictionary<int, string>();
-                // 初始化
                 if (_dailySnapshots == null) _dailySnapshots = new Dictionary<int, string>();
                 if (_dailySnapshotDays == null) _dailySnapshotDays = new Dictionary<int, int>();
             }
         }
 
-        // --- A. 每日自动快照 (Daily) ---
         public void SaveDailySnapshot(Pawn p)
         {
             if (p == null) return;
@@ -55,10 +53,8 @@ namespace Ustas.RimAI.Communication.Personas
             int id = p.thingIDNumber;
             int currentDay = GenDate.DaysPassed;
 
-            // ★★★ 关键：获取当前状态时，也开启 simpleEquipment = true ★★★
             string currentSnapshot = DirectorUtils.BuildCustomCharacterData(p, true, true);
 
-            // A. 初始化
             if (!_dailySnapshots.TryGetValue(id, out string storedSnapshot))
             {
                 _dailySnapshots[id] = currentSnapshot;
@@ -66,10 +62,8 @@ namespace Ustas.RimAI.Communication.Personas
                 return "Daily monitoring started just now.";
             }
 
-            // B. 对比 (Simple vs Simple)
             string diff = DirectorUtils.GenerateDiffReport(storedSnapshot, currentSnapshot);
 
-            // C. 换日逻辑
             int storedDay = _dailySnapshotDays.TryGetValue(id, out int val) ? val : -1;
 
             if (currentDay > storedDay)
@@ -82,7 +76,6 @@ namespace Ustas.RimAI.Communication.Personas
             return diff == "No significant changes." ? "No changes today." : diff;
         }
 
-        // --- B. 手动快照 (Evolve) ---
         public void SetTimestamp(Pawn p, string snapshotData = null) 
         {
             if (p == null) return;

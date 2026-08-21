@@ -3,7 +3,6 @@ using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
 {
-    // 静态库：只用于提供模板，不保存数据
     [StaticConstructorOnStartup]
     public static class PresetLibrary
     {
@@ -22,12 +21,10 @@ namespace Ustas.RimAI.Communication.Personas
         {
             _defaults = new List<CustomPreset>();
 
-            // === 基础风格 ===
             Add("Observer", "RPD_Preset_Observer", 0.4f);
             Add("Pragmatist", "RPD_Preset_Pragmatist", 0.5f);
             Add("Weary Survivor", "RPD_Preset_Weary", 0.3f);
 
-            // === 心理学 / 人格障碍 ===
             Add("Narcissist", "RPD_Preset_Narcissist", 0.7f);
             Add("Machiavellian", "RPD_Preset_Machiavellian", 0.4f);
             Add("Sociopath", "RPD_Preset_Sociopath", 0.6f);
@@ -35,7 +32,6 @@ namespace Ustas.RimAI.Communication.Personas
             Add("Histrionic", "RPD_Preset_Histrionic", 0.9f);
             Add("Obsessive", "RPD_Preset_Obsessive", 0.4f);
 
-            // === 创伤 / 精神状态 ===
             Add("Shell-Shocked", "RPD_Preset_ShellShocked", 0.1f);
             Add("Dissociated", "RPD_Preset_Dissociated", 0.2f);
             Add("Manic", "RPD_Preset_Manic", 1.0f);
@@ -44,7 +40,6 @@ namespace Ustas.RimAI.Communication.Personas
             Add("Fatalist", "RPD_Preset_Fatalist", 0.2f);
             Add("Nihilist", "RPD_Preset_Nihilist", 0.3f);
 
-            // === 认知风格 ===
             Add("Literal", "RPD_Preset_Literal", 0.3f);
             Add("Over-Thinker", "RPD_Preset_OverThinking", 0.5f);
             Add("Socially Awkward", "RPD_Preset_SocialAwkward", 0.2f);
@@ -52,13 +47,11 @@ namespace Ustas.RimAI.Communication.Personas
             Add("Mute", "RPD_Preset_MuteByChoice", 0.1f);
             Add("Gaslighter", "RPD_Preset_Gaslighter", 0.5f);
 
-            // === MBTI 原型 ===
             Add("ENTJ Commander", "RPD_Preset_Commander_ENTJ", 0.7f);
             Add("ENTP Debater", "RPD_Preset_Debater_ENTP", 0.7f);
             Add("INFP Mediator", "RPD_Preset_Mediator_INFP", 0.3f);
             Add("INTP Logician", "RPD_Preset_Logician_INTP", 0.2f);
 
-            // === ACG / 二次元 ===
             Add("Tsundere", "RPD_Preset_Tsundere", 0.2f);
             Add("Kuudere", "RPD_Preset_Kuudere", 0.1f);
             Add("Chuunibyou", "RPD_Preset_Chuunibyou", 0.6f);
@@ -68,14 +61,12 @@ namespace Ustas.RimAI.Communication.Personas
             Add("Gyaru", "RPD_Preset_Gyaru", 0.6f);
             Add("Butler/Maid", "RPD_Preset_Butler", 0.4f);
 
-            // === 中式仙侠 ===
             Add("Daoist", "RPD_Preset_Daoist", 0.3f);
             Add("Jianghu Hero", "RPD_Preset_Jianghu", 0.5f);
             Add("Young Master", "RPD_Preset_YoungMaster", 0.6f);
             Add("Scholar", "RPD_Preset_ScholarOfficial", 0.5f);
             Add("Monk", "RPD_Preset_Monk", 0.2f);
 
-            // === 现代网络文化 ===
             Add("Influencer", "RPD_Preset_Influencer", 0.9f);
             Add("Hustler/Grindset", "RPD_Preset_Grindset", 0.6f);
             Add("Doomer", "RPD_Preset_Doomer", 0.2f);
@@ -87,7 +78,6 @@ namespace Ustas.RimAI.Communication.Personas
             Add("Reviewer", "RPD_Preset_Reviewer", 0.5f);
             Add("Gamer", "RPD_Preset_Gamer", 0.5f);
 
-            // === 奇幻/科幻/异质 ===
             Add("Paladin", "RPD_Preset_Paladin", 0.5f);
             Add("Rogue", "RPD_Preset_Rogue", 0.3f);
             Add("Bard", "RPD_Preset_Bard", 0.7f);
@@ -105,7 +95,7 @@ namespace Ustas.RimAI.Communication.Personas
             _defaults.Add(new CustomPreset
             {
                 label = label,
-                personaText = key, // 这一步直接读取翻译文件的内容
+                personaText = key,
                 chattiness = chat
             });
         }

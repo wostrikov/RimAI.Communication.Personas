@@ -26,7 +26,6 @@ public static class DirectorPersonalityGenerator
 {
         private static async Task<PersonalityData> GenerateFromPreset(Pawn p, string presetName, bool isBatch)
         {
-            // A. 查找预设
             var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
             var targetPreset = presets.FirstOrDefault(x => x.Name == presetName);
             if (targetPreset == null) return null;
@@ -43,7 +42,6 @@ public static class DirectorPersonalityGenerator
                 return null;
             }
 
-            // C. 扁平化构建 (Flattening)
             StringBuilder systemBuilder = new StringBuilder();
             StringBuilder userBuilder = new StringBuilder();
 
@@ -54,8 +52,6 @@ public static class DirectorPersonalityGenerator
                 string renderedText = ScribanParser.Render(entry.Content, contextObj, true);
                 if (string.IsNullOrWhiteSpace(renderedText)) continue;
 
-                // 逻辑：System 角色放入 Context，其他角色放入 Prompt
-                // 这样能最大程度保留信息，同时适配 Query 接口
                 string roleStr = entry.Role.ToString();
 
                 if (roleStr == "System")
@@ -65,25 +61,20 @@ public static class DirectorPersonalityGenerator
                 }
                 else
                 {
-                    // User, Assistant 等都放入 User 消息流
                     if (userBuilder.Length > 0) userBuilder.AppendLine("\n");
-                    if (roleStr == "Assistant") userBuilder.Append("Assistant: "); // 简单标记一下 Assistant
+                    if (roleStr == "Assistant") userBuilder.Append("Assistant: ");
                     userBuilder.Append(renderedText);
                 }
             }
 
             if (systemBuilder.Length == 0 && userBuilder.Length == 0) return null;
 
-            // D. 注入 JSON 协议
             string technicalProtocol = isBatch
                 ? PersonasSettings.HiddenTechnicalPrompt_Batch
                 : PersonasSettings.HiddenTechnicalPrompt_Single;
 
-            // 协议追加在 User 内容最后
             userBuilder.AppendLine("\n" + technicalProtocol);
 
-            // E. 发送请求
-            // 使用标准的 AIService.Query
             var request = new TalkRequest(userBuilder.ToString(), p)
             {
                 Context = systemBuilder.ToString()
@@ -111,7 +102,6 @@ public static class DirectorPersonalityGenerator
                 if (PersonasMod.Settings.EnableDebugLog)
                     RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Gen Data for {pawnNameForLog}...");
 
-                // 优先尝试高级预设
                 string presetName = PersonasMod.Settings.rimTalkPreset_Single;
                 if (!string.IsNullOrEmpty(presetName) && presetName != "None (Use Internal)")
                 {
@@ -119,20 +109,17 @@ public static class DirectorPersonalityGenerator
                     if (result != null) return result;
                 }
 
-                // 回退到内置逻辑
                 string userPrompt = PersonasMod.Settings.GetActivePrompt(false);
                 if (string.IsNullOrEmpty(userPrompt)) userPrompt = PersonasSettings.DefaultPrompt_Standard;
 
                 string instruction = userPrompt.Replace("{LANG}", DirectorPromptComposer.CurrentLanguage) + "\n" + PersonasSettings.HiddenTechnicalPrompt_Single;
                 string data = $"[Character Data]\n{characterData}";
 
-                // 标准调用：数据在 Prompt，指令在 Context
                 var request = new TalkRequest(data, pawn)
                 {
                     Context = instruction
                 };
 
-                // 直接调用 AIService，日志会自动记录
                 return await AIService.Query<PersonalityData>(request);
             }
             catch (Exception e)
@@ -180,11 +167,8 @@ public static class DirectorPersonalityGenerator
                 if (hediff != null)
                 {
                     hediff.Personality = data.Persona.Trim();
-                    // 状态激活
                     hediff.Severity = 1.0f;
 
-                    // 数值处理
-                    // 如果 AI 还是因为某些原因（比如旧 Prompt 缓存）返回了 > 1 的数，Clamp 会把它修剪到 1.0
 
                     if (data.Chattiness < 0.05f)
                     {
@@ -192,12 +176,9 @@ public static class DirectorPersonalityGenerator
                     }
                     else
                     {
-                        // 钳位到 0.1 - 1.0
-                        // 这样即使旧数据是 1.8，也会变成 1.0，不会出错
                         hediff.TalkInitiationWeight = Mathf.Clamp(data.Chattiness, 0.1f, 1.0f);
                     }
 
-                    // 4. 刷新
                     pawn.health.Notify_HediffChanged(hediff);
                 }
             }
@@ -216,30 +197,22 @@ public static class DirectorPersonalityGenerator
 
             foreach (var part in personaParts)
             {
-                // 寻找闭合的方括号 ']' 作为分隔点。
                 int bracketIndex = part.IndexOf(']');
 
-                // 如果没找到方括号，说明格式彻底乱了，跳过
                 if (bracketIndex == -1)
                 {
                     if (PersonasMod.Settings.EnableDebugLog) RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Invalid format (no bracket found): {part.Trim()}");
                     continue;
                 }
 
-                // 1. 提取 Key，例如 "[ID:Human123]"
-                // Substring(0, length) -> 从 0 开始，截取到 ']' 为止
                 string keyPart = part.Substring(0, bracketIndex + 1).Trim();
 
-                // 2. 提取内容。从 ']' 后面开始截取，并修 trimmed掉可能存在的冒号、空格、换行
                 string text = part.Substring(bracketIndex + 1).TrimStart(':', ' ', '\n', '\r').Trim();
 
                 Pawn target = null;
 
-                // ★ 1. 优先尝试 ID 匹配 (最准确)
                 if (keyPart.StartsWith("[ID:") && keyPart.EndsWith("]"))
                 {
-                    // 提取 ID: [ID:123] -> 123
-                    // Substring(4) 跳过 "[ID:"，Length - 5 去掉头尾的 "[ID:" 和 "]"
                     if (keyPart.Length > 5)
                     {
                         string id = keyPart.Substring(4, keyPart.Length - 5);
@@ -247,11 +220,9 @@ public static class DirectorPersonalityGenerator
                     }
                 }
 
-                // 回退机制：尝试名字匹配 (兼容旧数据或 AI 格式错误)
                 if (target == null)
                 {
                     string cleanName = keyPart.TrimStart('[').TrimEnd(']').Trim();
-                    // 去掉可能残留的 "ID:" 前缀 (万一代码走到这)
                     if (cleanName.StartsWith("ID:")) cleanName = cleanName.Substring(3);
 
                     target = pawns.FirstOrDefault(p => p.Name != null && p.Name.ToStringFull == cleanName)

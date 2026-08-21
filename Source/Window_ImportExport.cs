@@ -14,7 +14,6 @@ namespace Ustas.RimAI.Communication.Personas
     {
         private string _text = "";
 
-        // 默认的注释模板
         private const string CommentedTemplate =
 @"<!-- 
   Paste your library data here.
@@ -56,25 +55,21 @@ namespace Ustas.RimAI.Communication.Personas
 
         public override void DoWindowContents(Rect inRect)
         {
-            // --- 1. 布局定义 ---
             float buttonRowHeight = 35f;
             float gap = 5f;
 
             Rect buttonRowRect = new Rect(inRect.x, inRect.y, inRect.width, buttonRowHeight);
             Rect textRect = new Rect(inRect.x, buttonRowRect.yMax + gap, inRect.width, inRect.height - buttonRowHeight - gap);
 
-            // --- 2. 绘制按钮行 ---
             float btnWidth = (buttonRowRect.width - 30f) / 4f;
 
             Rect exportBtnRect = new Rect(buttonRowRect.x, buttonRowRect.y, btnWidth, 30f);
 
-            // 手工绘制按钮外观
             if (Event.current.type == EventType.Repaint)
             {
                 GUI.Button(exportBtnRect, "RPD_IO_Export".Translate());
             }
 
-            // 处理点击
             if (Event.current.type == EventType.MouseUp && exportBtnRect.Contains(Event.current.mousePosition))
             {
                 if (Event.current.button == 0)
@@ -89,13 +84,11 @@ namespace Ustas.RimAI.Communication.Personas
             }
             TooltipHandler.TipRegion(exportBtnRect, "RPD_IO_TipExport".Translate());
 
-            // 导入(追加)
             if (Widgets.ButtonText(new Rect(buttonRowRect.x + btnWidth + 10f, buttonRowRect.y, btnWidth, 30f), "RPD_IO_ImportAppend".Translate()))
             {
                 ImportFromText(false);
             }
 
-            // 导入(覆盖)
             if (Widgets.ButtonText(new Rect(buttonRowRect.x + (btnWidth + 10f) * 2, buttonRowRect.y, btnWidth, 30f), "RPD_IO_ImportOverwrite".Translate()))
             {
                 Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("RPD_IO_ConfirmOverwrite".Translate(), () =>
@@ -104,7 +97,6 @@ namespace Ustas.RimAI.Communication.Personas
                 }, destructive: true));
             }
 
-            // 导入(从文件)
             Rect importFileRect = new Rect(buttonRowRect.x + (btnWidth + 10f) * 3, buttonRowRect.y, btnWidth, 30f);
             if (Widgets.ButtonText(importFileRect, "RPD_IO_ImportFile".Translate()))
             {
@@ -122,7 +114,6 @@ namespace Ustas.RimAI.Communication.Personas
                         var fname = Path.GetFileName(f);
                         var path = f; // capture
 
-                        // 这里的 (Append)/(Overwrite) 比较通用，可以保留英文，或者再加 Key
                         opts.Add(new FloatMenuOption($"{fname} (Append)", () =>
                         {
                             _text = LocalStorage.Current.ReadAllText(path);
@@ -139,10 +130,8 @@ namespace Ustas.RimAI.Communication.Personas
                 }
             }
 
-            // 分割线
             Widgets.DrawLineHorizontal(inRect.x, buttonRowRect.yMax, inRect.width);
 
-            // --- 3. 绘制文本框 ---
             _text = Widgets.TextArea(textRect, _text);
         }
 

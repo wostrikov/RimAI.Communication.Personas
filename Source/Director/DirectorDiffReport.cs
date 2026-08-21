@@ -38,7 +38,7 @@ public static class DirectorDiffReport
             {
                 if (title.Contains("Backstory"))
                 {
-                    continue; // 直接跳过，不进行对比
+                    continue;
                 }
 
                 oldBlocks.TryGetValue(title, out var oldContent);
@@ -46,17 +46,12 @@ public static class DirectorDiffReport
 
                 if (oldContent == newContent) continue;
 
-                // ★★★ 核心修复：默认列表，特判键值 ★★★
-                // 只有明确知道是 Key-Value 格式的块，才用 KeyValue 对比
-                // 其他所有（包括未来新增的）都按安全的 List 方式对比
                 if (title.Contains("Basic Info") || title.Contains("Skills"))
                 {
-                    // 使用“键值对对比”模式
                     CompareKeyValueBlock(diffSb, title, oldContent, newContent);
                 }
                 else
                 {
-                    // 其他所有块都使用安全的“列表对比”模式
                     CompareListBlock(diffSb, title, oldContent, newContent);
                 }
             }
@@ -78,11 +73,9 @@ public static class DirectorDiffReport
                     {
                         if (line.StartsWith("---") && line.EndsWith("---"))
                         {
-                            // 保存上一个块
                             if (currentContent.Length > 0)
                                 blocks[currentTitle] = currentContent.ToString().Trim();
         
-                            // 开始新块
                             currentTitle = line.Trim('-', ' ');
                             currentContent.Clear();
                         }
@@ -91,16 +84,12 @@ public static class DirectorDiffReport
                             currentContent.AppendLine(line);
                         }
                     }
-                    // 保存最后一个块
                     if (currentContent.Length > 0)
                         blocks[currentTitle] = currentContent.ToString().Trim();
         
                     return blocks;
                 }
         
-                /// <summary>
-                /// 对比列表型数据块 (如 Traits, Genes)
-                /// </summary>
 
         private static void CompareListBlock(StringBuilder diffSb, string title, string oldContent, string newContent)
         {

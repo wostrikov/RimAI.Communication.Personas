@@ -1,7 +1,7 @@
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq; // 确保引用 Linq
+using System.Linq;
 using UnityEngine;
 using Ustas.RimAI.Core.Handshake;
 using Verse;
@@ -13,10 +13,8 @@ namespace Ustas.RimAI.Communication.Personas
         public const string HandshakeModuleVersion = "1.0.0";
         public static PersonasSettings Settings;
 
-        // 全局滚动条的位置状态
         private Vector2 mainScrollPosition = Vector2.zero;
 
-        // 缓存 RimPsyche 加载状态
         private static bool _isRimPsycheLoaded = false;
 
         public PersonasMod(ModContentPack content) : base(content)
@@ -37,21 +35,14 @@ namespace Ustas.RimAI.Communication.Personas
         public override void DoSettingsWindowContents(Rect inRect)
         {
             Ustas.RimAI.Core.Modules.RimAISettingsNavigation.Open("communication", "personas");
-            // --- 1. 计算内容总高度 (预估) ---
-            // 标题(30) + 按钮(30) + 开关(24*4) + 过滤器(200+) + 模板选择(60) + Prompt编辑(300+)
-            // 给一个足够大的高度，或者动态计算。这里给 1200f 足够了。
             float contentHeight = 1200f;
             Rect viewRect = new Rect(0, 0, inRect.width - 16f, contentHeight);
 
-            // --- 2. 开始全局滚动视图 ---
             Widgets.BeginScrollView(inRect, ref mainScrollPosition, viewRect);
 
             Listing_Standard list = new Listing_Standard();
             list.Begin(viewRect);
 
-            // ==========================================
-            //  A. 标题与库按钮
-            // ==========================================
             Rect titleRect = list.GetRect(30f);
             Text.Font = GameFont.Medium;
             Widgets.Label(titleRect.LeftPart(0.7f), "RPD_Settings_Title".Translate());
@@ -66,9 +57,6 @@ namespace Ustas.RimAI.Communication.Personas
 
             list.Gap(8f);
 
-            // ==========================================
-            //  B. 全局开关
-            // ==========================================
             list.CheckboxLabeled("RPD_Settings_ShowMainButton".Translate(), ref Settings.ShowMainButton, "RPD_Settings_ShowMainButtonTip".Translate());
 
             list.CheckboxLabeled("RPD_Filter_DirectorNotes".Translate(), ref Settings.Context.Inc_DirectorNotes, "RPD_Tip_NotesDesc".Translate());
@@ -78,33 +66,23 @@ namespace Ustas.RimAI.Communication.Personas
 
             list.GapLine();
 
-            // ==========================================
-            //  C. 数据过滤器 (三列布局)
-            // ==========================================
             DrawContextFilterSettings(list);
 
             list.GapLine();
 
-            // ==========================================
-            //  D. RimTalk 模板集成 (新增)
-            // ==========================================
             list.Label("<b>" + "RPD_Setting_RimTalkIntegration".Translate() + "</b>");
             list.Label("RPD_Setting_RimTalkIntegrationDesc".Translate());
 
-            // 获取 RimTalk 所有预设名
             string noneLabel = "RPD_Setting_NoneInternal".Translate();
 
             List<string> rtPresets = new List<string> { noneLabel };
             try
             {
-                // 使用反射或直接调用 API 获取预设列表
-                // 假设你有 Ustas.RimAI.Communication.API 引用
                 var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
                 if (presets != null) rtPresets.AddRange(presets.Select(p => p.Name));
             }
             catch { }
 
-            // 单体生成下拉
             Rect row1 = list.GetRect(24f);
             Widgets.Label(row1.LeftPart(0.4f), "RPD_Setting_ForSingleGen".Translate());
             string currentSingle = string.IsNullOrEmpty(Settings.rimTalkPreset_Single) ? noneLabel : Settings.rimTalkPreset_Single;
@@ -120,7 +98,6 @@ namespace Ustas.RimAI.Communication.Personas
             }
             list.Gap(5f);
 
-            // Evolve 下拉
             Rect row2 = list.GetRect(24f);
             Widgets.Label(row2.LeftPart(0.4f), "RPD_Setting_ForEvolve".Translate());
 
@@ -139,10 +116,7 @@ namespace Ustas.RimAI.Communication.Personas
 
             list.GapLine();
 
-            // ==========================================
-            //  E. 内置 Prompt 编辑器
-            // ==========================================
-            DrawPromptSection(list, viewRect.width); // 传入宽度
+            DrawPromptSection(list, viewRect.width);
 
             list.End();
             Widgets.EndScrollView();
@@ -157,12 +131,10 @@ namespace Ustas.RimAI.Communication.Personas
 
             var currentPreset = settings.presets[settings.selectedPresetIndex];
 
-            // 标题 & 重置
             Rect headerRect = list.GetRect(24f);
             Widgets.Label(headerRect.LeftPart(0.7f), "RPD_Prompt_Label".Translate());
             if (Widgets.ButtonText(headerRect.RightPart(0.3f), "RPD_Button_Reset".Translate()))
             {
-                // 重置逻辑
                 if (settings.selectedPresetIndex == 0) { currentPreset.label = "Standard (3 Options)"; currentPreset.text = PersonasSettings.DefaultPrompt_Standard; }
                 else if (settings.selectedPresetIndex == 1) { currentPreset.label = "Simple (One Shot)"; currentPreset.text = PersonasSettings.DefaultPrompt_Simple; }
                 else if (settings.selectedPresetIndex == 2) { currentPreset.label = "Strict (Backstory)"; currentPreset.text = PersonasSettings.DefaultPrompt_Strict; }
@@ -176,7 +148,6 @@ namespace Ustas.RimAI.Communication.Personas
             GUI.color = Color.white;
             list.Gap(2f);
 
-            // 控制行 (Token & Dropdown)
             Rect ctrlRect = list.GetRect(26f);
             int userChar = currentPreset.text?.Length ?? 0;
             int hiddenChar = PersonasSettings.HiddenTechnicalPrompt_Single.Length;
@@ -218,10 +189,8 @@ namespace Ustas.RimAI.Communication.Personas
             Text.Anchor = TextAnchor.UpperLeft;
             list.Gap(5f);
 
-            // 大文本框 (固定高度，比如 400)
             Rect outRect = list.GetRect(600f);
-            // 注意：这里不需要再嵌套 ScrollView 了，因为最外层已经有一个 ScrollView 了
-            // 直接用 TextArea 即可
+            // Non-obvious edge case — read carefully before changing. (ScrollView ScrollView TextArea)
             currentPreset.text = Widgets.TextArea(outRect, currentPreset.text);
         }
 
@@ -232,19 +201,13 @@ namespace Ustas.RimAI.Communication.Personas
             listingStandard.Label("RPD_Setting_FilterLabel".Translate());
             listingStandard.Gap(5f);
 
-            // 3. 计算列宽
-            const float colGap = 10f; // 稍微紧凑一点
+            const float colGap = 10f;
             int colCount = 3;
-            // 总宽度减去间隙，除以列数
             float colWidth = (listingStandard.ColumnWidth - (colGap * (colCount - 1))) / colCount;
 
-            // 获取当前 Y 轴位置
             Rect positionRect = listingStandard.GetRect(0f);
             float startY = positionRect.y;
 
-            // =================================================
-            // 第一列：生物与背景 (Biology & Background) - 6项
-            // =================================================
             Rect col1Rect = new Rect(positionRect.x, startY, colWidth, 9999f);
             Listing_Standard list1 = new Listing_Standard { ColumnWidth = colWidth };
             list1.Begin(col1Rect);
@@ -259,9 +222,6 @@ namespace Ustas.RimAI.Communication.Personas
 
             list1.End();
 
-            // =================================================
-            // 第二列：特征与状态 (Traits & Status) - 6项
-            // =================================================
             Rect col2Rect = new Rect(col1Rect.xMax + colGap, startY, colWidth, 9999f);
             Listing_Standard list2 = new Listing_Standard { ColumnWidth = colWidth };
             list2.Begin(col2Rect);
@@ -276,9 +236,6 @@ namespace Ustas.RimAI.Communication.Personas
 
             list2.End();
 
-            // =================================================
-            // 第三列：外部数据源 (External Data) - 动态显示
-            // =================================================
             Rect col3Rect = new Rect(col2Rect.xMax + colGap, startY, colWidth, 9999f);
             Listing_Standard list3 = new Listing_Standard { ColumnWidth = colWidth };
             list3.Begin(col3Rect);
@@ -303,10 +260,6 @@ namespace Ustas.RimAI.Communication.Personas
 
                 list3.End();
 
-            // =================================================
-            // 布局收尾
-            // =================================================
-            // 计算三列中最高的一列，撑开主 Listing 的高度，防止内容重叠
             float maxHeight = Mathf.Max(list1.CurHeight, list2.CurHeight);
             maxHeight = Mathf.Max(maxHeight, list3.CurHeight);
 

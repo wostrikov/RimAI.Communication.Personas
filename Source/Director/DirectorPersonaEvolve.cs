@@ -28,7 +28,6 @@ public static class DirectorPersonaEvolve
         {
             try
             {
-                // A. 获取当前文本 (UI 操作)
                 string currentPersona = GetWindowText(editorWindow);
                 if (string.IsNullOrEmpty(currentPersona))
                 {
@@ -37,24 +36,19 @@ public static class DirectorPersonaEvolve
                 }
                 if (string.IsNullOrEmpty(currentPersona)) return (null, null);
 
-                // B. 设置临时缓存 (给 Scriban {{director_evolve_current_persona}} 使用)
                 DirectorDataEngine.TempCurrentPersona = currentPersona;
 
-                // C. 决定使用哪种逻辑
                 string presetName = PersonasMod.Settings.rimTalkPreset_Evolve;
                 string finalPrompt = "";
                 string finalContext = "";
 
-                // --- 分支 1: 使用 RimTalk 高级预设 ---
                 if (!string.IsNullOrEmpty(presetName) && presetName != "None (Use Internal)")
                 {
-                    // 1. 查找预设
                     var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
                     var targetPreset = presets.FirstOrDefault(x => x.Name == presetName);
 
                     if (targetPreset != null)
                     {
-                        // 2. 准备渲染上下文 (利用反射创建 Context)
                         PromptContext contextObj = new PromptContext(p);
                         StringBuilder systemSb = new StringBuilder();
                         StringBuilder userSb = new StringBuilder();
@@ -67,9 +61,6 @@ public static class DirectorPersonaEvolve
 
                             if (string.IsNullOrWhiteSpace(renderedText)) continue;
 
-                            // 根据角色拼接到不同的缓冲区
-                            // Ustas.RimAI.Communication.Data.Role 枚举: System, User, AI
-                            // PromptEntry.Role 可能是字符串也可能是枚举，我们要判断
                             string roleStr = entry.Role.ToString().ToLowerInvariant();
 
                             if (roleStr == "system")
@@ -79,13 +70,12 @@ public static class DirectorPersonaEvolve
                             }
                             else
                             {
-                                // User 或 Assistant 都作为 Prompt 的一部分
                                 if (userSb.Length > 0) userSb.AppendLine("\n");
                                 userSb.Append(renderedText);
                             }
                         }
 
-                        // 4. 加上 JSON 协议 (这是硬性要求，必须加在最后)
+                        // Hard constraint — changing this breaks an invariant. (JSON)
                         systemSb.AppendLine("\n" + PersonasSettings.HiddenTechnicalPrompt_Single);
 
                         finalContext = systemSb.ToString();
@@ -100,10 +90,8 @@ public static class DirectorPersonaEvolve
                     }
                 }
 
-                // --- 分支 2: 使用内置逻辑 (保底或默认) ---
                 if (string.IsNullOrEmpty(finalPrompt))
                 {
-                    // 准备内置数据
                     var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
                     string timeInfo = "No previous update record.";
                     string comparisonBlock = "";
@@ -134,7 +122,6 @@ public static class DirectorPersonaEvolve
                         }
                     }
 
-                    // 组装数据包
                     StringBuilder contextSb = new StringBuilder();
                     var ctx = PersonasMod.Settings.Context;
 
@@ -173,18 +160,14 @@ public static class DirectorPersonaEvolve
                             contextSb.AppendLine($"[Common Knowledge]\n{ck}\n");
                     }
 
-                    // 组装最终结果
                     string userInstruction = PersonasMod.Settings.presets[3].text.Replace("{LANG}", Constant.Lang);
                     string technicalProtocol = PersonasSettings.HiddenTechnicalPrompt_Single;
 
-                    // 指令进 Context
                     finalContext = userInstruction + "\n\n" + technicalProtocol;
-                    // 数据进 Prompt
                     finalPrompt = "[Update Data]\n" + contextSb.ToString();
                 }
 
-                // D. 构造 TalkRequest
-                // 必须在主线程构造
+                // Threading/concurrency constraint — do not race this state. (D. TalkRequest)
                 var request = new TalkRequest(finalPrompt, p)
                 {
                     Context = finalContext
@@ -199,7 +182,6 @@ public static class DirectorPersonaEvolve
             }
             finally
             {
-                // 确保缓存被清理
                 DirectorDataEngine.TempCurrentPersona = "";
             }
         }
@@ -208,7 +190,6 @@ public static class DirectorPersonaEvolve
         {
             try
             {
-                // 调用 AIService.Query (它内部是异步的，但在 Task.Run 里我们可以直接 .Result 阻塞等待)
                 var task = AIService.Query<PersonalityData>(request);
                 return task.Result;
             }
@@ -225,9 +206,9 @@ public static class DirectorPersonaEvolve
 
             try
             {
-                // ★★★ 核心：在后台线程中阻塞等待 ★★★
+                // Threading/concurrency constraint — do not race this state.
                 Task<PersonalityData> task = AIService.Query<PersonalityData>(request);
-                PersonalityData result = task.Result; // 阻塞后台线程，不影响 UI
+                PersonalityData result = task.Result;  // Threading/concurrency constraint — do not race this state. (UI)
 
                 if (result != null && !string.IsNullOrEmpty(result.Persona))
                 {
@@ -236,9 +217,8 @@ public static class DirectorPersonaEvolve
             }
             catch (Exception ex)
             {
-                // 后台线程记录错误
+                // Threading/concurrency constraint — do not race this state.
                 RimAiLog.Error(RimAiLogCategory.Personas, $"[Director] Evolve execution failed: {ex.Message}");
-                // (可选) 调用 TryLogErrorToApiHistory
             }
             return null;
         }
