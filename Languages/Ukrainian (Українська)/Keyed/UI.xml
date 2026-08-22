@@ -116,6 +116,10 @@
   <RPD_Message_BatchGeneratedFail>Пакетна генерація не вдалася. ШІ повернув порожній результат або помилку формату.</RPD_Message_BatchGeneratedFail>
   <RPD_Message_GeneratedSuccess>Персонажа для {0} згенеровано.</RPD_Message_GeneratedSuccess>
   <RPD_Message_GeneratedFail>Не вдалося згенерувати для {0}: ШІ повернув порожній результат.</RPD_Message_GeneratedFail>
+  <RPD_Message_SelectVariant>Оберіть варіант персони для {0}.</RPD_Message_SelectVariant>
+  <RPD_VariantPicker_Title>Варіанти персони — {0}</RPD_VariantPicker_Title>
+  <RPD_VariantPicker_Apply>Застосувати вибраний</RPD_VariantPicker_Apply>
+  <RPD_VariantPicker_Cancel>Скасувати</RPD_VariantPicker_Cancel>
   <!-- Evolve Messages  -->
   <RPD_Msg_NoPersona>Немає наявної персони для оновлення.</RPD_Msg_NoPersona>
   <RPD_Msg_UpdatedSuccess>Персону успішно оновлено.</RPD_Msg_UpdatedSuccess>

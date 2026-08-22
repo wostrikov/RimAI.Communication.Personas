@@ -19,6 +19,7 @@ using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Communication.Personas.Policy;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -112,7 +113,11 @@ public static class DirectorPersonalityGenerator
                 string userPrompt = PersonasMod.Settings.GetActivePrompt(false);
                 if (string.IsNullOrEmpty(userPrompt)) userPrompt = PersonasSettings.DefaultPrompt_Standard;
 
-                string instruction = userPrompt.Replace("{LANG}", DirectorPromptComposer.CurrentLanguage) + "\n" + PersonasSettings.HiddenTechnicalPrompt_Single;
+                string instruction = PersonaVariantGenerationPolicy.ComposeInstruction(
+                    userPrompt,
+                    DirectorPromptComposer.CurrentLanguage,
+                    PersonaVariantGenerationPolicy.DefaultCount,
+                    PersonasSettings.HiddenTechnicalPrompt_Single);
                 string data = $"[Character Data]\n{characterData}";
 
                 var request = new TalkRequest(data, pawn)

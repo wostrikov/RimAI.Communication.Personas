@@ -114,8 +114,10 @@ namespace Ustas.RimAI.Communication.Personas
                         var result = task.Result;
                         if (pawn != null && !pawn.Destroyed && result != null && !string.IsNullOrEmpty(result.Persona))
                         {
-                            DirectorUtils.ApplyPersonalityToPawn(pawn, result);
-                            Messages.Message("RPD_Message_GeneratedSuccess".Translate(pawn.LabelShortCap), MessageTypeDefOf.PositiveEvent, false);
+                            if (DirectorPersonaVariantFlow.OfferSelectionOrApply(pawn, result))
+                                Messages.Message("RPD_Message_SelectVariant".Translate(pawn.LabelShortCap), MessageTypeDefOf.PositiveEvent, false);
+                            else
+                                Messages.Message("RPD_Message_GeneratedSuccess".Translate(pawn.LabelShortCap), MessageTypeDefOf.PositiveEvent, false);
                         }
                         else
                         {

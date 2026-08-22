@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Source\Policy\PersonaVariantGenerationPolicy.cs" Link="Policy\PersonaVariantGenerationPolicy.cs" />
+    <None Include="..\Source\Director\DirectorPersonalityGenerator.cs" Link="DirectorPersonalityGenerator.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Director\DirectorPersonaVariantFlow.cs" Link="DirectorPersonaVariantFlow.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Window_BatchDirector.cs" Link="Window_BatchDirector.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Window_PersonaVariantPicker.cs" Link="Window_PersonaVariantPicker.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\PersonasSettings.cs" Link="PersonasSettings.cs.src" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

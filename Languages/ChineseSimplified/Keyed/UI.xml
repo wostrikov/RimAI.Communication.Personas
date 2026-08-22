@@ -128,6 +128,10 @@
   <!-- 消息提示 -->
   <RPD_Message_GeneratedSuccess>已为 {0} 生成新的人设。</RPD_Message_GeneratedSuccess>
   <RPD_Message_GeneratedFail>为 {0} 生成人设失败: AI 返回了空结果。</RPD_Message_GeneratedFail>
+  <RPD_Message_SelectVariant>请为 {0} 选择一个人设变体。</RPD_Message_SelectVariant>
+  <RPD_VariantPicker_Title>人设变体 — {0}</RPD_VariantPicker_Title>
+  <RPD_VariantPicker_Apply>应用所选</RPD_VariantPicker_Apply>
+  <RPD_VariantPicker_Cancel>取消</RPD_VariantPicker_Cancel>
   <!-- Evolve Messages  -->
   <RPD_Msg_NoPersona>没有需要更新的人设</RPD_Msg_NoPersona>
   <RPD_Msg_UpdatedSuccess>成功更新人设</RPD_Msg_UpdatedSuccess>

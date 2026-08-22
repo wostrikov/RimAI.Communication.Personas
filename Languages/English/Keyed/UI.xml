@@ -126,6 +126,10 @@
   <RPD_Message_BatchGeneratedFail>Batch generation failed. AI returned empty result or format error.</RPD_Message_BatchGeneratedFail>
   <RPD_Message_GeneratedSuccess>Generated persona for {0}.</RPD_Message_GeneratedSuccess>
   <RPD_Message_GeneratedFail>Failed to generate for {0}: AI returned empty result.</RPD_Message_GeneratedFail>
+  <RPD_Message_SelectVariant>Choose a persona variant for {0}.</RPD_Message_SelectVariant>
+  <RPD_VariantPicker_Title>Persona variants — {0}</RPD_VariantPicker_Title>
+  <RPD_VariantPicker_Apply>Apply selected</RPD_VariantPicker_Apply>
+  <RPD_VariantPicker_Cancel>Cancel</RPD_VariantPicker_Cancel>
 
 <!-- Evolve Messages  -->
   <RPD_Msg_NoPersona>No existing persona to update.</RPD_Msg_NoPersona>

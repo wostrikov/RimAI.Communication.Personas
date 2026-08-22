@@ -1,6 +1,10 @@
 ﻿<Project>
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'RimAI.Communication.Personas'">
     <BaseOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas\bin\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'RimAI.Communication.Personas.Tests'">
+    <BaseOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas.Tests\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(LOCALAPPDATA)\Ustas\RimWorldSourceBuilds\RimAI.Communication.Personas.Tests\obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
 </Project>
