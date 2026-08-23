@@ -7,8 +7,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Source\Policy\PersonaVariantGenerationPolicy.cs" Link="Policy\PersonaVariantGenerationPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaProfileExtractPolicy.cs" Link="Policy\PersonaProfileExtractPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaDirectorNotesPolicy.cs" Link="Policy\PersonaDirectorNotesPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaEvolutionPolicy.cs" Link="Policy\PersonaEvolutionPolicy.cs" />
     <None Include="..\Source\Director\DirectorPersonalityGenerator.cs" Link="DirectorPersonalityGenerator.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Director\DirectorPersonaVariantFlow.cs" Link="DirectorPersonaVariantFlow.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Director\DirectorCharacterDataBuilder.cs" Link="DirectorCharacterDataBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Director\DirectorPersonaEvolve.cs" Link="DirectorPersonaEvolve.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Window_BatchDirector.cs" Link="Window_BatchDirector.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Window_PersonaVariantPicker.cs" Link="Window_PersonaVariantPicker.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\PersonasSettings.cs" Link="PersonasSettings.cs.src" CopyToOutputDirectory="PreserveNewest" />

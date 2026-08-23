@@ -19,6 +19,7 @@ using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Communication.Personas.Policy;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -94,7 +95,7 @@ public static class DirectorPersonaEvolve
                 {
                     var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
                     string timeInfo = "No previous update record.";
-                    string comparisonBlock = "";
+                    string diffReport = "";
                     int lastTick = -1;
 
                     if (worldComp != null)
@@ -115,8 +116,7 @@ public static class DirectorPersonaEvolve
                                 if (!string.IsNullOrEmpty(oldSnapshot))
                                 {
                                     string currentSnapshot = DirectorCharacterDataBuilder.BuildCustomCharacterData(p, true);
-                                    string diffReport = DirectorDiffReport.GenerateDiffReport(oldSnapshot, currentSnapshot);
-                                    comparisonBlock = $"\n[Status Changes (since last update)]:\n{diffReport}\n";
+                                    diffReport = DirectorDiffReport.GenerateDiffReport(oldSnapshot, currentSnapshot);
                                 }
                             }
                         }
@@ -132,19 +132,14 @@ public static class DirectorPersonaEvolve
                     contextSb.AppendLine($"Status: {DirectorPawnStatus.GetPawnSocialStatus(p)}");
                     contextSb.AppendLine();
 
-                    contextSb.AppendLine($"[Previous Persona (The Starting Point)]\n{currentPersona}\n");
-                    contextSb.AppendLine($"[Time Context]\n{timeInfo}\n");
-
-                    if (!string.IsNullOrEmpty(comparisonBlock)) contextSb.AppendLine(comparisonBlock);
-
-                    if (ctx.Inc_DirectorNotes && !string.IsNullOrEmpty(PersonasMod.Settings.directorNotes))
-                        contextSb.AppendLine($"[Director's Notes]\n{PersonasMod.Settings.directorNotes}\n");
-
                     string memories = DirectorMemoryContext.GetExternalMemories(p, lastTick);
-                    if (!string.IsNullOrEmpty(memories))
-                        contextSb.AppendLine($"[New Memories]\n{memories}\n");
-                    else
-                        contextSb.AppendLine("[New Memories]\nNo new significant memories since last update.\n");
+                    contextSb.Append(PersonaEvolutionPolicy.Compose(
+                        currentPersona,
+                        timeInfo,
+                        diffReport,
+                        PersonasMod.Settings.directorNotes,
+                        ctx.Inc_DirectorNotes,
+                        memories));
 
                     if (ctx.Inc_CommonKnowledge)
                     {

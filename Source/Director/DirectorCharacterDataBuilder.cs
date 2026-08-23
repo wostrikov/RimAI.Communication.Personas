@@ -19,6 +19,7 @@ using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Communication.Personas.Policy;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -34,7 +35,7 @@ public static class DirectorCharacterDataBuilder
             {
                 if (ctx.Inc_Basic)
                 {
-                    sb.AppendLine("--- Basic Info ---");
+                    sb.AppendLine(PersonaProfileExtractPolicy.IdentityMarker);
                     sb.AppendLine($"Name: {p.LabelShortCap}");
                     sb.AppendLine($"Gender: {p.gender}");
                     sb.AppendLine($"Age: {p.ageTracker.AgeBiologicalYears}");
@@ -86,7 +87,7 @@ public static class DirectorCharacterDataBuilder
             {
                 if (ctx.Inc_Race)
                 {
-                    sb.AppendLine("\n--- Race & Xenotype ---");
+                    sb.AppendLine("\n" + PersonaProfileExtractPolicy.XenotypeMarker);
                     sb.Append($"Race: {p.def.label}");
                     if (ctx.Inc_Race_Desc) sb.AppendLine($": {p.def.description}"); else sb.AppendLine();
 
@@ -103,10 +104,10 @@ public static class DirectorCharacterDataBuilder
             {
                 if (ctx.Inc_Genes && p.genes != null)
                 {
-                    sb.AppendLine("\n--- Genes ---");
+                    sb.AppendLine("\n" + PersonaProfileExtractPolicy.GenesMarker);
                     if (p.genes.Endogenes.Any())
                     {
-                        sb.Append("[Endogenes (Natural)]: ");
+                        sb.Append(PersonaProfileExtractPolicy.EndogeneMarker + " ");
                         foreach (var gene in p.genes.Endogenes)
                         {
                             if (gene.def.displayCategory != GeneCategoryDefOf.Miscellaneous && !gene.Overridden)
@@ -120,7 +121,7 @@ public static class DirectorCharacterDataBuilder
                     }
                     if (p.genes.Xenogenes.Any())
                     {
-                        sb.Append("[Xenogenes (Artificial)]: ");
+                        sb.Append(PersonaProfileExtractPolicy.XenogeneMarker + " ");
                         foreach (var gene in p.genes.Xenogenes)
                         {
                             if (gene.def.displayCategory != GeneCategoryDefOf.Miscellaneous && !gene.Overridden)
@@ -229,7 +230,7 @@ public static class DirectorCharacterDataBuilder
 
                     if (relationSb.Length > 0)
                     {
-                        sb.AppendLine("\n--- Key Relationships ---");
+                        sb.AppendLine("\n" + PersonaProfileExtractPolicy.RelationsMarker);
                         sb.Append(relationSb);
                     }
                 }
@@ -254,7 +255,7 @@ public static class DirectorCharacterDataBuilder
             {
                 if (ctx.Inc_Ideology && p.Ideo != null)
                 {
-                    sb.AppendLine("\n--- Ideology ---");
+                    sb.AppendLine("\n" + PersonaProfileExtractPolicy.IdeologyMarker);
                     sb.AppendLine($"Religion: {p.Ideo.name}");
                     foreach (var meme in p.Ideo.memes)
                     {
@@ -269,7 +270,7 @@ public static class DirectorCharacterDataBuilder
             {
                 if (ctx.Inc_Skills && p.skills != null)
                 {
-                    sb.AppendLine("\n--- Skills ---");
+                    sb.AppendLine("\n" + PersonaProfileExtractPolicy.SkillsMarker);
                     foreach (var skill in p.skills.skills)
                     {
                         sb.Append($"{skill.def.label}: ");
@@ -400,8 +401,12 @@ public static class DirectorCharacterDataBuilder
                 {
                     if (ctx.Inc_DirectorNotes && !string.IsNullOrEmpty(PersonasMod.Settings.directorNotes))
                     {
-                        sb.AppendLine("\n--- Director's Notes (Custom Context) ---");
-                        sb.AppendLine(PersonasMod.Settings.directorNotes);
+                        string withNotes = PersonaDirectorNotesPolicy.AppendNotes(
+                            sb.ToString(),
+                            PersonasMod.Settings.directorNotes,
+                            true);
+                        sb.Clear();
+                        sb.Append(withNotes);
                     }
                 }
                 catch { }
