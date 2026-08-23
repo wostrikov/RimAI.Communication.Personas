@@ -22,10 +22,14 @@
     <li>brrainz.harmony</li>
     <li>ustas.rimai.communication</li>
   </loadAfter>
-  <description>RimAI.Communication.Personas generates and maintains colonist personas for RimAI dialogue.
+  <description>RimAI.Communication.Personas створює й підтримує персоналії колоністів для діалогів RimAI.
 
-It reads genes, skills, relationships, and other pawn data, then offers distinct personality options. You can add director notes and turn individual data fields on or off.
+Основні можливості:
+• враховує гени, навички, стосунки та інші дані пішака
+• пропонує кілька варіантів характеру
+• власні нотатки режисера
+• можна вимикати окремі поля даних
 
-Requires Harmony and RimAI.Communication. Gameplay text AI uses shared RimAI settings.
+Потрібні Harmony та RimAI.Communication. Текстовий ШІ — зі спільних налаштувань RimAI.
   </description>
 </ModMetaData>
