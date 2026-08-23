@@ -22,15 +22,10 @@
     <li>brrainz.harmony</li>
     <li>ustas.rimai.communication</li>
   </loadAfter>
-  <description>
-    RimAI.Communication.Personas generates and maintains colonist personas for RimAI dialogue.
+  <description>RimAI.Communication.Personas generates and maintains colonist personas for RimAI dialogue.
 
-    Features:
-    1. **Deep Data Extraction**: Reads Genes (Endo/Xeno), Skills, Relationships, and more.
-    2. **Director Mode**: Generate 3 distinct personality options based on rich data.
-    3. **Custom Context**: Add your own director notes to shape the character's memory.
-    4. **Fully Configurable**: Toggle every data field to save tokens or reduce noise.
+It reads genes, skills, relationships, and other pawn data, then offers distinct personality options. You can add director notes and turn individual data fields on or off.
 
-    Gameplay text AI uses the shared RimAI configuration.
+Requires Harmony and RimAI.Communication. Gameplay text AI uses shared RimAI settings.
   </description>
 </ModMetaData>
