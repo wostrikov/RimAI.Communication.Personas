@@ -44,6 +44,29 @@ namespace Ustas.RimAI.Communication.Personas
             RefreshPawnCache();
         }
 
+        public int VisiblePawnCount => cachedPawns.Count;
+
+        public IReadOnlyList<string> CharacterTypeFilterKeys
+        {
+            get
+            {
+                if (PersonasMod.Settings.BatchFilters == null)
+                    PersonasMod.Settings.InitFilters();
+                return PersonasMod.Settings.BatchFilters.Keys.ToList();
+            }
+        }
+
+        public bool TrySetCharacterTypeFilter(string key, bool enabled)
+        {
+            if (PersonasMod.Settings.BatchFilters == null)
+                PersonasMod.Settings.InitFilters();
+            if (string.IsNullOrEmpty(key) || !PersonasMod.Settings.BatchFilters.ContainsKey(key))
+                return false;
+            PersonasMod.Settings.BatchFilters[key] = enabled;
+            RefreshPawnCache();
+            return true;
+        }
+
         public override Vector2 InitialSize => new Vector2(1000f, 700f);
 
         public override void PostClose()

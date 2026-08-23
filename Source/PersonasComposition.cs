@@ -43,6 +43,7 @@ public sealed class PersonasComposition : IRimAiModuleComposition
         // (same LongEvent timing as the former PersonasMod / StaticConstructor paths).
         LongEventHandler.ExecuteWhenFinished(DirectorStartup.Initialize);
         LongEventHandler.ExecuteWhenFinished(DirectorApiAdapter.RegisterSurface);
+        PersonasPipelineProbe.Register();
 
         IsStarted = true;
     }
