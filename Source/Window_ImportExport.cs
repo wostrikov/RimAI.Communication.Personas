@@ -7,6 +7,7 @@ using System.Linq;
 using Ustas.RimAI.Core.Storage;
 using Ustas.RimAI.Core.Diagnostics;
 using Ustas.RimAI.Core.Personas;
+using Ustas.RimAI.Communication.Personas.Policy;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -176,12 +177,7 @@ namespace Ustas.RimAI.Communication.Personas
 
         private string GenerateExportXml()
         {
-            var dataToExport = new TempExportData
-            {
-                Presets = PersonasMod.Settings.userPresets,
-                Rules = PersonasMod.Settings.assignmentRules
-            };
-            return Scribe.saver.DebugOutputFor(dataToExport);
+            return PersonaPresetLibraryIoPolicy.Format(CaptureCurrent());
         }
 
         private void ImportFromText(bool overwrite)
@@ -190,48 +186,154 @@ namespace Ustas.RimAI.Communication.Personas
 
             try
             {
-                var loadedData = new TempExportData();
-                string tempPath = null;
-                try
+                var parsed = PersonaPresetLibraryIoPolicy.Parse(_text);
+                if (parsed.Accepted && parsed.Snapshot != null)
                 {
-                    tempPath = Path.Combine(Path.GetTempPath(), $"RPD_Import_{System.DateTime.Now:yyyyMMdd_HHmmssfff}.xml");
-                    LocalStorage.Current.WriteAllText(tempPath, _text);
-                    Scribe.loader.InitLoading(tempPath);
-                    loadedData.ExposeData();
-                    Scribe.loader.FinalizeLoading();
-                }
-                finally
-                {
-                    if (!string.IsNullOrEmpty(tempPath) && LocalStorage.Current.FileExists(tempPath))
-                    {
-                        try { LocalStorage.Current.DeleteFile(tempPath); } catch { }
-                    }
+                    ApplySnapshot(PersonaPresetLibraryIoPolicy.Apply(CaptureCurrent(), parsed.Snapshot, overwrite));
+                    PresetSynchronizer.SyncToRimTalk();
+                    Messages.Message("RPD_IO_MsgImportSuccess".Translate(), MessageTypeDefOf.PositiveEvent, false);
+                    Close();
+                    return;
                 }
 
-                if (overwrite)
+                if (!TryImportLegacyScribe(overwrite))
                 {
-                    PersonasMod.Settings.userPresets = loadedData.Presets ?? new List<CustomPreset>();
-                    PersonasMod.Settings.assignmentRules = loadedData.Rules ?? new List<AssignmentRule>();
-                }
-                else
-                {
-                    if (loadedData.Presets != null)
-                        PersonasMod.Settings.userPresets.AddRange(loadedData.Presets);
-
-                    if (loadedData.Rules != null)
-                        PersonasMod.Settings.assignmentRules.AddRange(loadedData.Rules);
+                    Messages.Message("RPD_IO_MsgImportFail".Translate(parsed.Reason ?? "parse"), MessageTypeDefOf.RejectInput, false);
+                    return;
                 }
 
                 PresetSynchronizer.SyncToRimTalk();
-
                 Messages.Message("RPD_IO_MsgImportSuccess".Translate(), MessageTypeDefOf.PositiveEvent, false);
-                this.Close();
+                Close();
             }
             catch (System.Exception ex)
             {
                 RimAiLog.Error(RimAiLogCategory.Personas, $"Import failed: {ex}");
                 Messages.Message("RPD_IO_MsgImportFail".Translate(ex.Message), MessageTypeDefOf.RejectInput, false);
             }
+        }
+
+        private PersonaLibrarySnapshot CaptureCurrent()
+        {
+            var snapshot = new PersonaLibrarySnapshot();
+            var presets = PersonasMod.Settings.userPresets;
+            if (presets != null)
+            {
+                foreach (var preset in presets)
+                {
+                    if (preset == null)
+                        continue;
+                    snapshot.Presets.Add(new PersonaLibraryPresetRecord
+                    {
+                        Id = preset.id,
+                        Label = preset.label,
+                        PersonaText = preset.personaText,
+                        Chattiness = preset.chattiness,
+                        Category = preset.category,
+                        Enabled = preset.enabled
+                    });
+                }
+            }
+
+            var rules = PersonasMod.Settings.assignmentRules;
+            if (rules != null)
+            {
+                foreach (var rule in rules)
+                {
+                    if (rule == null)
+                        continue;
+                    snapshot.Rules.Add(new PersonaLibraryRuleRecord
+                    {
+                        Enabled = rule.enabled,
+                        TargetDefName = rule.targetDefName,
+                        Type = rule.type.ToString(),
+                        Priority = rule.priority,
+                        AllowedPresetIds = new List<string>(rule.allowedPresetIds ?? new List<string>())
+                    });
+                }
+            }
+
+            return snapshot;
+        }
+
+        private void ApplySnapshot(PersonaLibrarySnapshot snapshot)
+        {
+            var presets = new List<CustomPreset>();
+            foreach (var record in snapshot?.Presets ?? new List<PersonaLibraryPresetRecord>())
+            {
+                if (record == null)
+                    continue;
+                presets.Add(new CustomPreset
+                {
+                    id = record.Id,
+                    label = record.Label,
+                    personaText = record.PersonaText,
+                    chattiness = record.Chattiness,
+                    category = record.Category,
+                    enabled = record.Enabled
+                });
+            }
+
+            var rules = new List<AssignmentRule>();
+            foreach (var record in snapshot?.Rules ?? new List<PersonaLibraryRuleRecord>())
+            {
+                if (record == null)
+                    continue;
+                RuleType type;
+                if (!System.Enum.TryParse(record.Type, true, out type))
+                    type = RuleType.FactionDef;
+                rules.Add(new AssignmentRule
+                {
+                    enabled = record.Enabled,
+                    targetDefName = record.TargetDefName,
+                    type = type,
+                    priority = record.Priority,
+                    allowedPresetIds = new List<string>(record.AllowedPresetIds ?? new List<string>())
+                });
+            }
+
+            PersonasMod.Settings.userPresets = presets;
+            PersonasMod.Settings.assignmentRules = rules;
+        }
+
+        private bool TryImportLegacyScribe(bool overwrite)
+        {
+            var loadedData = new TempExportData();
+            string tempPath = null;
+            try
+            {
+                tempPath = Path.Combine(Path.GetTempPath(), $"RPD_Import_{System.DateTime.Now:yyyyMMdd_HHmmssfff}.xml");
+                LocalStorage.Current.WriteAllText(tempPath, _text);
+                Scribe.loader.InitLoading(tempPath);
+                loadedData.ExposeData();
+                Scribe.loader.FinalizeLoading();
+            }
+            finally
+            {
+                if (!string.IsNullOrEmpty(tempPath) && LocalStorage.Current.FileExists(tempPath))
+                {
+                    try { LocalStorage.Current.DeleteFile(tempPath); } catch { }
+                }
+            }
+
+            if ((loadedData.Presets == null || loadedData.Presets.Count == 0) &&
+                (loadedData.Rules == null || loadedData.Rules.Count == 0))
+                return false;
+
+            if (overwrite)
+            {
+                PersonasMod.Settings.userPresets = loadedData.Presets ?? new List<CustomPreset>();
+                PersonasMod.Settings.assignmentRules = loadedData.Rules ?? new List<AssignmentRule>();
+            }
+            else
+            {
+                if (loadedData.Presets != null)
+                    PersonasMod.Settings.userPresets.AddRange(loadedData.Presets);
+                if (loadedData.Rules != null)
+                    PersonasMod.Settings.assignmentRules.AddRange(loadedData.Rules);
+            }
+
+            return true;
         }
 
         private class TempExportData : IExposable
