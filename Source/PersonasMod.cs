@@ -41,6 +41,10 @@ namespace Ustas.RimAI.Communication.Personas
             Widgets.BeginScrollView(inRect, ref mainScrollPosition, viewRect);
 
             Listing_Standard list = new Listing_Standard();
+            // Verse wraps a Listing into a second column, off the visible view, as soon as
+            // content passes the rect height, and CurHeight then reports that new column.
+            // A scrolling settings page never wants that; see validate_scrollable_listings.
+            list.maxOneColumn = true;
             list.Begin(viewRect);
 
             Rect titleRect = list.GetRect(30f);

@@ -169,6 +169,10 @@ namespace Ustas.RimAI.Communication.Personas
             if (selectedPreset != null)
             {
                 Listing_Standard editor = new Listing_Standard();
+                // Verse wraps a Listing into a second column, off the visible view, as soon as
+                // content passes the rect height, and CurHeight then reports that new column.
+                // A scrolling settings page never wants that; see validate_scrollable_listings.
+                editor.maxOneColumn = true;
                 editor.Begin(rightRect.ContractedBy(12f));
                 editor.Label("RPD_Library_PresetName".Translate());
                 selectedPreset.label = editor.TextEntry(selectedPreset.label);

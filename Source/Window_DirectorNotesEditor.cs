@@ -21,6 +21,10 @@ namespace Ustas.RimAI.Communication.Personas
         public override void DoWindowContents(Rect inRect)
         {
             Listing_Standard list = new Listing_Standard();
+            // Verse wraps a Listing into a second column, off the visible view, as soon as
+            // content passes the rect height, and CurHeight then reports that new column.
+            // A scrolling settings page never wants that; see validate_scrollable_listings.
+            list.maxOneColumn = true;
             list.Begin(inRect);
 
             Rect headerRect = list.GetRect(30f);
