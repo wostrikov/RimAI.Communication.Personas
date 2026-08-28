@@ -3,6 +3,7 @@ using RimWorld;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using RimAI.Core.Runtime;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -83,7 +84,7 @@ namespace Ustas.RimAI.Communication.Personas
 
                     if (request != null)
                     {
-                        evolveTask = Task.Run(() =>
+                        evolveTask = RimAiBackground.Run(() =>
                         {
                             var result = DirectorUtils.ExecuteEvolveTask(request);
                             if (result != null && !string.IsNullOrEmpty(result.Persona))
