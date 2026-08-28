@@ -313,7 +313,7 @@ namespace Ustas.RimAI.Communication.Personas
                             }
 
                             string targetInfo = "";
-                            if (!string.IsNullOrEmpty(line.target) && line.target != "None" && line.target != "自己" && line.target != line.name)
+                            if (!string.IsNullOrEmpty(line.target) && line.target != "None" && line.target != "сам" && line.target != line.name)
                             {
                                 targetInfo = $" (to {line.target})";
                             }
