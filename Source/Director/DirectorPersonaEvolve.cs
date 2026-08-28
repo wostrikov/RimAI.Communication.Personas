@@ -20,6 +20,7 @@ using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Core.Diagnostics;
 using Ustas.RimAI.Communication.Personas.Policy;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -229,7 +230,11 @@ public static class DirectorPersonaEvolve
                     apiLog.Response = $"[Director] Task failed: {ex.Message}";
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - could not annotate the api log entry with the failure
+            catch (System.Exception annotateEx)
+            {
+                ModuleLog.Message("[RimAI.Personas] could not annotate the api log entry with the failure: " + annotateEx.Message);
+            }
         }
 
         public static string GetWindowText(Window window)

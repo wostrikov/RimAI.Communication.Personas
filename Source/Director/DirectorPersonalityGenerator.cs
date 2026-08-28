@@ -20,6 +20,7 @@ using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Core.Diagnostics;
 using Ustas.RimAI.Communication.Personas.Policy;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -258,7 +259,11 @@ public static class DirectorPersonalityGenerator
                     return hediff.Personality;
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - persona hediff unreadable, using the not-set label
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] persona hediff unreadable, using the not-set label: " + ex.Message);
+            }
             return "RPD_Batch_PersonalityNotSet".Translate();
         }
 

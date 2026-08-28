@@ -8,6 +8,7 @@ using Ustas.RimAI.Core.Storage;
 using Ustas.RimAI.Core.Diagnostics;
 using Ustas.RimAI.Core.Personas;
 using Ustas.RimAI.Communication.Personas.Policy;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -312,7 +313,12 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 if (!string.IsNullOrEmpty(tempPath) && LocalStorage.Current.FileExists(tempPath))
                 {
-                    try { LocalStorage.Current.DeleteFile(tempPath); } catch { }
+                    try { LocalStorage.Current.DeleteFile(tempPath); }
+                    // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - import temp file outlived the import
+                    catch (System.Exception ex)
+                    {
+                        ModuleLog.Message("[RimAI.Personas] import temp file outlived the import: " + ex.Message);
+                    }
                 }
             }
 

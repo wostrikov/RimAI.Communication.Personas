@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -108,7 +109,11 @@ public static class DirectorModCompat
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - RimPsyche compatibility data is missing from the persona
+            catch (System.Exception ex)
+            {
+                RimAiLog.WarningOnce(RimAiLogCategory.Personas, "[RimAI.Personas] RimPsyche compatibility data is missing from the persona: " + ex, 1511129089);
+            }
             try
             {
                 object interestsTracker = null;
@@ -155,7 +160,11 @@ public static class DirectorModCompat
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - RimPsyche compatibility data is missing from the persona
+            catch (System.Exception ex)
+            {
+                RimAiLog.WarningOnce(RimAiLogCategory.Personas, "[RimAI.Personas] RimPsyche compatibility data is missing from the persona: " + ex, 1511129090);
+            }
             return psySb.ToString();
         }
 
@@ -207,6 +216,10 @@ public static class DirectorModCompat
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - RimPsyche compatibility data is missing from the persona
+            catch (System.Exception ex)
+            {
+                RimAiLog.WarningOnce(RimAiLogCategory.Personas, "[RimAI.Personas] RimPsyche compatibility data is missing from the persona: " + ex, 1511129091);
+            }
         }
 }

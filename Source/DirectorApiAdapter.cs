@@ -77,8 +77,10 @@ namespace Ustas.RimAI.Communication.Personas
                     }
                 );
             }
-            catch
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - director API adapter registration failed
+            catch (System.Exception ex)
             {
+                RimAiLog.WarningOnce(RimAiLogCategory.Personas, "[RimAI.Personas] director API adapter registration failed: " + ex, 1511129092);
             }
 
             Reg("d_basic_name", p => p.LabelShortCap);

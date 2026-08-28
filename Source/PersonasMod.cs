@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Ustas.RimAI.Core.Handshake;
 using Verse;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -85,7 +86,11 @@ namespace Ustas.RimAI.Communication.Personas
                 var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
                 if (presets != null) rtPresets.AddRange(presets.Select(p => p.Name));
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - preset list could not be read, so the dropdown is empty
+            catch (System.Exception ex)
+            {
+                RimAiLog.WarningOnce(RimAiLogCategory.Personas, "[RimAI.Personas] preset list could not be read, so the dropdown is empty: " + ex, 1511129093);
+            }
 
             Rect row1 = list.GetRect(24f);
             Widgets.Label(row1.LeftPart(0.4f), "RPD_Setting_ForSingleGen".Translate());

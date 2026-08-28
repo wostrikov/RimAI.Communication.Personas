@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Verse;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -215,7 +216,12 @@ namespace Ustas.RimAI.Communication.Personas
             if (currentPawn == null) return "";
 
             int totalBudget = 5;
-            try { totalBudget = Ustas.RimAI.Communication.Settings.Get().Context.ConversationHistoryCount; } catch { }
+            try { totalBudget = Ustas.RimAI.Communication.Settings.Get().Context.ConversationHistoryCount; }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - persona data section fell back to its default
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] persona data section fell back to its default: " + ex.Message);
+            }
             if (isMonologue) totalBudget = Math.Min(totalBudget, 3);
 
             var participants = allPawns ?? new List<Pawn>();
@@ -327,7 +333,11 @@ namespace Ustas.RimAI.Communication.Personas
                         }
                     }
                 }
-                catch { }
+                // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - persona data section fell back to its default
+                catch (System.Exception ex)
+                {
+                    ModuleLog.Message("[RimAI.Personas] persona data section fell back to its default: " + ex.Message);
+                }
             }
 
             return resultLines;
@@ -350,8 +360,10 @@ namespace Ustas.RimAI.Communication.Personas
                     }
                 }
             }
-            catch
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - persona data section fell back to its default
+            catch (System.Exception ex)
             {
+                ModuleLog.Message("[RimAI.Personas] persona data section fell back to its default: " + ex.Message);
             }
 
             var hediff = Hediff_Persona.GetOrAddNew(p);

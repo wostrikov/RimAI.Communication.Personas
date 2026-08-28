@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -32,7 +33,11 @@ public static class DirectorPromptComposer
                     if (LanguageDatabase.activeLanguage != null)
                         return LanguageDatabase.activeLanguage.info.friendlyNameNative;
                 }
-                catch { }
+                // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - active language name unavailable, using English
+                catch (System.Exception ex)
+                {
+                    ModuleLog.Message("[RimAI.Personas] active language name unavailable, using English: " + ex.Message);
+                }
                 return "English";
             }
         }

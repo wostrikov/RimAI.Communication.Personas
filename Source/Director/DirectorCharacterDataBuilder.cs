@@ -20,6 +20,7 @@ using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Core.Diagnostics;
 using Ustas.RimAI.Communication.Personas.Policy;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -81,7 +82,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -98,7 +103,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -135,7 +144,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -188,7 +201,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -235,7 +252,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -249,7 +270,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -264,7 +289,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -307,7 +336,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -366,7 +399,11 @@ public static class DirectorCharacterDataBuilder
                     if (hasItems) { sb.AppendLine("\n--- Equipment ---"); sb.Append(equipSb); }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -379,7 +416,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             try
             {
@@ -393,7 +434,11 @@ public static class DirectorCharacterDataBuilder
                     }
                 }
             }
-            catch { }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+            catch (System.Exception ex)
+            {
+                ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+            }
 
             if (!isSnapshot)
             {
@@ -409,7 +454,11 @@ public static class DirectorCharacterDataBuilder
                         sb.Append(withNotes);
                     }
                 }
-                catch { }
+                // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - optional persona data was skipped
+                catch (System.Exception ex)
+                {
+                    ModuleLog.Message("[RimAI.Personas] optional persona data was skipped: " + ex.Message);
+                }
 
                 if (ctx.Inc_Memories)
                 {

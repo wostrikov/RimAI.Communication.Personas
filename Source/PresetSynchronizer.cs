@@ -3,6 +3,7 @@ using Ustas.RimAI.Communication.Data;
 using System.Collections.Generic;
 using System;
 using Ustas.RimAI.Core.Diagnostics;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -26,7 +27,11 @@ namespace Ustas.RimAI.Communication.Personas
                         {
                             chat = DirectorUtils.NormalizeChattiness(chat);
                         }
-                        catch { }
+                        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - chattiness kept its raw value
+                        catch (System.Exception ex)
+                        {
+                            ModuleLog.Message("[RimAI.Personas] chattiness kept its raw value: " + ex.Message);
+                        }
 
                         syncList.Add(new PersonalityData(preset.personaText, chat));
                     }

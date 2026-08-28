@@ -9,6 +9,7 @@ using UnityEngine;
 using Verse;
 using Ustas.RimAI.Core.Diagnostics;
 using Ustas.RimAI.Core.Personas;
+using Ustas.RimAI.Communication.Personas.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas
 {
@@ -376,12 +377,22 @@ namespace Ustas.RimAI.Communication.Personas
                 foreach (var p in sourceList)
                 {
                     string translatedText = p.Persona;
-                    try { translatedText = p.Persona.Translate().Resolve(); } catch { }
+                    try { translatedText = p.Persona.Translate().Resolve(); }
+                    // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - preset label kept its raw text instead of a translation
+                    catch (System.Exception ex)
+                    {
+                        ModuleLog.Message("[RimAI.Personas] preset label kept its raw text instead of a translation: " + ex.Message);
+                    }
                     bool isBuiltIn = PresetLibrary.Defaults.Any(d => d.personaText == translatedText);
                     if (!isBuiltIn && !userPresets.Any(existing => existing.personaText == translatedText))
                     {
                         string smartLabel = $"Vanilla {vanillaCount + 1}";
-                        try { smartLabel = ExtractLabelFromText(translatedText) ?? smartLabel; } catch { }
+                        try { smartLabel = ExtractLabelFromText(translatedText) ?? smartLabel; }
+                        // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY - preset label kept its raw text instead of a translation
+                        catch (System.Exception ex)
+                        {
+                            ModuleLog.Message("[RimAI.Personas] preset label kept its raw text instead of a translation: " + ex.Message);
+                        }
 
                         userPresets.Add(new CustomPreset
                         {
