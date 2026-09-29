@@ -18,6 +18,7 @@ namespace Ustas.RimAI.Communication.Personas.History
         public void ExposeData()
         {
             Scribe_Collections.Look(ref _byPawn, "byPawn", LookMode.Value, LookMode.Deep);
+            if (Scribe.mode == LoadSaveMode.LoadingVars) _byPawn ??= new Dictionary<int, PersonaPawnHistory>();
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 _byPawn ??= new Dictionary<int, PersonaPawnHistory>();

@@ -20,6 +20,9 @@ namespace Ustas.RimAI.Communication.Personas
         private Dictionary<int, int> _dailySnapshotDays = new Dictionary<int, int>();
 
         public int lastRuleCheckTick = 0;
+
+        // Set by FinalizeInit, done on the first tick: see FinalizeInit.
+        private bool _historyPrunePending;
         private HashSet<int> _processedPawnIds = new HashSet<int>();
         public DirectorWorldComponent(World world) : base(world) { }
 
@@ -33,6 +36,9 @@ namespace Ustas.RimAI.Communication.Personas
             Scribe_Collections.Look(ref _dailySnapshotDays, PersonaScribeLabels.WorldComponent.DailySnapshotDays, LookMode.Value, LookMode.Value);
             Scribe_Values.Look(ref lastRuleCheckTick, PersonaScribeLabels.WorldComponent.LastRuleCheckTick, 0);
             Scribe_Deep.Look(ref _history, "personaHistory");
+            // World.FinalizeInit runs before the loader's PostLoadInit pass, so a save
+            // written before persona history existed must have its store now, not there.
+            if (Scribe.mode == LoadSaveMode.LoadingVars && _history == null) _history = new PersonaHistoryStore();
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
@@ -52,7 +58,9 @@ namespace Ustas.RimAI.Communication.Personas
             // A new game or a loaded save: whatever the automation held belongs
             // to the world before this one.
             PersonasComposition.Current.Automation.BindWorld(world);
-            _history.RemoveMissingPawns();
+            // Not here: on a load this runs before the maps are read, so every pawn on
+            // a map would look missing and lose its history. The first tick knows them all.
+            _historyPrunePending = fromLoad;
         }
 
         // The game already guards each world component's tick and logs what it
@@ -61,6 +69,11 @@ namespace Ustas.RimAI.Communication.Personas
         public override void WorldComponentTick()
         {
             base.WorldComponentTick();
+            if (_historyPrunePending)
+            {
+                _historyPrunePending = false;
+                _history.RemoveMissingPawns();
+            }
             if (PersonasComposition.Current.IsStarted)
                 PersonasComposition.Current.Automation.Tick(this);
         }
