@@ -11,6 +11,8 @@
     <Compile Include="..\Source\Policy\PersonaDirectorNotesPolicy.cs" Link="Policy\PersonaDirectorNotesPolicy.cs" />
     <Compile Include="..\Source\Policy\PersonaEvolutionPolicy.cs" Link="Policy\PersonaEvolutionPolicy.cs" />
     <Compile Include="..\Source\Policy\PersonaPresetLibraryIoPolicy.cs" Link="Policy\PersonaPresetLibraryIoPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaAutomationPolicy.cs" Link="Policy\PersonaAutomationPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaHistoryPolicy.cs" Link="Policy\PersonaHistoryPolicy.cs" />
     <None Include="..\Source\Director\DirectorPersonalityGenerator.cs" Link="DirectorPersonalityGenerator.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Director\DirectorPersonaVariantFlow.cs" Link="DirectorPersonaVariantFlow.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Director\DirectorCharacterDataBuilder.cs" Link="DirectorCharacterDataBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />

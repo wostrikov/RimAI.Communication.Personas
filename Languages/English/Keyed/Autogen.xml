@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <!-- Automation block on the Mod-settings page -->
+  <RPD_Settings_AutomationHeader>Automatic persona work</RPD_Settings_AutomationHeader>
+  <RPD_Settings_EnableAutoGen>Enable Auto-Gen</RPD_Settings_EnableAutoGen>
+  <RPD_Settings_EnableAutoGenTip>Write a persona automatically for pawns that only have a randomly drawn one: when they first appear on a map, or when their role changes. Which roles take part is set in the configuration window. Off by default.</RPD_Settings_EnableAutoGenTip>
+  <RPD_Settings_ConfigAutoGen>Configure</RPD_Settings_ConfigAutoGen>
+  <RPD_Settings_ConfigAutoGenTip>Open the Auto-Gen configuration window to choose roles, prompts and pawn data.</RPD_Settings_ConfigAutoGenTip>
+  <RPD_AutoEvolve_ConfigTip>Open the Auto-Evolve configuration window to choose the schedule, the life events and the update mode.</RPD_AutoEvolve_ConfigTip>
+  <RPD_Settings_AutoNotify>Show a message when a persona changes automatically</RPD_Settings_AutoNotify>
+  <RPD_Settings_AutoNotifyTip>A short message in the top-left corner each time Auto-Gen or Auto-Evolve updates a pawn's persona.</RPD_Settings_AutoNotifyTip>
+  <RPD_Msg_AutoPersonaUpdated>{0}: persona updated automatically.</RPD_Msg_AutoPersonaUpdated>
+  <!-- Auto-Gen configuration window -->
+  <RPD_AutoGen_ConfigTitle>Auto-Gen Configuration</RPD_AutoGen_ConfigTitle>
+  <RPD_AutoGen_QueueStatus>Queued: {0} pawns</RPD_AutoGen_QueueStatus>
+  <RPD_AutoGen_Enable>New pawns</RPD_AutoGen_Enable>
+  <RPD_AutoGen_EnableTip>Write a persona for pawns of this role when they first appear on a map.</RPD_AutoGen_EnableTip>
+  <RPD_AutoGen_OnlyOnRoleChangeShort>Role change</RPD_AutoGen_OnlyOnRoleChangeShort>
+  <RPD_AutoGen_OnlyOnRoleChangeTip>Write a persona when a pawn on a map enters this role, for example a prisoner recruited as a colonist. Only pawns that still have a randomly drawn persona are affected; a pawn with a persona of its own is left to Auto-Evolve, if its role-change trigger is on.</RPD_AutoGen_OnlyOnRoleChangeTip>
+  <RPD_AutoGen_SyncModSettingsShort>Global data</RPD_AutoGen_SyncModSettingsShort>
+  <RPD_AutoGen_SyncModSettingsTip>Send the pawn data selected on the Mod-settings page. Turn off to choose this role's own data with the Pawn data button.</RPD_AutoGen_SyncModSettingsTip>
+  <RPD_AutoGen_Preset>Prompt</RPD_AutoGen_Preset>
+  <RPD_AutoGen_PresetTip>Which single-persona prompt slot writes the persona. The three-option slot is not offered: nobody is there to pick one.</RPD_AutoGen_PresetTip>
+  <RPD_AutoGen_EditContext>Pawn data</RPD_AutoGen_EditContext>
+  <RPD_AutoGen_EditContextTip>Turn off Global data first, then choose which pawn data this role sends to Auto-Gen.</RPD_AutoGen_EditContextTip>
+  <RPD_AutoGen_ContextTitle>{0}: Auto-Gen pawn data</RPD_AutoGen_ContextTitle>
+  <RPD_AutoGen_CategoryColonist>Colonist</RPD_AutoGen_CategoryColonist>
+  <RPD_AutoGen_CategoryPrisoner>Prisoner</RPD_AutoGen_CategoryPrisoner>
+  <RPD_AutoGen_CategorySlave>Slave</RPD_AutoGen_CategorySlave>
+  <RPD_AutoGen_CategoryVisitor>Visitor</RPD_AutoGen_CategoryVisitor>
+  <RPD_AutoGen_CategoryEnemy>Enemy</RPD_AutoGen_CategoryEnemy>
+  <RPD_AutoGen_CategoryOther>Other</RPD_AutoGen_CategoryOther>
+  <!-- Auto-Evolve configuration window -->
+  <RPD_AutoEvolve_IncludeCaptives>Include prisoners and slaves</RPD_AutoEvolve_IncludeCaptives>
+  <RPD_AutoEvolve_IncludeCaptivesTip>Auto-Evolve always covers free colonists. With this on it also covers the colony's prisoners and slaves.</RPD_AutoEvolve_IncludeCaptivesTip>
+  <RPD_AutoEvolve_Interval>Evolve every (days, 0 = on events only):</RPD_AutoEvolve_Interval>
+  <RPD_AutoEvolve_IntervalTip>Days between scheduled updates, counted from the pawn's last evolve or "Set Time". 0 turns the schedule off and leaves only the events below.</RPD_AutoEvolve_IntervalTip>
+  <RPD_AutoEvolve_Triggers>Life events</RPD_AutoEvolve_Triggers>
+  <RPD_AutoEvolve_TriggersTip>Events that ask for an update between scheduled ones. Several events for the same pawn are merged into one request.</RPD_AutoEvolve_TriggersTip>
+  <RPD_AutoEvolve_RoleTriggers>Role change</RPD_AutoEvolve_RoleTriggers>
+  <RPD_AutoEvolve_RoleChangeTip>Update a pawn's persona when its role changes, for example a colonist taken prisoner. A pawn that still has a randomly drawn persona gets Auto-Gen instead, if that role's Auto-Gen role-change switch is on.</RPD_AutoEvolve_RoleChangeTip>
+  <RPD_AutoEvolve_EventMarriage>Marriage</RPD_AutoEvolve_EventMarriage>
+  <RPD_AutoEvolve_EventMarriageTip>Update both partners after a wedding.</RPD_AutoEvolve_EventMarriageTip>
+  <RPD_AutoEvolve_EventBreakup>Breakup or divorce</RPD_AutoEvolve_EventBreakup>
+  <RPD_AutoEvolve_EventBreakupTip>Update both partners after a breakup or a divorce.</RPD_AutoEvolve_EventBreakupTip>
+  <RPD_AutoEvolve_EventBirth>Childbirth</RPD_AutoEvolve_EventBirth>
+  <RPD_AutoEvolve_EventBirthTip>Update the parents when a child is born alive. Twins count as one event.</RPD_AutoEvolve_EventBirthTip>
+  <RPD_AutoEvolve_EventDirectFamilyDeath>Death in the family</RPD_AutoEvolve_EventDirectFamilyDeath>
+  <RPD_AutoEvolve_EventDirectFamilyDeathTip>Update a pawn when a parent, child or spouse dies.</RPD_AutoEvolve_EventDirectFamilyDeathTip>
+  <RPD_AutoEvolve_EventTraitAdded>New trait</RPD_AutoEvolve_EventTraitAdded>
+  <RPD_AutoEvolve_EventTraitAddedTip>Update a pawn that gains a trait it did not have.</RPD_AutoEvolve_EventTraitAddedTip>
+  <!-- Persona history -->
+  <RPD_Tip_History>Earlier versions of this persona, with a way to restore any of them.</RPD_Tip_History>
+  <RPD_History_MaxRecords>History entries kept per pawn:</RPD_History_MaxRecords>
+  <RPD_History_MaxRecordsTip>How many persona changes each pawn keeps for undo. The oldest are dropped first.</RPD_History_MaxRecordsTip>
+  <RPD_History_BeforePersona>Persona before the change</RPD_History_BeforePersona>
+  <RPD_History_AfterPersona>Persona after the change</RPD_History_AfterPersona>
+  <RPD_History_RestoreBefore>Restore "before"</RPD_History_RestoreBefore>
+  <RPD_History_RestoreAfter>Restore "after"</RPD_History_RestoreAfter>
+  <RPD_History_RestoreBeforeConfirm>Replace the current persona with the version from before this change?</RPD_History_RestoreBeforeConfirm>
+  <RPD_History_RestoreAfterConfirm>Replace the current persona with the version from after this change?</RPD_History_RestoreAfterConfirm>
+  <RPD_History_AutoGen>Auto-Gen</RPD_History_AutoGen>
+  <RPD_History_AutoEvolve>Auto-Evolve</RPD_History_AutoEvolve>
+  <RPD_History_Director>Director</RPD_History_Director>
+  <RPD_History_Restored>Restored</RPD_History_Restored>
+  <RPD_History_Scheduled>Scheduled update.</RPD_History_Scheduled>
+</LanguageData>

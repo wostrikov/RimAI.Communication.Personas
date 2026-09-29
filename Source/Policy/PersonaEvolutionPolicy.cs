@@ -10,6 +10,7 @@ namespace Ustas.RimAI.Communication.Personas.Policy
     {
         public const string PreviousPersonaMarker = "[Previous Persona (The Starting Point)]";
         public const string TimeContextMarker = "[Time Context]";
+        public const string TriggerEventsMarker = "[Trigger Events]";
         public const string StatusChangesMarker = "[Status Changes (since last update)]:";
         public const string NotesMarker = "[Director's Notes]";
         public const string NewMemoriesMarker = "[New Memories]";
@@ -21,7 +22,8 @@ namespace Ustas.RimAI.Communication.Personas.Policy
             string diffReport,
             string notes,
             bool includeNotes,
-            string memories)
+            string memories,
+            string triggerEvents = null)
         {
             var sb = new StringBuilder();
             sb.AppendLine(PreviousPersonaMarker);
@@ -30,6 +32,14 @@ namespace Ustas.RimAI.Communication.Personas.Policy
             sb.AppendLine(TimeContextMarker);
             sb.AppendLine(string.IsNullOrEmpty(timeInfo) ? "No previous update record." : timeInfo);
             sb.AppendLine();
+            // The events that asked for this update: the model should explain the
+            // change by them rather than by whatever the memories happen to hold.
+            if (!string.IsNullOrWhiteSpace(triggerEvents))
+            {
+                sb.AppendLine(TriggerEventsMarker);
+                sb.AppendLine(triggerEvents.Trim());
+                sb.AppendLine();
+            }
             if (!string.IsNullOrEmpty(diffReport))
             {
                 sb.AppendLine(StatusChangesMarker);

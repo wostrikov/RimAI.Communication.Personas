@@ -23,6 +23,7 @@ namespace Ustas.RimAI.Communication.Personas
         public static void DrawFooter(PersonaEditorWindow window, Pawn pawn, Rect inRect)
         {
             if (window == null || pawn == null) return;
+            History.PersonaEditorHistoryWatcher.Observe(window, pawn);
 
             if (evolveResult != null && evolvingPawn == pawn)
             {
@@ -63,6 +64,14 @@ namespace Ustas.RimAI.Communication.Personas
                         : "RPD_Tip_NoNotes".Translate().ToString();
                     TooltipHandler.TipRegion(noteRect, tooltip);
                 }
+            }
+
+            Rect historyRect = new Rect(timeRect.xMax + spacing, footerY, buttonWidth, buttonHeight);
+            if (History.PersonaHistoryService.CurrentStore?.HasRecords(pawn) == true)
+            {
+                if (Widgets.ButtonText(historyRect, "RPD_AutoEvolve_ButtonHistory".Translate()))
+                    Find.WindowStack.Add(new UI.Window_PersonaHistory(pawn, window));
+                TooltipHandler.TipRegion(historyRect, "RPD_Tip_History".Translate());
             }
 
             if (!PersonasMod.Settings.enableEvolveFeature)

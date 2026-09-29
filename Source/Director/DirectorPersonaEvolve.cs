@@ -26,7 +26,18 @@ namespace Ustas.RimAI.Communication.Personas;
 
 public static class DirectorPersonaEvolve
 {
-        public static (TalkRequest request, string currentPersona) PrepareEvolveRequest(Pawn p, Window editorWindow)
+        /// <summary>
+        /// Builds the evolve request. The editor window, when open, supplies the
+        /// text being edited; Auto-Evolve passes none and adds the events that
+        /// triggered it. Overwrite asks for a rewritten persona instead of a
+        /// development line. A Communication prompt preset selected for evolve
+        /// owns the whole prompt, so neither extra reaches it.
+        /// </summary>
+        public static (TalkRequest request, string currentPersona) PrepareEvolveRequest(
+            Pawn p,
+            Window editorWindow,
+            string triggerEvents = null,
+            bool overwrite = false)
         {
             try
             {
@@ -140,7 +151,8 @@ public static class DirectorPersonaEvolve
                         diffReport,
                         PersonasMod.Settings.directorNotes,
                         ctx.Inc_DirectorNotes,
-                        memories));
+                        memories,
+                        triggerEvents));
 
                     if (ctx.Inc_CommonKnowledge)
                     {
@@ -156,7 +168,10 @@ public static class DirectorPersonaEvolve
                             contextSb.AppendLine($"[Common Knowledge]\n{ck}\n");
                     }
 
-                    string userInstruction = PersonasMod.Settings.presets[3].text.Replace("{LANG}", Constant.Lang);
+                    string instructionTemplate = overwrite
+                        ? Config.PersonaAutomationSettings.DefaultPrompt_Overwrite
+                        : PersonasMod.Settings.presets[3].text;
+                    string userInstruction = instructionTemplate.Replace("{LANG}", Constant.Lang);
                     string technicalProtocol = PersonasSettings.HiddenTechnicalPrompt_Single;
 
                     finalContext = userInstruction + "\n\n" + technicalProtocol;

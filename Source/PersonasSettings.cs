@@ -259,6 +259,7 @@ namespace Ustas.RimAI.Communication.Personas
         public bool ShowMainButton = true;
         public bool enableEvolveFeature = true;
         public ContextSettings Context = new ContextSettings();
+        public Config.PersonaAutomationSettings Automation = new Config.PersonaAutomationSettings();
         public Dictionary<string, bool> BatchFilters;
 
         public string rimTalkPreset_Single = "";
@@ -284,6 +285,8 @@ namespace Ustas.RimAI.Communication.Personas
 
             Scribe_Deep.Look(ref Context, PersonaScribeLabels.Settings.Context);
             if (Context == null) Context = new ContextSettings();
+            Scribe_Deep.Look(ref Automation, "automation");
+            if (Automation == null) Automation = new Config.PersonaAutomationSettings();
 
             Scribe_Collections.Look(ref BatchFilters, PersonaScribeLabels.Settings.BatchFilters, LookMode.Value, LookMode.Value);
             Scribe_Collections.Look(ref userPresets, PersonaScribeLabels.Settings.UserPresets, LookMode.Deep);

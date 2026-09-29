@@ -1,23 +1,32 @@
 <?xml version='1.0' encoding='utf-8'?>
 <LanguageData>
   <!-- Auto-Generation Settings (ModSettings) -->
+  <RPD_Settings_AutomationHeader>Автоматична робота з персонами</RPD_Settings_AutomationHeader>
   <RPD_Settings_EnableAutoGen>Увімкнути автоматичну генерацію</RPD_Settings_EnableAutoGen>
-  <RPD_Settings_EnableAutoGenTip>Автоматично генерувати персони для нових персонажів, коли вони приєднуються до вашої колонії. Налаштуйте категорії та пресети у вікні конфігурації.</RPD_Settings_EnableAutoGenTip>
+  <RPD_Settings_EnableAutoGenTip>Автоматично писати персону для персонажів, які мають лише випадково вибрану: коли вони вперше з’являються на мапі або коли змінюється їхня роль. Які ролі беруть участь, налаштовується у вікні конфігурації. Типово вимкнено.</RPD_Settings_EnableAutoGenTip>
   <RPD_Settings_ConfigAutoGen>Налаштувати</RPD_Settings_ConfigAutoGen>
-  <RPD_Settings_ConfigAutoGenTip>Відкрити вікно налаштування автоматичної генерації, щоб налаштувати категорії, пресети та параметри контексту.</RPD_Settings_ConfigAutoGenTip>
+  <RPD_Settings_ConfigAutoGenTip>Відкрити вікно налаштування автоматичної генерації, щоб вибрати ролі, промпти та дані персонажа.</RPD_Settings_ConfigAutoGenTip>
+  <RPD_AutoEvolve_ConfigTip>Відкрити вікно налаштування автоеволюції, щоб вибрати розклад, життєві події та режим оновлення.</RPD_AutoEvolve_ConfigTip>
+  <RPD_Settings_AutoNotify>Показувати повідомлення, коли персона змінюється автоматично</RPD_Settings_AutoNotify>
+  <RPD_Settings_AutoNotifyTip>Коротке повідомлення у верхньому лівому куті щоразу, коли автоматична генерація чи автоеволюція оновлює персону персонажа.</RPD_Settings_AutoNotifyTip>
+  <RPD_Msg_AutoPersonaUpdated>{0}: персону оновлено автоматично.</RPD_Msg_AutoPersonaUpdated>
   <!-- Auto-Generation Config Window -->
   <RPD_AutoGen_ConfigTitle>Налаштування автоматичної генерації</RPD_AutoGen_ConfigTitle>
   <RPD_AutoGen_QueueStatus>Черга: {0} персонажів</RPD_AutoGen_QueueStatus>
   <RPD_AutoGen_Generating>генерується</RPD_AutoGen_Generating>
-  <RPD_AutoGen_Enable>Увімкнути</RPD_AutoGen_Enable>
-  <RPD_AutoGen_EnableTip>Увімкнути автоматичну генерацію для цієї категорії, коли персонажі вперше з’являються</RPD_AutoGen_EnableTip>
+  <RPD_AutoGen_Enable>Нові персонажі</RPD_AutoGen_Enable>
+  <RPD_AutoGen_EnableTip>Писати персону для персонажів цієї ролі, коли вони вперше з’являються на мапі.</RPD_AutoGen_EnableTip>
   <RPD_AutoGen_OnlyOnRoleChange>Під час зміни ролі</RPD_AutoGen_OnlyOnRoleChange>
-  <RPD_AutoGen_OnlyOnRoleChangeShort>Зміна</RPD_AutoGen_OnlyOnRoleChangeShort>
-  <RPD_AutoGen_OnlyOnRoleChangeTip>Генерувати, коли роль персонажа змінюється на цю категорію (незалежно від параметра «Увімкнути»). Колоніст: із неколоніста на колоніста (вербування/звільнення/приєднання біженця). В’язень: із нев’язня на в’язня (полонення ворога/арешт союзника чи нейтрала, без арешту колоніста). Раб: із нераба на раба (поневолення в’язня/купівля у торговця). Відвідувач: із представника фракції гравця на відвідувача (викуп фракцією/продаж раба). Інше: із представника фракції гравця в іншу категорію (залишення колонії/здичавіння). Ворог: вимкнено (щоб уникнути масових спрацювань під час рейдів).</RPD_AutoGen_OnlyOnRoleChangeTip>
+  <RPD_AutoGen_OnlyOnRoleChangeShort>Зміна ролі</RPD_AutoGen_OnlyOnRoleChangeShort>
+  <RPD_AutoGen_OnlyOnRoleChangeTip>Писати персону, коли персонаж на мапі переходить у цю роль, наприклад в’язня завербовано в колоністи. Діє лише на персонажів, які досі мають випадково вибрану персону; персонажа з власною персоною оновлює автоеволюція, якщо в ній увімкнено реакцію на зміну ролі.</RPD_AutoGen_OnlyOnRoleChangeTip>
   <RPD_AutoGen_SyncModSettings>Синхронізувати з ModSettings</RPD_AutoGen_SyncModSettings>
-  <RPD_AutoGen_SyncModSettingsShort>Синхронізувати</RPD_AutoGen_SyncModSettingsShort>
-  <RPD_AutoGen_SyncModSettingsTip>Використовувати глобальний контекст ModSettings замість власного контексту для цієї категорії</RPD_AutoGen_SyncModSettingsTip>
-  <RPD_AutoGen_Preset>Пресет:</RPD_AutoGen_Preset>
+  <RPD_AutoGen_SyncModSettingsShort>Глобальні дані</RPD_AutoGen_SyncModSettingsShort>
+  <RPD_AutoGen_SyncModSettingsTip>Надсилати дані персонажа, вибрані на сторінці налаштувань мода. Вимкніть, щоб вибрати власні дані для цієї ролі кнопкою «Дані персонажа».</RPD_AutoGen_SyncModSettingsTip>
+  <RPD_AutoGen_Preset>Промпт</RPD_AutoGen_Preset>
+  <RPD_AutoGen_PresetTip>Який слот промпту для однієї персони пише персону. Слот із трьома варіантами не пропонується: вибирати варіант нікому.</RPD_AutoGen_PresetTip>
+  <RPD_AutoGen_EditContext>Дані персонажа</RPD_AutoGen_EditContext>
+  <RPD_AutoGen_EditContextTip>Спершу вимкніть «Глобальні дані», потім виберіть, які дані персонажа ця роль надсилає для автоматичної генерації.</RPD_AutoGen_EditContextTip>
+  <RPD_AutoGen_ContextTitle>{0}: дані для автоматичної генерації</RPD_AutoGen_ContextTitle>
   <RPD_AutoGen_AdvancedPreset>Розширені</RPD_AutoGen_AdvancedPreset>
   <RPD_AutoGen_AdvancedPresetTooltip>Використовувати розширений пресет RimTalk для цієї категорії. Якщо встановлено «Немає», використовуються внутрішні промпти.</RPD_AutoGen_AdvancedPresetTooltip>
   <!-- Auto-Gen Notes Editor -->
@@ -64,6 +73,40 @@
   <!-- Auto-Evolve Notes Editor -->
   <RPD_AutoEvolve_NotesLabel>Нотатки для автовдосконалення (шаблон Scriban)</RPD_AutoEvolve_NotesLabel>
   <RPD_AutoEvolve_NotesHint>Використовуйте синтаксис Scriban для створення динамічних нотаток для автовдосконалення. Приклад: {{- if pawn.IsPrisoner -}}Зосередьтеся на полоні та інстинктах виживання{{- else if pawn.IsColonist -}}Зосередьтеся на житті колонії та стосунках{{- end -}}.</RPD_AutoEvolve_NotesHint>
+  <!-- Auto-Evolve Config Window -->
+  <RPD_AutoEvolve_IncludeCaptives>Також в’язні та раби</RPD_AutoEvolve_IncludeCaptives>
+  <RPD_AutoEvolve_IncludeCaptivesTip>Автоеволюція завжди охоплює вільних колоністів. Якщо це ввімкнено, вона охоплює також в’язнів і рабів колонії.</RPD_AutoEvolve_IncludeCaptivesTip>
+  <RPD_AutoEvolve_Interval>Розвивати кожні (днів, 0 — лише за подіями):</RPD_AutoEvolve_Interval>
+  <RPD_AutoEvolve_IntervalTip>Кількість днів між запланованими оновленнями, від останнього розвитку персонажа або «Установити час». 0 вимикає розклад і залишає лише події нижче.</RPD_AutoEvolve_IntervalTip>
+  <RPD_AutoEvolve_Triggers>Життєві події</RPD_AutoEvolve_Triggers>
+  <RPD_AutoEvolve_TriggersTip>Події, які просять оновлення між запланованими. Кілька подій одного персонажа об’єднуються в один запит.</RPD_AutoEvolve_TriggersTip>
+  <RPD_AutoEvolve_RoleTriggers>Зміна ролі</RPD_AutoEvolve_RoleTriggers>
+  <RPD_AutoEvolve_RoleChangeTip>Оновлювати персону, коли змінюється роль персонажа, наприклад колоніста взято в полон. Персонаж, який досі має випадково вибрану персону, натомість отримує автоматичну генерацію, якщо для цієї ролі ввімкнено генерацію під час зміни ролі.</RPD_AutoEvolve_RoleChangeTip>
+  <RPD_AutoEvolve_EventMarriage>Шлюб</RPD_AutoEvolve_EventMarriage>
+  <RPD_AutoEvolve_EventMarriageTip>Оновлювати обох партнерів після весілля.</RPD_AutoEvolve_EventMarriageTip>
+  <RPD_AutoEvolve_EventBreakup>Розрив або розлучення</RPD_AutoEvolve_EventBreakup>
+  <RPD_AutoEvolve_EventBreakupTip>Оновлювати обох партнерів після розриву або розлучення.</RPD_AutoEvolve_EventBreakupTip>
+  <RPD_AutoEvolve_EventBirth>Народження дитини</RPD_AutoEvolve_EventBirth>
+  <RPD_AutoEvolve_EventBirthTip>Оновлювати батьків, коли дитина народжується живою. Близнюки вважаються однією подією.</RPD_AutoEvolve_EventBirthTip>
+  <RPD_AutoEvolve_EventDirectFamilyDeath>Смерть у родині</RPD_AutoEvolve_EventDirectFamilyDeath>
+  <RPD_AutoEvolve_EventDirectFamilyDeathTip>Оновлювати персонажа, коли помирає його батько чи мати, дитина або подружжя.</RPD_AutoEvolve_EventDirectFamilyDeathTip>
+  <RPD_AutoEvolve_EventTraitAdded>Нова риса</RPD_AutoEvolve_EventTraitAdded>
+  <RPD_AutoEvolve_EventTraitAddedTip>Оновлювати персонажа, який отримує рису, якої раніше не мав.</RPD_AutoEvolve_EventTraitAddedTip>
+  <!-- Persona History -->
+  <RPD_Tip_History>Попередні версії цієї персони з можливістю відновити будь-яку з них.</RPD_Tip_History>
+  <RPD_History_MaxRecords>Записів історії на персонажа:</RPD_History_MaxRecords>
+  <RPD_History_MaxRecordsTip>Скільки змін персони кожен персонаж зберігає для скасування. Найстаріші видаляються першими.</RPD_History_MaxRecordsTip>
+  <RPD_History_BeforePersona>Персона до зміни</RPD_History_BeforePersona>
+  <RPD_History_AfterPersona>Персона після зміни</RPD_History_AfterPersona>
+  <RPD_History_RestoreBefore>Відновити «до»</RPD_History_RestoreBefore>
+  <RPD_History_RestoreAfter>Відновити «після»</RPD_History_RestoreAfter>
+  <RPD_History_RestoreBeforeConfirm>Замінити поточну персону версією, що була до цієї зміни?</RPD_History_RestoreBeforeConfirm>
+  <RPD_History_RestoreAfterConfirm>Замінити поточну персону версією, що була після цієї зміни?</RPD_History_RestoreAfterConfirm>
+  <RPD_History_AutoGen>Автоматична генерація</RPD_History_AutoGen>
+  <RPD_History_AutoEvolve>Автоеволюція</RPD_History_AutoEvolve>
+  <RPD_History_Director>Керування персоною</RPD_History_Director>
+  <RPD_History_Restored>Відновлено</RPD_History_Restored>
+  <RPD_History_Scheduled>Заплановане оновлення.</RPD_History_Scheduled>
   <!-- Batch Director Notes Hints -->
   <RPD_Batch_SceneNotesHint>Ці нотатки буде додано до промптів генерації. Підтримується синтаксис Scriban для динамічного вмісту. Використовуйте {%raw%}...{%endraw%}, щоб екранувати приклади коду.</RPD_Batch_SceneNotesHint>
 </LanguageData>

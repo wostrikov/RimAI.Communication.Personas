@@ -3,11 +3,16 @@ using RimWorld.Planet;
 using System.Collections.Generic;
 using Verse;
 using Ustas.RimAI.Core.Personas;
+using Ustas.RimAI.Communication.Personas.History;
 
 namespace Ustas.RimAI.Communication.Personas
 {
     public class DirectorWorldComponent : WorldComponent
     {
+        private PersonaHistoryStore _history = new PersonaHistoryStore();
+
+        public PersonaHistoryStore History => _history;
+
         private Dictionary<int, int> _lastEvolveTicks = new Dictionary<int, int>();
         private Dictionary<int, long> _lastEvolveBioAgeTicks = new Dictionary<int, long>(); 
         private Dictionary<int, string> _dataSnapshots = new Dictionary<int, string>();
@@ -27,15 +32,37 @@ namespace Ustas.RimAI.Communication.Personas
             Scribe_Collections.Look(ref _dailySnapshots, PersonaScribeLabels.WorldComponent.DailySnapshots, LookMode.Value, LookMode.Value);
             Scribe_Collections.Look(ref _dailySnapshotDays, PersonaScribeLabels.WorldComponent.DailySnapshotDays, LookMode.Value, LookMode.Value);
             Scribe_Values.Look(ref lastRuleCheckTick, PersonaScribeLabels.WorldComponent.LastRuleCheckTick, 0);
+            Scribe_Deep.Look(ref _history, "personaHistory");
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
+                if (_history == null) _history = new PersonaHistoryStore();
                 if (_lastEvolveTicks == null) _lastEvolveTicks = new Dictionary<int, int>();
                 if (_lastEvolveBioAgeTicks == null) _lastEvolveBioAgeTicks = new Dictionary<int, long>();
                 if (_dataSnapshots == null) _dataSnapshots = new Dictionary<int, string>();
                 if (_dailySnapshots == null) _dailySnapshots = new Dictionary<int, string>();
                 if (_dailySnapshotDays == null) _dailySnapshotDays = new Dictionary<int, int>();
             }
+        }
+
+        public override void FinalizeInit(bool fromLoad)
+        {
+            base.FinalizeInit(fromLoad);
+            if (!PersonasComposition.Current.IsStarted) return;
+            // A new game or a loaded save: whatever the automation held belongs
+            // to the world before this one.
+            PersonasComposition.Current.Automation.BindWorld(world);
+            _history.RemoveMissingPawns();
+        }
+
+        // The game already guards each world component's tick and logs what it
+        // throws. The automation takes every job and event off its queue before
+        // working on it, so a fault drops that one item instead of repeating.
+        public override void WorldComponentTick()
+        {
+            base.WorldComponentTick();
+            if (PersonasComposition.Current.IsStarted)
+                PersonasComposition.Current.Automation.Tick(this);
         }
 
         public void SaveDailySnapshot(Pawn p)

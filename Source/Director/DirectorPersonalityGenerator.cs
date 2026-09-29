@@ -163,12 +163,19 @@ public static class DirectorPersonalityGenerator
             }
         }
 
-        public static void ApplyPersonalityToPawn(Pawn pawn, PersonalityData data)
+        public static void ApplyPersonalityToPawn(
+            Pawn pawn,
+            PersonalityData data,
+            History.PersonaChangeSource source = History.PersonaChangeSource.Director,
+            string historyContext = null)
         {
             if (pawn == null || pawn.Destroyed || data == null) return;
 
             try
             {
+                // Read before GetOrAddNew: on a pawn without a persona it draws a
+                // random one first, and that draw is not a "before" worth keeping.
+                string before = Automation.PersonaOwnership.ReadWithoutCreating(pawn);
                 var hediff = Hediff_Persona.GetOrAddNew(pawn);
                 if (hediff != null)
                 {
@@ -186,6 +193,7 @@ public static class DirectorPersonalityGenerator
                     }
 
                     pawn.health.Notify_HediffChanged(hediff);
+                    History.PersonaHistoryService.Record(pawn, before, hediff.Personality, source, historyContext);
                 }
             }
             catch (Exception e)

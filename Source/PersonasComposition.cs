@@ -1,4 +1,5 @@
 using HarmonyLib;
+using Ustas.RimAI.Communication.Personas.Automation;
 using Ustas.RimAI.Communication.Personas.Integration;
 using Ustas.RimAI.Core.Composition;
 using Ustas.RimAI.Core.Handshake;
@@ -20,6 +21,9 @@ public sealed class PersonasComposition : IRimAiModuleComposition
     public string ModuleId => RimAiModuleIds.Personas;
 
     public bool IsStarted { get; private set; }
+
+    /// <summary>Auto-Gen / Auto-Evolve runner; runtime state only, reset on Stop and on world unload.</summary>
+    public PersonaAutomationCoordinator Automation { get; } = new PersonaAutomationCoordinator();
 
     Harmony _harmony;
 
@@ -54,6 +58,7 @@ public sealed class PersonasComposition : IRimAiModuleComposition
             return;
 
         // Do not UnpatchAll — Harmony is process-lifetime (matches Memory/Communication).
+        Automation.Reset();
         CommunicationBridge.Unregister();
         DirectorApiAdapter.UnregisterSurface();
         PersonaResolver.ClearAssignmentCache();

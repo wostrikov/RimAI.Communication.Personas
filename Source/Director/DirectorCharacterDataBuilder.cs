@@ -26,10 +26,14 @@ namespace Ustas.RimAI.Communication.Personas;
 
 public static class DirectorCharacterDataBuilder
 {
-        public static string BuildCustomCharacterData(Pawn p, bool isSnapshot = false, bool simpleEquipment = false)
+        /// <param name="context">
+        /// Which facets to include; null means the global Mod-settings selection.
+        /// Auto-Gen passes a category's own selection here.
+        /// </param>
+        public static string BuildCustomCharacterData(Pawn p, bool isSnapshot = false, bool simpleEquipment = false, ContextSettings context = null)
         {
             StringBuilder sb = new StringBuilder();
-            var ctx = PersonasMod.Settings.Context;
+            var ctx = context ?? PersonasMod.Settings.Context;
             string data = DirectorDataEngine.BuildCompleteData(p, simpleEquipment);
 
             try

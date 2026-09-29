@@ -6,7 +6,8 @@ internal static class Program
     {
         int n = PersonaVariantGenerationTests.Run()
             + PersonaProfileNotesAndEvolutionTests.Run()
-            + PersonaPresetLibraryIoTests.Run();
+            + PersonaPresetLibraryIoTests.Run()
+            + PersonaAutomationPolicyTests.Run();
         Console.WriteLine("PERSONAS_FOCUSED_TESTS_OK passed=" + n);
         Console.WriteLine("TESTS total=" + n + " failed=0");
         return 0;

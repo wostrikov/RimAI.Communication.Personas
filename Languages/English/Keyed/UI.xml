@@ -136,4 +136,27 @@
   <RPD_Msg_UpdatedSuccess>Persona updated successfully.</RPD_Msg_UpdatedSuccess>
   <RPD_Msg_UpdateFailed>Update failed or no changes detected.</RPD_Msg_UpdateFailed>
 
+  <RPD_Setting_Slot>Slot {0}</RPD_Setting_Slot>
+
+<!-- Persona history -->
+  <RPD_History_Title>History of {0}</RPD_History_Title>
+  <RPD_History_Record>Record {0} of {1}</RPD_History_Record>
+  <RPD_History_NoRecords>No history records yet.</RPD_History_NoRecords>
+  <RPD_History_Context>Context ({0} days ago):</RPD_History_Context>
+  <RPD_History_NoContext>No context recorded.</RPD_History_NoContext>
+  <RPD_History_Empty>Empty.</RPD_History_Empty>
+  <RPD_History_RestoreSuccess>{0}'s persona was restored to an earlier version.</RPD_History_RestoreSuccess>
+  <RPD_ManualEdit>[Manual edit]</RPD_ManualEdit>
+  <RPD_History_SystemRestore>[System]: The player restored an earlier version.</RPD_History_SystemRestore>
+
+<!-- Auto-Evolve -->
+  <RPD_Tab_AutoEvolution>Auto-Evolve</RPD_Tab_AutoEvolution>
+  <RPD_AutoEvolve_Enable>Enable Auto-Evolve</RPD_AutoEvolve_Enable>
+  <RPD_AutoEvolve_EnableTooltip>Master switch. When off, no automatic persona updates run.</RPD_AutoEvolve_EnableTooltip>
+  <RPD_AutoEvolve_Mode>Mode</RPD_AutoEvolve_Mode>
+  <RPD_AutoEvolve_ModeTooltip>Append: adds a development line to the end.\nOverwrite: rewrites the whole persona. The history keeps the previous version either way.</RPD_AutoEvolve_ModeTooltip>
+  <RPD_AutoEvolve_ModeAppend>Append</RPD_AutoEvolve_ModeAppend>
+  <RPD_AutoEvolve_ModeOverwrite>Overwrite</RPD_AutoEvolve_ModeOverwrite>
+  <RPD_AutoEvolve_ButtonHistory>History</RPD_AutoEvolve_ButtonHistory>
+
 </LanguageData>
