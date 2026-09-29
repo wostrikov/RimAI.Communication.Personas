@@ -9,7 +9,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
     // own switch first, so with Auto-Evolve off they cost one settings read on
     // the vanilla path, and otherwise they only record the event.
 
-    [HarmonyPatch(typeof(MarriageCeremonyUtility), nameof(MarriageCeremonyUtility.Married))]
     internal static class Patch_PersonaEvolveOnMarriage
     {
         static void Postfix(Pawn firstPawn, Pawn secondPawn)
@@ -18,7 +17,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(SpouseRelationUtility), nameof(SpouseRelationUtility.DoDivorce))]
     internal static class Patch_PersonaEvolveOnDivorce
     {
         static void Postfix(Pawn initiator, Pawn recipient)
@@ -27,7 +25,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(InteractionWorker_Breakup), nameof(InteractionWorker_Breakup.Interacted))]
     internal static class Patch_PersonaEvolveOnBreakup
     {
         static void Postfix(Pawn initiator, Pawn recipient)
@@ -36,7 +33,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(PregnancyUtility), nameof(PregnancyUtility.ApplyBirthOutcome))]
     internal static class Patch_PersonaEvolveOnBirth
     {
         static void Postfix(Thing __result, Pawn geneticMother, Thing birtherThing, Pawn father)
@@ -48,7 +44,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Pawn), nameof(Pawn.Kill))]
     internal static class Patch_PersonaEvolveOnFamilyDeath
     {
         static void Prefix(Pawn __instance, out bool __state)
@@ -64,7 +59,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(TraitSet), nameof(TraitSet.GainTrait))]
     internal static class Patch_PersonaEvolveOnTraitGained
     {
         static void Prefix(TraitSet __instance, Pawn ___pawn, Trait trait, out bool __state)

@@ -9,7 +9,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
     // Hooks that tell the persona automation who arrived, who changed sides, and
     // when the world goes away. Each one records and returns.
 
-    [HarmonyPatch(typeof(Pawn), nameof(Pawn.SpawnSetup), new[] { typeof(Map), typeof(bool) })]
     internal static class Patch_PersonaNewPawnSpawned
     {
         static void Postfix(Pawn __instance, bool respawningAfterLoad)
@@ -21,7 +20,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Pawn), nameof(Pawn.SetFaction))]
     internal static class Patch_PersonaRoleOnSetFaction
     {
         static void Prefix(Pawn __instance, out PawnRoleCategory __state)
@@ -35,7 +33,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Pawn_GuestTracker), nameof(Pawn_GuestTracker.SetGuestStatus))]
     internal static class Patch_PersonaRoleOnGuestStatus
     {
         static void Prefix(Pawn ___pawn, out PawnRoleCategory __state)
@@ -50,7 +47,6 @@ namespace Ustas.RimAI.Communication.Personas.Patches
     }
 
     /// <summary>Going to the main menu or loading a save clears the world; the automation goes with it.</summary>
-    [HarmonyPatch(typeof(MemoryUtility), nameof(MemoryUtility.ClearAllMapsAndWorld))]
     internal static class Patch_PersonaAutomationOnWorldCleared
     {
         static void Prefix()
