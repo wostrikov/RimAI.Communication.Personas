@@ -40,7 +40,12 @@ namespace Ustas.RimAI.Communication.Personas.Config
         public bool autoGenEnabled;
         public Dictionary<string, AutoGenCategorySettings> autoGenCategories = new Dictionary<string, AutoGenCategorySettings>();
 
+        // Free text added to every automatic request's built-in prompt; preset
+        // variables such as {{pawn.name}} resolve for the pawn in question.
+        public string autoGenNotes = string.Empty;
+
         public bool autoEvolveEnabled;
+        public string autoEvolveNotes = string.Empty;
         public int autoEvolveIntervalDays = 15;
         public bool autoEvolveIncludeCaptives;
         public AutoEvolveMode autoEvolveMode = AutoEvolveMode.Append;
@@ -68,7 +73,9 @@ namespace Ustas.RimAI.Communication.Personas.Config
         {
             Scribe_Values.Look(ref autoGenEnabled, "autoGenEnabled", false);
             Scribe_Collections.Look(ref autoGenCategories, "autoGenCategories", LookMode.Value, LookMode.Deep);
+            Scribe_Values.Look(ref autoGenNotes, "autoGenNotes", string.Empty);
             Scribe_Values.Look(ref autoEvolveEnabled, "autoEvolveEnabled", false);
+            Scribe_Values.Look(ref autoEvolveNotes, "autoEvolveNotes", string.Empty);
             Scribe_Values.Look(ref autoEvolveIntervalDays, "autoEvolveIntervalDays", 15);
             Scribe_Values.Look(ref autoEvolveIncludeCaptives, "autoEvolveIncludeCaptives", false);
             Scribe_Values.Look(ref autoEvolveMode, "autoEvolveMode", AutoEvolveMode.Append);
@@ -90,6 +97,8 @@ namespace Ustas.RimAI.Communication.Personas.Config
                 historyMaxRecords = PersonaHistoryPolicy.ClampMaxRecords(historyMaxRecords);
                 pauseAtSpeed = PersonaAutomationPolicy.ClampPauseAtSpeed(pauseAtSpeed);
                 if (fuseReason == null) fuseReason = string.Empty;
+                if (autoGenNotes == null) autoGenNotes = string.Empty;
+                if (autoEvolveNotes == null) autoEvolveNotes = string.Empty;
                 EnsureCategories();
             }
         }
@@ -125,6 +134,9 @@ namespace Ustas.RimAI.Communication.Personas.Config
         public bool onRoleChange;
         public bool syncWithGlobalContext = true;
         public int presetSlot = FirstSinglePersonaSlot;
+        // A Communication prompt preset that replaces the slot's prompt for this
+        // category; empty uses the slot.
+        public string advancedPreset = string.Empty;
         public ContextSettings customContext = CreateDefaultContext();
 
         public void ExposeData()
@@ -133,12 +145,14 @@ namespace Ustas.RimAI.Communication.Personas.Config
             Scribe_Values.Look(ref onRoleChange, "onRoleChange", false);
             Scribe_Values.Look(ref syncWithGlobalContext, "syncWithGlobalContext", true);
             Scribe_Values.Look(ref presetSlot, "presetSlot", FirstSinglePersonaSlot);
+            Scribe_Values.Look(ref advancedPreset, "advancedPreset", string.Empty);
             Scribe_Deep.Look(ref customContext, "customContext");
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (customContext == null) customContext = CreateDefaultContext();
                 presetSlot = ClampSlot(presetSlot);
+                if (advancedPreset == null) advancedPreset = string.Empty;
             }
         }
 

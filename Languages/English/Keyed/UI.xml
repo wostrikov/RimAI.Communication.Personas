@@ -167,4 +167,6 @@
   <RPD_Msg_PrepareFailed>Failed to prepare data.</RPD_Msg_PrepareFailed>
   <RPD_AutoEvolve_InternalPromptNotice>Both modes use the Communication preset chosen for Evolve, if any; otherwise each mode uses its own built-in prompt. The editor's Evolve button follows this mode too.</RPD_AutoEvolve_InternalPromptNotice>
   <RPD_History_CurrentPersona>Current persona</RPD_History_CurrentPersona>
+  <RPD_AutoEvolve_Notes>Notes for every Auto-Evolve request</RPD_AutoEvolve_Notes>
+  <RPD_AutoEvolve_NotesTip>Added to the built-in prompt of automatic evolves, not the editor's button. Preset variables such as {{pawn.name}} work here.</RPD_AutoEvolve_NotesTip>
 </LanguageData>

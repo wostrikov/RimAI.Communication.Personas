@@ -75,4 +75,9 @@
   <RPD_Experimental_AutomationRuntimeFailed>the automation hit an internal error (see the log).</RPD_Experimental_AutomationRuntimeFailed>
   <RPD_Experimental_AutoGenTimeout>three Auto-Gen requests in a row got no answer.</RPD_Experimental_AutoGenTimeout>
   <RPD_Experimental_AutoEvolveTimeout>three Auto-Evolve requests in a row got no answer.</RPD_Experimental_AutoEvolveTimeout>
+  <RPD_AutoGen_AdvancedPreset>Communication preset</RPD_AutoGen_AdvancedPreset>
+  <RPD_AutoGen_AdvancedPresetTip>A Communication prompt preset to use for this category instead of the prompt slot. {{director_trigger_context}} in it holds the event that asked for the persona. If the preset is missing or renders nothing, the slot's prompt is used.</RPD_AutoGen_AdvancedPresetTip>
+  <RPD_AutoGen_AdvancedNone>None (use the slot)</RPD_AutoGen_AdvancedNone>
+  <RPD_AutoGen_Notes>Notes for every Auto-Gen request</RPD_AutoGen_Notes>
+  <RPD_AutoGen_NotesTip>Added to the built-in Auto-Gen prompt, for every category. Preset variables such as {{pawn.name}} work here. Not used by a category that has a Communication preset.</RPD_AutoGen_NotesTip>
 </LanguageData>

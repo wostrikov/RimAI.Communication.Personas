@@ -13,7 +13,9 @@ namespace Ustas.RimAI.Communication.Personas.UI
         const float CategoryWidth = 150f;
         const float CheckWidth = 110f;
         const float PresetWidth = 170f;
+        const float AdvancedWidth = 170f;
         const float ContextWidth = 120f;
+        const float NotesHeight = 64f;
 
         readonly PersonaAutomationSettings _settings;
 
@@ -26,7 +28,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             forcePause = false;
         }
 
-        public override Vector2 InitialSize => new Vector2(820f, 420f);
+        public override Vector2 InitialSize => new Vector2(990f, 520f);
 
         public override void PreClose()
         {
@@ -46,7 +48,12 @@ namespace Ustas.RimAI.Communication.Personas.UI
             Widgets.CheckboxLabeled(switchRect, "RPD_Settings_EnableAutoGen".Translate(), ref _settings.autoGenEnabled);
             TooltipHandler.TipRegion(switchRect, "RPD_Settings_EnableAutoGenTip".Translate());
 
-            float y = inRect.y + 78f;
+            Rect notesLabel = new Rect(inRect.x, inRect.y + 70f, inRect.width, 24f);
+            Widgets.Label(notesLabel, "RPD_AutoGen_Notes".Translate());
+            TooltipHandler.TipRegion(notesLabel, "RPD_AutoGen_NotesTip".Translate());
+            _settings.autoGenNotes = Widgets.TextArea(new Rect(inRect.x, inRect.y + 94f, inRect.width, NotesHeight), _settings.autoGenNotes ?? string.Empty);
+
+            float y = inRect.y + 94f + NotesHeight + 10f;
             DrawHeaderRow(new Rect(inRect.x, y, inRect.width, 24f));
             y += 28f;
             Widgets.DrawLineHorizontal(inRect.x, y - 2f, inRect.width);
@@ -68,6 +75,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             Label(ref x, row, CheckWidth, "RPD_AutoGen_OnlyOnRoleChangeShort".Translate(), "RPD_AutoGen_OnlyOnRoleChangeTip".Translate());
             Label(ref x, row, CheckWidth, "RPD_AutoGen_SyncModSettingsShort".Translate(), "RPD_AutoGen_SyncModSettingsTip".Translate());
             Label(ref x, row, PresetWidth, "RPD_AutoGen_Preset".Translate(), "RPD_AutoGen_PresetTip".Translate());
+            Label(ref x, row, AdvancedWidth, "RPD_AutoGen_AdvancedPreset".Translate(), "RPD_AutoGen_AdvancedPresetTip".Translate());
             GUI.color = Color.white;
         }
 
@@ -92,10 +100,18 @@ namespace Ustas.RimAI.Communication.Personas.UI
             Checkbox(ref x, row, ref category.onRoleChange, "RPD_AutoGen_OnlyOnRoleChangeTip".Translate());
             Checkbox(ref x, row, ref category.syncWithGlobalContext, "RPD_AutoGen_SyncModSettingsTip".Translate());
 
+            bool advanced = DirectorPresetRenderer.IsSet(category.advancedPreset);
             Rect presetRect = new Rect(x, row.y + 3f, PresetWidth - 10f, 24f);
-            if (Widgets.ButtonText(presetRect, PresetLabel(category.presetSlot)))
+            if (Widgets.ButtonText(presetRect, PresetLabel(category.presetSlot), active: !advanced) && !advanced)
                 Find.WindowStack.Add(new FloatMenu(PresetOptions(category)));
             x += PresetWidth;
+
+            Rect advancedRect = new Rect(x, row.y + 3f, AdvancedWidth - 10f, 24f);
+            string advancedLabel = advanced ? category.advancedPreset : "RPD_AutoGen_AdvancedNone".Translate().ToString();
+            if (Widgets.ButtonText(advancedRect, advancedLabel.Truncate(advancedRect.width - 10f)))
+                Find.WindowStack.Add(new FloatMenu(AdvancedOptions(category)));
+            TooltipHandler.TipRegion(advancedRect, "RPD_AutoGen_AdvancedPresetTip".Translate());
+            x += AdvancedWidth;
 
             Rect contextRect = new Rect(x, row.y + 3f, ContextWidth, 24f);
             TooltipHandler.TipRegion(contextRect, "RPD_AutoGen_EditContextTip".Translate());
@@ -120,6 +136,26 @@ namespace Ustas.RimAI.Communication.Personas.UI
             int index = AutoGenCategorySettings.ClampSlot(slot);
             string label = presets != null && presets.Count > index ? presets[index]?.label : null;
             return string.IsNullOrEmpty(label) ? "RPD_Setting_Slot".Translate(index + 1).ToString() : label;
+        }
+
+        /// <summary>Every Communication preset, and the slot's own prompt.</summary>
+        static List<FloatMenuOption> AdvancedOptions(AutoGenCategorySettings category)
+        {
+            var options = new List<FloatMenuOption>
+            {
+                new FloatMenuOption("RPD_AutoGen_AdvancedNone".Translate(), () => category.advancedPreset = string.Empty)
+            };
+            var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
+            if (presets != null)
+            {
+                foreach (var preset in presets)
+                {
+                    string name = preset?.Name;
+                    if (string.IsNullOrEmpty(name)) continue;
+                    options.Add(new FloatMenuOption(name, () => category.advancedPreset = name));
+                }
+            }
+            return options;
         }
 
         static List<FloatMenuOption> PresetOptions(AutoGenCategorySettings category)

@@ -51,6 +51,13 @@ namespace Ustas.RimAI.Communication.Personas
                 "Global notes from Persona Director"
             );
 
+            RimTalkPromptAPI.RegisterContextVariable(
+                ModId,
+                "director_trigger_context",
+                _ => DirectorPresetRenderer.CurrentTriggerContext,
+                "Auto-Gen / Auto-Evolve: the events that asked for this request (empty elsewhere)"
+            );
+
             RimTalkPromptAPI.RegisterContextVariable(ModId, "smart_history",
                 ctx => DirectorDataEngine.GetSmartHistory(ctx.CurrentPawn, ctx.Pawns, ctx.IsMonologue),
                 "Smart history: Dynamic quota & formatting based on context (Monologue/Dialogue).");

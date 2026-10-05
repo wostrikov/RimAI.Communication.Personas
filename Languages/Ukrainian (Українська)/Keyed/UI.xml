@@ -176,4 +176,6 @@
   <RPD_Msg_PrepareFailed>Не вдалося підготувати дані.</RPD_Msg_PrepareFailed>
   <RPD_AutoEvolve_InternalPromptNotice>Обидва режими використовують пресет Communication, вибраний для розвитку, якщо він є; інакше кожен режим має свій вбудований промпт. Кнопка «Розвивати» в редакторі теж дотримується цього режиму.</RPD_AutoEvolve_InternalPromptNotice>
   <RPD_History_CurrentPersona>Поточна особистість</RPD_History_CurrentPersona>
+  <RPD_AutoEvolve_Notes>Нотатки для кожного запиту автоеволюції</RPD_AutoEvolve_Notes>
+  <RPD_AutoEvolve_NotesTip>Додаються до вбудованого промпту автоматичної еволюції, а не кнопки в редакторі. Змінні пресетів на кшталт {{pawn.name}} тут працюють.</RPD_AutoEvolve_NotesTip>
 </LanguageData>

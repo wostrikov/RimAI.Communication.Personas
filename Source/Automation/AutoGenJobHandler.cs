@@ -17,10 +17,17 @@ namespace Ustas.RimAI.Communication.Personas.Automation
             job.Category = role;
             job.OriginalPersona = PersonaOwnership.ReadWithoutCreating(job.Pawn);
 
+            string trigger = job.TriggerContexts.Count > 0 ? job.TriggerText : string.Empty;
+            if (DirectorPresetRenderer.TryRender(category.advancedPreset, job.Pawn, trigger, out string presetContext, out string presetPrompt))
+                return new TalkRequest(presetPrompt, job.Pawn) { Context = presetContext };
+
             ContextSettings context = category.EffectiveContext(settings.Context);
             string data = DirectorCharacterDataBuilder.BuildCustomCharacterData(job.Pawn, context: context);
-            if (job.TriggerContexts.Count > 0)
-                data += "\n\n[Trigger Event]\n" + job.TriggerText;
+            string notes = DirectorPresetRenderer.RenderNotes(settings.Automation?.autoGenNotes, job.Pawn);
+            if (notes.Length > 0)
+                data += "\n\n[Auto-Gen Notes]\n" + notes;
+            if (trigger.Length > 0)
+                data += "\n\n[Trigger Event]\n" + trigger;
 
             string instruction = PromptFor(settings, category.presetSlot).Replace("{LANG}", DirectorPromptComposer.CurrentLanguage)
                 + "\n\n" + PersonasSettings.HiddenTechnicalPrompt_Single;

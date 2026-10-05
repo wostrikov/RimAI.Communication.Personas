@@ -20,7 +20,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             absorbInputAroundWindow = true;
         }
 
-        public override Vector2 InitialSize => new Vector2(560f, 560f);
+        public override Vector2 InitialSize => new Vector2(560f, 660f);
 
         public override void PreClose()
         {
@@ -50,6 +50,10 @@ namespace Ustas.RimAI.Communication.Personas.UI
             list.Gap(6f);
 
             DrawMode(list);
+            list.Gap(6f);
+            Rect notesLabel = list.Label("RPD_AutoEvolve_Notes".Translate());
+            TooltipHandler.TipRegion(notesLabel, "RPD_AutoEvolve_NotesTip".Translate());
+            _settings.autoEvolveNotes = Widgets.TextArea(list.GetRect(64f), _settings.autoEvolveNotes ?? string.Empty);
             list.GapLine();
 
             string triggers = "RPD_AutoEvolve_Triggers".Translate();

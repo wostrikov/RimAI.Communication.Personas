@@ -31,7 +31,9 @@ public static class DirectorPersonaEvolve
         /// text being edited; Auto-Evolve passes none and adds the events that
         /// triggered it. Overwrite asks for a rewritten persona instead of a
         /// development line. A Communication prompt preset selected for evolve
-        /// owns the whole prompt, so neither extra reaches it.
+        /// owns the whole prompt; it reaches the triggering events through
+        /// {{director_trigger_context}}. Auto-Evolve's own notes are added to the
+        /// built-in prompt of an automatic request only.
         /// </summary>
         public static (TalkRequest request, string currentPersona) PrepareEvolveRequest(
             Pawn p,
@@ -55,52 +57,10 @@ public static class DirectorPersonaEvolve
                 string finalPrompt = "";
                 string finalContext = "";
 
-                if (!string.IsNullOrEmpty(presetName) && presetName != "None (Use Internal)")
+                if (DirectorPresetRenderer.TryRender(presetName, p, triggerEvents, out string presetContext, out string presetPrompt))
                 {
-                    var presets = Ustas.RimAI.Communication.API.RimTalkPromptAPI.GetAllPresets();
-                    var targetPreset = presets.FirstOrDefault(x => x.Name == presetName);
-
-                    if (targetPreset != null)
-                    {
-                        PromptContext contextObj = new PromptContext(p);
-                        StringBuilder systemSb = new StringBuilder();
-                        StringBuilder userSb = new StringBuilder();
-
-                        foreach (var entry in targetPreset.Entries)
-                        {
-                            if (!entry.Enabled) continue;
-
-                            string renderedText = ScribanParser.Render(entry.Content, contextObj, true);
-
-                            if (string.IsNullOrWhiteSpace(renderedText)) continue;
-
-                            string roleStr = entry.Role.ToString().ToLowerInvariant();
-
-                            if (roleStr == "system")
-                            {
-                                if (systemSb.Length > 0) systemSb.AppendLine("\n");
-                                systemSb.Append(renderedText);
-                            }
-                            else
-                            {
-                                if (userSb.Length > 0) userSb.AppendLine("\n");
-                                userSb.Append(renderedText);
-                            }
-                        }
-
-                        // Hard constraint — changing this breaks an invariant. (JSON)
-                        systemSb.AppendLine("\n" + PersonasSettings.HiddenTechnicalPrompt_Single);
-
-                        finalContext = systemSb.ToString();
-                        finalPrompt = userSb.ToString();
-
-                        if (PersonasMod.Settings.EnableDebugLog)
-                            RimAiLog.Info(RimAiLogCategory.Personas, $"[Director] Advanced Preset Rendered.\nContext Len: {finalContext.Length}\nPrompt Len: {finalPrompt.Length}");
-                    }
-                    else
-                    {
-                        RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Preset '{presetName}' not found. Falling back to internal.");
-                    }
+                    finalContext = presetContext;
+                    finalPrompt = presetPrompt;
                 }
 
                 if (string.IsNullOrEmpty(finalPrompt))
@@ -153,6 +113,13 @@ public static class DirectorPersonaEvolve
                         ctx.Inc_DirectorNotes,
                         memories,
                         triggerEvents));
+
+                    if (editorWindow == null)
+                    {
+                        string autoNotes = DirectorPresetRenderer.RenderNotes(PersonasMod.Settings.Automation?.autoEvolveNotes, p);
+                        if (autoNotes.Length > 0)
+                            contextSb.AppendLine().AppendLine("[Auto-Evolve Notes]").AppendLine(autoNotes);
+                    }
 
                     if (ctx.Inc_CommonKnowledge)
                     {
