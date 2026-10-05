@@ -78,6 +78,12 @@ namespace Ustas.RimAI.Communication.Personas.UI
                 _settings.autoEvolveMode = AutoEvolveMode.Append;
             if (Widgets.RadioButtonLabeled(overwriteRect, "RPD_AutoEvolve_ModeOverwrite".Translate(), _settings.autoEvolveMode == AutoEvolveMode.Overwrite))
                 _settings.autoEvolveMode = AutoEvolveMode.Overwrite;
+
+            Text.Font = GameFont.Tiny;
+            GUI.color = Color.gray;
+            list.Label("RPD_AutoEvolve_InternalPromptNotice".Translate());
+            GUI.color = Color.white;
+            Text.Font = GameFont.Small;
         }
     }
 }

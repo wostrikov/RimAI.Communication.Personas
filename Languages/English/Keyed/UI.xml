@@ -62,7 +62,7 @@
   <RPD_Tip_NoNotes>Click to edit</RPD_Tip_NoNotes>
   <RPD_MainButton_Label>Notes</RPD_MainButton_Label>
   <RPD_Button_Evolve>Evolve</RPD_Button_Evolve>
-  <RPD_Tip_Evolve>Append new character development based on recent memories and time passed.</RPD_Tip_Evolve>
+  <RPD_Tip_Evolve>Update the persona from memories and elapsed time, in the Append or Overwrite mode set on the Auto-Evolve page.</RPD_Tip_Evolve>
   
   <RPD_Button_SetTime>Set Time</RPD_Button_SetTime>
   <RPD_Button_TimeAgo>{0}d ago</RPD_Button_TimeAgo> <!-- {0} is days number -->
@@ -165,4 +165,6 @@
   <RPD_Setting_RimTalkIntegration>Integration with RimTalk Presets</RPD_Setting_RimTalkIntegration>
   <RPD_Setting_RimTalkIntegrationDesc>If a preset is selected below, it overrides the internal prompts.</RPD_Setting_RimTalkIntegrationDesc>
   <RPD_Msg_PrepareFailed>Failed to prepare data.</RPD_Msg_PrepareFailed>
+  <RPD_AutoEvolve_InternalPromptNotice>Both modes use the Communication preset chosen for Evolve, if any; otherwise each mode uses its own built-in prompt. The editor's Evolve button follows this mode too.</RPD_AutoEvolve_InternalPromptNotice>
+  <RPD_History_CurrentPersona>Current persona</RPD_History_CurrentPersona>
 </LanguageData>

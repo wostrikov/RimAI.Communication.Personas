@@ -1,5 +1,9 @@
 using Ustas.RimAI.Communication.UI;
+using Ustas.RimAI.Communication.Personas.Config;
+using Ustas.RimAI.Communication.Personas.Policy;
+using Ustas.RimAI.Core.Diagnostics;
 using RimWorld;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
@@ -10,14 +14,36 @@ namespace Ustas.RimAI.Communication.Personas
     public static class Patch_PersonaEditorWindow_DirectorFeatures
     {
         private static Task<string> evolveTask = null;
-        private static string evolveResult = null;
         private static Pawn evolvingPawn = null;
+        // The window the request came from: a different editor opened meanwhile
+        // must not receive the answer.
+        private static Window evolvingWindow = null;
+        // Captured at the click, so changing the mode mid-request changes nothing.
+        private static bool evolvingOverwrite = false;
 
         private static void ClearEvolveState()
         {
             evolveTask = null;
-            evolveResult = null;
             evolvingPawn = null;
+            evolvingWindow = null;
+            evolvingOverwrite = false;
+        }
+
+        /// <summary>
+        /// Takes a finished answer on the UI thread. A continuation used to write it
+        /// from the worker thread, racing the next frame's read.
+        /// </summary>
+        private static string TakeFinishedResult(Window window)
+        {
+            if (evolveTask == null || !evolveTask.IsCompleted || evolvingWindow != window)
+                return null;
+            string result = null;
+            if (evolveTask.IsFaulted)
+                RimAiLog.Warning(RimAiLogCategory.Personas, "[Director] Manual Evolve request failed: " + evolveTask.Exception?.GetBaseException());
+            else if (!evolveTask.IsCanceled)
+                result = evolveTask.Result;
+            evolveTask = null;
+            return result;
         }
 
         public static void DrawFooter(PersonaEditorWindow window, Pawn pawn, Rect inRect)
@@ -25,14 +51,16 @@ namespace Ustas.RimAI.Communication.Personas
             if (window == null || pawn == null) return;
             History.PersonaEditorHistoryWatcher.Observe(window, pawn);
 
+            string evolveResult = TakeFinishedResult(window);
             if (evolveResult != null && evolvingPawn == pawn)
             {
+                // Overwrite replaces the text with the rewritten persona; Append adds
+                // a development line - the Auto-Evolve page's mode, as Auto-Evolve uses it.
                 string currentText = DirectorUtils.GetWindowText(window);
-                string newText = $"{currentText}\n\n[Development]: {evolveResult}";
-                DirectorUtils.SetWindowText(window, newText);
-                evolveResult = null;
-                evolvingPawn = null;
+                DirectorUtils.SetWindowText(window, PersonaAutomationPolicy.ComposeEvolved(currentText, evolveResult, evolvingOverwrite));
             }
+            if (evolveTask == null && evolvingWindow == window)
+                ClearEvolveState();
 
             float footerY = inRect.y + 267f;
             float buttonWidth = 80f;
@@ -89,7 +117,9 @@ namespace Ustas.RimAI.Communication.Personas
                 {
                     ClearEvolveState();
                     evolvingPawn = pawn;
-                    var (request, currentPersona) = DirectorUtils.PrepareEvolveRequest(pawn, window);
+                    evolvingWindow = window;
+                    evolvingOverwrite = PersonasMod.Settings.Automation?.autoEvolveMode == AutoEvolveMode.Overwrite;
+                    var (request, currentPersona) = DirectorPersonaEvolve.PrepareEvolveRequest(pawn, window, null, evolvingOverwrite);
 
                     if (request != null)
                     {
@@ -99,12 +129,6 @@ namespace Ustas.RimAI.Communication.Personas
                             if (result != null && !string.IsNullOrEmpty(result.Persona))
                                 return result.Persona.Trim();
                             return null;
-                        });
-
-                        evolveTask.ContinueWith(task => {
-                            if (task.IsCompleted && !task.IsFaulted)
-                                evolveResult = task.Result;
-                            evolveTask = null;
                         });
                     }
                     else

@@ -60,7 +60,7 @@
   <RPD_Tip_NoNotes>Натисніть, щоб редагувати</RPD_Tip_NoNotes>
   <RPD_MainButton_Label>Нотатки</RPD_MainButton_Label>
   <RPD_Button_Evolve>Розвивати</RPD_Button_Evolve>
-  <RPD_Tip_Evolve>Додати новий розвиток характеру на основі нещодавніх спогадів і плину часу.</RPD_Tip_Evolve>
+  <RPD_Tip_Evolve>Оновити особистість на основі спогадів і плину часу в режимі «Додати» або «Перезаписати», вибраному на сторінці автоеволюції.</RPD_Tip_Evolve>
   <RPD_Button_SetTime>Установити час</RPD_Button_SetTime>
   <RPD_Button_TimeAgo>{0} дн. тому</RPD_Button_TimeAgo>
   <!-- {0} is days number -->
@@ -174,4 +174,6 @@
   <!-- Patch_ManualSave -->
   <RPD_ManualEdit>[Ручне редагування]</RPD_ManualEdit>
   <RPD_Msg_PrepareFailed>Не вдалося підготувати дані.</RPD_Msg_PrepareFailed>
+  <RPD_AutoEvolve_InternalPromptNotice>Обидва режими використовують пресет Communication, вибраний для розвитку, якщо він є; інакше кожен режим має свій вбудований промпт. Кнопка «Розвивати» в редакторі теж дотримується цього режиму.</RPD_AutoEvolve_InternalPromptNotice>
+  <RPD_History_CurrentPersona>Поточна особистість</RPD_History_CurrentPersona>
 </LanguageData>

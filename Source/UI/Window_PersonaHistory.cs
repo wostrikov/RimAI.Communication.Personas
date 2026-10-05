@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
+using Ustas.RimAI.Communication.Personas.Automation;
 using Ustas.RimAI.Communication.Personas.History;
 using Ustas.RimAI.Communication.UI;
 using Verse;
@@ -15,6 +16,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
     public sealed class Window_PersonaHistory : Window
     {
         const float TextBoxHeight = 90f;
+        const float CurrentBoxHeight = 110f;
         const float ButtonWidth = 170f;
 
         readonly Pawn _pawn;
@@ -38,8 +40,13 @@ namespace Ustas.RimAI.Communication.Personas.UI
             Widgets.Label(new Rect(inRect.x, inRect.y, inRect.width, 34f), "RPD_History_Title".Translate(_pawn?.LabelShortCap ?? ""));
             Text.Font = GameFont.Small;
 
+            // The persona as it stands, so each record below can be read against it.
+            float top = inRect.y + 40f;
+            if (_pawn != null)
+                top = DrawText(new Rect(inRect.x, 0f, inRect.width - 16f, 0f), top, "RPD_History_CurrentPersona".Translate(), CurrentPersona(), CurrentBoxHeight) + 8f;
+
             IReadOnlyList<PersonaHistoryRecord> records = PersonaHistoryService.CurrentStore?.GetRecords(_pawn);
-            Rect body = new Rect(inRect.x, inRect.y + 40f, inRect.width, inRect.height - 90f);
+            Rect body = new Rect(inRect.x, top, inRect.width, inRect.yMax - 50f - top);
             if (_pawn == null || records == null || records.Count == 0)
             {
                 Widgets.Label(body, "RPD_History_NoRecords".Translate());
@@ -90,17 +97,25 @@ namespace Ustas.RimAI.Communication.Personas.UI
                 ConfirmRestore(record.after, "RPD_History_RestoreAfterConfirm".Translate());
         }
 
-        static float DrawText(Rect inner, float y, string label, string text)
+        /// <summary>The open editor's text when there is one - that is what Save will write.</summary>
+        string CurrentPersona()
+        {
+            if (_editor != null && Find.WindowStack.IsOpen(_editor) && !string.IsNullOrEmpty(_editor.EditingPersonality))
+                return _editor.EditingPersonality;
+            return PersonaOwnership.ReadWithoutCreating(_pawn);
+        }
+
+        static float DrawText(Rect inner, float y, string label, string text, float height = TextBoxHeight)
         {
             Widgets.Label(new Rect(inner.x, y, inner.width, 24f), label);
             y += 24f;
-            Rect box = new Rect(inner.x, y, inner.width, TextBoxHeight);
+            Rect box = new Rect(inner.x, y, inner.width, height);
             Widgets.DrawBoxSolid(box, new Color(0f, 0f, 0f, 0.25f));
             Text.Font = GameFont.Tiny;
             Widgets.Label(box.ContractedBy(4f), string.IsNullOrEmpty(text) ? "RPD_History_Empty".Translate().ToString() : text);
             Text.Font = GameFont.Small;
             TooltipHandler.TipRegion(box, text ?? "");
-            return y + TextBoxHeight;
+            return y + height;
         }
 
         void ConfirmRestore(string text, string question)
