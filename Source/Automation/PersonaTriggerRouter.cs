@@ -75,7 +75,7 @@ namespace Ustas.RimAI.Communication.Personas.Automation
                     OfferPair(gameEvent.Subject, gameEvent.Other, "breakup", other => "Broke up with or divorced " + other.LabelShortCap + ".", now);
                     break;
                 case PersonaGameEventKind.Birth:
-                    Birth(gameEvent.Subject, gameEvent.Other, gameEvent.Third, now);
+                    Birth(gameEvent.Third, gameEvent.Subject == gameEvent.Other ? null : gameEvent.Subject, gameEvent.Other, now);
                     break;
                 case PersonaGameEventKind.Death:
                     DirectFamilyDeath(gameEvent.Subject, now);
@@ -117,11 +117,21 @@ namespace Ustas.RimAI.Communication.Personas.Automation
             Offer(pawn, PersonaAutomationKind.Generate, false, "new:" + pawn.thingIDNumber, null, now);
         }
 
+        /// <summary>
+        /// The mother always; the father only as her lover, fiancé or spouse - a
+        /// man who is merely the genetic father of a stranger's child has not, in
+        /// his own story, become a parent. Twins and the two birth paths share one
+        /// key per parent, so one birth is one request.
+        /// </summary>
         void Birth(Pawn child, Pawn mother, Pawn father, int now)
         {
-            string context = "Became a parent: " + child.LabelShortCap + " was born.";
+            string context = child != null
+                ? "Became a parent: " + child.LabelShortCap + " was born."
+                : "Became a parent: a child was born.";
             if (mother != null) OfferEvolve(mother, "birth:" + mother.thingIDNumber, context, now);
-            if (father != null && father != mother) OfferEvolve(father, "birth:" + father.thingIDNumber, context, now);
+            if (father != null && father != mother && mother != null
+                && LovePartnerRelationUtility.LovePartnerRelationExists(mother, father))
+                OfferEvolve(father, "birth:" + father.thingIDNumber, context, now);
         }
 
         void DirectFamilyDeath(Pawn deceased, int now)

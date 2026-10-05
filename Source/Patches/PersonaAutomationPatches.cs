@@ -32,6 +32,9 @@ namespace Ustas.RimAI.Communication.Personas.Patches
             installed += Postfix(harmony, AccessTools.Method(typeof(SpouseRelationUtility), nameof(SpouseRelationUtility.DoDivorce)), typeof(Patch_PersonaEvolveOnDivorce));
             installed += Postfix(harmony, AccessTools.Method(typeof(InteractionWorker_Breakup), nameof(InteractionWorker_Breakup.Interacted)), typeof(Patch_PersonaEvolveOnBreakup));
             installed += Postfix(harmony, AccessTools.Method(typeof(PregnancyUtility), nameof(PregnancyUtility.ApplyBirthOutcome)), typeof(Patch_PersonaEvolveOnBirth));
+            installed += Postfix(harmony, AccessTools.Method(typeof(Hediff_Pregnant), nameof(Hediff_Pregnant.DoBirthSpawn)), typeof(Patch_PersonaEvolveOnLegacyBirth));
+            installed += Both(harmony, AccessTools.Method(typeof(InteractionWorker_MarriageProposal), nameof(InteractionWorker_MarriageProposal.Interacted)), typeof(Patch_PersonaEvolveOnRejectedProposal));
+            installed += Postfix(harmony, AccessTools.Method(typeof(InteractionWorker_RomanceAttempt), "BreakLoverAndFianceRelations"), typeof(Patch_PersonaEvolveOnRomanceReplacement));
             installed += Both(harmony, AccessTools.Method(typeof(Pawn), nameof(Pawn.Kill)), typeof(Patch_PersonaEvolveOnFamilyDeath));
             installed += Both(harmony, AccessTools.Method(typeof(TraitSet), nameof(TraitSet.GainTrait)), typeof(Patch_PersonaEvolveOnTraitGained));
             installed += Postfix(harmony, AccessTools.Method(typeof(Pawn), nameof(Pawn.SpawnSetup), new[] { typeof(Map), typeof(bool) }), typeof(Patch_PersonaNewPawnSpawned));
@@ -39,7 +42,7 @@ namespace Ustas.RimAI.Communication.Personas.Patches
             installed += Both(harmony, AccessTools.Method(typeof(Pawn_GuestTracker), nameof(Pawn_GuestTracker.SetGuestStatus)), typeof(Patch_PersonaRoleOnGuestStatus));
             installed += Prefix(harmony, AccessTools.Method(typeof(MemoryUtility), nameof(MemoryUtility.ClearAllMapsAndWorld)), typeof(Patch_PersonaAutomationOnWorldCleared));
 
-            ModuleLog.Message("[RimAI.Personas] automation hooks installed: " + installed + " of 10");
+            ModuleLog.Message("[RimAI.Personas] automation hooks installed: " + installed + " of 13");
         }
 
         private static int Postfix(Harmony harmony, System.Reflection.MethodBase target, Type patch)
