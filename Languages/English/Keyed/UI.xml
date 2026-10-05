@@ -187,4 +187,6 @@
   <RPD_Roster_Empty>No pawns to show.</RPD_Roster_Empty>
   <RPD_Batch_SearchTip>Search the visible pawn list by name.</RPD_Batch_SearchTip>
   <RPD_Filter_Other>Other</RPD_Filter_Other>
+  <RPD_Filter_PawnPortrait>Portrait (single-pawn requests)</RPD_Filter_PawnPortrait>
+  <RPD_Tip_PawnPortrait>Send the pawn's in-game portrait as a picture with requests about one pawn: Gen, Evolve, Auto-Gen and Auto-Evolve. It costs image tokens and needs a model that takes pictures; if the model refuses, the request is sent again without it. Batch requests never include it.</RPD_Tip_PawnPortrait>
 </LanguageData>

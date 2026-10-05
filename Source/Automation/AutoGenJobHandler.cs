@@ -18,10 +18,14 @@ namespace Ustas.RimAI.Communication.Personas.Automation
             job.OriginalPersona = PersonaOwnership.ReadWithoutCreating(job.Pawn);
 
             string trigger = job.TriggerContexts.Count > 0 ? job.TriggerText : string.Empty;
-            if (DirectorPresetRenderer.TryRender(category.advancedPreset, job.Pawn, trigger, out string presetContext, out string presetPrompt))
-                return new TalkRequest(presetPrompt, job.Pawn) { Context = presetContext };
-
             ContextSettings context = category.EffectiveContext(settings.Context);
+            if (DirectorPresetRenderer.TryRender(category.advancedPreset, job.Pawn, trigger, out string presetContext, out string presetPrompt))
+            {
+                var presetRequest = new TalkRequest(presetPrompt, job.Pawn) { Context = presetContext };
+                PawnPortraitCapture.Attach(presetRequest, job.Pawn, context);
+                return presetRequest;
+            }
+
             string data = DirectorCharacterDataBuilder.BuildCustomCharacterData(job.Pawn, context: context);
             string notes = DirectorPresetRenderer.RenderNotes(settings.Automation?.autoGenNotes, job.Pawn);
             if (notes.Length > 0)
@@ -31,10 +35,12 @@ namespace Ustas.RimAI.Communication.Personas.Automation
 
             string instruction = PromptFor(settings, category.presetSlot).Replace("{LANG}", DirectorPromptComposer.CurrentLanguage)
                 + "\n\n" + PersonasSettings.HiddenTechnicalPrompt_Single;
-            return new TalkRequest("[Character Data]\n" + data, job.Pawn)
+            var request = new TalkRequest("[Character Data]\n" + data, job.Pawn)
             {
                 Context = instruction
             };
+            PawnPortraitCapture.Attach(request, job.Pawn, context);
+            return request;
         }
 
         public bool Apply(PersonaAutomationJob job, PersonalityData result, DirectorWorldComponent world)

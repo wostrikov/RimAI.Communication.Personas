@@ -150,6 +150,7 @@ public static class DirectorPersonaEvolve
                 {
                     Context = finalContext
                 };
+                PawnPortraitCapture.Attach(request, p, PersonasMod.Settings.Context);
 
                 return (request, currentPersona);
             }

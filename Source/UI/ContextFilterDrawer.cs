@@ -51,6 +51,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             list3.Begin(col3Rect);
             DrawHeader(list3, "RPD_Group_ExternalData".Translate());
             DrawRow(list3, "RPD_Filter_DataComparison".Translate(), ref ctx.Inc_DataComparison);
+            DrawRow(list3, "RPD_Filter_PawnPortrait".Translate(), ref ctx.Inc_PawnPortrait, "RPD_Tip_PawnPortrait".Translate());
             if (rimPsycheLoaded)
             {
                 DrawRow(list3, "RPD_Filter_RimPsyche".Translate(), ref ctx.Inc_RimPsyche, ref ctx.Inc_RimPsyche_All, "RPD_Tip_RimPsyche".Translate());

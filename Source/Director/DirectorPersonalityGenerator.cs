@@ -81,6 +81,7 @@ public static class DirectorPersonalityGenerator
             {
                 Context = systemBuilder.ToString()
             };
+            if (!isBatch) PawnPortraitCapture.Attach(request, p, PersonasMod.Settings.Context);
 
             return await AIService.Query<PersonalityData>(request);
         }
@@ -125,6 +126,7 @@ public static class DirectorPersonalityGenerator
                 {
                     Context = instruction
                 };
+                PawnPortraitCapture.Attach(request, pawn, PersonasMod.Settings.Context);
 
                 return await AIService.Query<PersonalityData>(request);
             }

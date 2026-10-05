@@ -634,6 +634,9 @@ namespace Ustas.RimAI.Communication.Personas
         public bool Inc_Memories = false;
         public bool Inc_CommonKnowledge = false;
         public bool Inc_DataComparison = false;
+        // The pawn's portrait as a picture, for requests about one pawn. Off by
+        // default: it costs image tokens and needs a model that takes pictures.
+        public bool Inc_PawnPortrait = false;
 
         public void ExposeData()
         {
@@ -661,6 +664,7 @@ namespace Ustas.RimAI.Communication.Personas
             Scribe_Values.Look(ref Inc_Memories, PersonaScribeLabels.Context.IncMemories, false);
             Scribe_Values.Look(ref Inc_CommonKnowledge, PersonaScribeLabels.Context.IncCommonKnowledge, false);
             Scribe_Values.Look(ref Inc_DataComparison, PersonaScribeLabels.Context.IncDataComparison, false);
+            Scribe_Values.Look(ref Inc_PawnPortrait, PersonaScribeLabels.Context.IncPawnPortrait, false);
         }
     }
 
