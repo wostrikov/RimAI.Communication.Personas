@@ -173,4 +173,5 @@
   <RPD_AutoEvolve_ButtonHistory>Історія</RPD_AutoEvolve_ButtonHistory>
   <!-- Patch_ManualSave -->
   <RPD_ManualEdit>[Ручне редагування]</RPD_ManualEdit>
+  <RPD_Msg_PrepareFailed>Не вдалося підготувати дані.</RPD_Msg_PrepareFailed>
 </LanguageData>

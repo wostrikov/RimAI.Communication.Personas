@@ -61,4 +61,17 @@
   <RPD_IO_MsgImportFail>Import failed: Invalid format or corrupted data.\n{0}</RPD_IO_MsgImportFail>
   <RPD_IO_MsgNoFolder>No export folder found.</RPD_IO_MsgNoFolder>
   <RPD_IO_MsgNoFiles>No files found</RPD_IO_MsgNoFiles>
+  <RPD_Library_AddAll>Add All "{0}" Presets</RPD_Library_AddAll>
+  <RPD_Library_AddSpecific>Add Specific...</RPD_Library_AddSpecific>
+  <RPD_Library_AllAdded>(All already in library)</RPD_Library_AllAdded>
+  <RPD_Library_ManageBuiltin>Manage Built-in</RPD_Library_ManageBuiltin>
+  <RPD_Library_ManageVanilla>Manage Vanilla</RPD_Library_ManageVanilla>
+  <RPD_Library_MsgAdded>Successfully added {0} presets.</RPD_Library_MsgAdded>
+  <RPD_Library_MsgRemoved>Successfully removed {0} presets.</RPD_Library_MsgRemoved>
+  <RPD_Library_RemoveAll>Remove All "{0}" Presets</RPD_Library_RemoveAll>
+  <RPD_Library_CategoryAll>All</RPD_Library_CategoryAll>
+  <RPD_Library_CategoryVanilla>Vanilla</RPD_Library_CategoryVanilla>
+  <RPD_Library_CategoryBuiltIn>Built-in</RPD_Library_CategoryBuiltIn>
+  <RPD_Library_CategoryCustom>Custom</RPD_Library_CategoryCustom>
+  <RPD_Library_NewPreset>New Preset</RPD_Library_NewPreset>
 </LanguageData>

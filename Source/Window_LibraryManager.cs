@@ -104,11 +104,11 @@ namespace Ustas.RimAI.Communication.Personas
             topY += 30f;
             
             Rect filterRect = new Rect(innerLeft.x, topY, innerLeft.width, 24f);
-            if (Widgets.ButtonText(filterRect, "RPD_Library_Category".Translate(selectedCategoryFilter)))
+            if (Widgets.ButtonText(filterRect, "RPD_Library_Category".Translate(PresetCategoryLabel(selectedCategoryFilter))))
             {
-                List<FloatMenuOption> opts = new List<FloatMenuOption> { new FloatMenuOption("All", () => selectedCategoryFilter = "All") };
+                List<FloatMenuOption> opts = new List<FloatMenuOption> { new FloatMenuOption(PresetCategoryLabel("All"), () => selectedCategoryFilter = "All") };
                 foreach (var cat in PersonasMod.Settings.userPresets.Select(p => p.category).Distinct())
-                    opts.Add(new FloatMenuOption(cat, () => selectedCategoryFilter = cat));
+                    opts.Add(new FloatMenuOption(PresetCategoryLabel(cat), () => selectedCategoryFilter = cat));
                 Find.WindowStack.Add(new FloatMenu(opts));
             }
             topY += 30f;
@@ -119,7 +119,7 @@ namespace Ustas.RimAI.Communication.Personas
                 .Where(p => searchWidget.filter.Matches(p.label) && (selectedCategoryFilter == "All" || p.category == selectedCategoryFilter)).ToList();
 
             DrawLeftList(listRect, filtered,
-                p => $"[{p.category}] {p.label}",
+                p => $"[{PresetCategoryLabel(p.category)}] {p.label}",
                 p => selectedPreset = p,
                 ref scrollLeft,
                 selectedPreset,
@@ -135,7 +135,7 @@ namespace Ustas.RimAI.Communication.Personas
 
             if (Widgets.ButtonText(new Rect(bottomRow1.x, bottomRow1.y, btnWidth, 30f), "RPD_Library_CreatePreset".Translate()))
             {
-                var n = new CustomPreset("New Preset", "...") { category = "Custom", enabled = true };
+                var n = new CustomPreset("RPD_Library_NewPreset".Translate(), "...") { category = "Custom", enabled = true };
                 PersonasMod.Settings.userPresets.Add(n);
                 selectedPreset = n;
             }
@@ -194,12 +194,31 @@ namespace Ustas.RimAI.Communication.Personas
             }
         }
 
+        /// <summary>
+        /// The label a preset category is shown under. The category itself is data -
+        /// "All", "Vanilla", "Built-in" and "Custom" are stored as written and compared
+        /// as such - so only its display is translated; a category the player named
+        /// is shown as named. It used to call Translate() on the stored string, which
+        /// shows a raw key for anything not keyed under that exact text.
+        /// </summary>
+        private static string PresetCategoryLabel(string category)
+        {
+            switch (category)
+            {
+                case "All": return "RPD_Library_CategoryAll".Translate();
+                case "Vanilla": return "RPD_Library_CategoryVanilla".Translate();
+                case "Built-in": return "RPD_Library_CategoryBuiltIn".Translate();
+                case "Custom": return "RPD_Library_CategoryCustom".Translate();
+                default: return category;
+            }
+        }
+
         private void OpenManageMenu(string targetCategory, List<Ustas.RimAI.Communication.Data.PersonalityData> vanillaSource = null, List<CustomPreset> builtInSource = null)
         {
             List<FloatMenuOption> opts = new List<FloatMenuOption>();
             var userPresets = PersonasMod.Settings.userPresets;
 
-            opts.Add(new FloatMenuOption("RPD_Library_AddAll".Translate(targetCategory.Translate()), () =>
+            opts.Add(new FloatMenuOption("RPD_Library_AddAll".Translate(PresetCategoryLabel(targetCategory)), () =>
             {
                 int count = 0;
                 if (vanillaSource != null)
@@ -231,7 +250,7 @@ namespace Ustas.RimAI.Communication.Personas
                 Messages.Message("RPD_Library_MsgAdded".Translate(count), MessageTypeDefOf.PositiveEvent, false);
             }));
 
-            opts.Add(new FloatMenuOption("RPD_Library_RemoveAll".Translate(targetCategory.Translate()), () =>
+            opts.Add(new FloatMenuOption("RPD_Library_RemoveAll".Translate(PresetCategoryLabel(targetCategory)), () =>
             {
                 int removed = userPresets.RemoveAll(p => p.category == targetCategory);
                 selectedPreset = null;

@@ -159,4 +159,10 @@
   <RPD_AutoEvolve_ModeOverwrite>Overwrite</RPD_AutoEvolve_ModeOverwrite>
   <RPD_AutoEvolve_ButtonHistory>History</RPD_AutoEvolve_ButtonHistory>
 
+  <RPD_Setting_ForEvolve>Evolve preset:</RPD_Setting_ForEvolve>
+  <RPD_Setting_ForSingleGen>For Single Generation:</RPD_Setting_ForSingleGen>
+  <RPD_Setting_NoneInternal>None (Use Internal)</RPD_Setting_NoneInternal>
+  <RPD_Setting_RimTalkIntegration>Integration with RimTalk Presets</RPD_Setting_RimTalkIntegration>
+  <RPD_Setting_RimTalkIntegrationDesc>If a preset is selected below, it overrides the internal prompts.</RPD_Setting_RimTalkIntegrationDesc>
+  <RPD_Msg_PrepareFailed>Failed to prepare data.</RPD_Msg_PrepareFailed>
 </LanguageData>

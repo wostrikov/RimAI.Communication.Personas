@@ -70,4 +70,9 @@
   <RPD_IO_MsgImportFail>Помилка імпорту: недійсний формат або пошкоджені дані.\n{0}</RPD_IO_MsgImportFail>
   <RPD_IO_MsgNoFolder>Папку для експорту не знайдено.</RPD_IO_MsgNoFolder>
   <RPD_IO_MsgNoFiles>Файлів не знайдено</RPD_IO_MsgNoFiles>
+  <RPD_Library_CategoryAll>Усі</RPD_Library_CategoryAll>
+  <RPD_Library_CategoryVanilla>Ванільні</RPD_Library_CategoryVanilla>
+  <RPD_Library_CategoryBuiltIn>Вбудовані</RPD_Library_CategoryBuiltIn>
+  <RPD_Library_CategoryCustom>Власні</RPD_Library_CategoryCustom>
+  <RPD_Library_NewPreset>Новий пресет</RPD_Library_NewPreset>
 </LanguageData>

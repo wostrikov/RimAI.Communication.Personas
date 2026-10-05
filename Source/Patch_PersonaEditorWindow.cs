@@ -109,7 +109,7 @@ namespace Ustas.RimAI.Communication.Personas
                     }
                     else
                     {
-                        Messages.Message("Failed to prepare data.", MessageTypeDefOf.RejectInput, false);
+                        Messages.Message("RPD_Msg_PrepareFailed".Translate(), MessageTypeDefOf.RejectInput, false);
                     }
                 }
                 TooltipHandler.TipRegion(evolveRect, "RPD_Tip_Evolve".Translate());
