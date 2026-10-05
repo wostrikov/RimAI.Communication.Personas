@@ -178,4 +178,22 @@
   <RPD_History_CurrentPersona>Поточна особистість</RPD_History_CurrentPersona>
   <RPD_AutoEvolve_Notes>Нотатки для кожного запиту автоеволюції</RPD_AutoEvolve_Notes>
   <RPD_AutoEvolve_NotesTip>Додаються до вбудованого промпту автоматичної еволюції, а не кнопки в редакторі. Змінні пресетів на кшталт {{pawn.name}} тут працюють.</RPD_AutoEvolve_NotesTip>
+  <RPD_AutoEvolve_Roster>Налаштування для персонажів...</RPD_AutoEvolve_Roster>
+  <RPD_AutoEvolve_RosterTip>Виключити окремих персонажів з автоеволюції або дати комусь власний розклад.</RPD_AutoEvolve_RosterTip>
+  <RPD_AutoEvolve_RosterTitle>Автоеволюція за персонажами</RPD_AutoEvolve_RosterTitle>
+  <RPD_AutoEvolve_RosterNoGame>Доступно лише під час гри.</RPD_AutoEvolve_RosterNoGame>
+  <RPD_AutoEvolve_RosterHint>Порожній інтервал — загальний ({0} дн.); 0 — лише події.</RPD_AutoEvolve_RosterHint>
+  <RPD_AutoEvolve_RosterPawn>Персонаж</RPD_AutoEvolve_RosterPawn>
+  <RPD_AutoEvolve_RosterRole>Роль</RPD_AutoEvolve_RosterRole>
+  <RPD_AutoEvolve_RosterEnabled>Автоеволюція</RPD_AutoEvolve_RosterEnabled>
+  <RPD_AutoEvolve_RosterEnabledTip>Без позначки персонаж не отримує автоматичних оновлень — ні за розкладом, ні від подій. В’язнів і рабів охоплює лише увімкнене «Також в’язні та раби».</RPD_AutoEvolve_RosterEnabledTip>
+  <RPD_AutoEvolve_RosterInterval>Інтервал, днів</RPD_AutoEvolve_RosterInterval>
+  <RPD_AutoEvolve_RosterIntervalTip>Днів між оновленнями за розкладом для цього персонажа. Порожньо — загальний інтервал. 0 — лише події.</RPD_AutoEvolve_RosterIntervalTip>
+  <RPD_AutoEvolve_RosterDefault>за замовч. ({0})</RPD_AutoEvolve_RosterDefault>
+  <RPD_AutoEvolve_RosterLast>Останнє оновлення</RPD_AutoEvolve_RosterLast>
+  <RPD_AutoEvolve_RosterNever>ніколи</RPD_AutoEvolve_RosterNever>
+  <RPD_AutoEvolve_RosterDaysAgo>{0} дн. тому</RPD_AutoEvolve_RosterDaysAgo>
+  <RPD_Roster_Empty>Немає персонажів для показу.</RPD_Roster_Empty>
+  <RPD_Batch_SearchTip>Пошук у видимому списку персонажів за іменем.</RPD_Batch_SearchTip>
+  <RPD_Filter_Other>Інші</RPD_Filter_Other>
 </LanguageData>

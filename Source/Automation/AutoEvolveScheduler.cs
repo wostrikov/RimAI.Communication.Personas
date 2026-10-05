@@ -35,7 +35,9 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         public void Tick(PersonaAutomationCoordinator coordinator, DirectorWorldComponent world, int nowTick)
         {
             PersonaAutomationSettings settings = PersonasMod.Settings?.Automation;
-            if (settings == null || !settings.autoEvolveEnabled || settings.autoEvolveIntervalDays <= 0) return;
+            if (settings == null || !settings.autoEvolveEnabled) return;
+            // With no global schedule only pawns given their own are scanned for.
+            if (settings.autoEvolveIntervalDays <= 0 && !world.AutoEvolvePawns.AnyOwnSchedule) return;
             if (nowTick < _nextScanTick) return;
             _nextScanTick = nowTick + ScanIntervalTicks;
 
@@ -57,7 +59,8 @@ namespace Ustas.RimAI.Communication.Personas.Automation
                     }
 
                     if (_retryAfterTick.TryGetValue(pawn.thingIDNumber, out int retryAt) && nowTick < retryAt) continue;
-                    if (!PersonaAutomationPolicy.IsEvolveDue(last, nowTick, settings.autoEvolveIntervalDays)) continue;
+                    int days = world.AutoEvolvePawns.IntervalFor(pawn, settings.autoEvolveIntervalDays);
+                    if (!PersonaAutomationPolicy.IsEvolveDue(last, nowTick, days)) continue;
 
                     coordinator.Enqueue(pawn, PersonaAutomationKind.Evolve, false, "schedule:" + pawn.thingIDNumber + ":" + last, null);
                 }

@@ -605,6 +605,8 @@ namespace Ustas.RimAI.Communication.Personas
             EnsureKey("Animals", false);
             EnsureKey("Mechs", false);
             EnsureKey("Anomalies", false);
+            // Humanlike pawns no other filter takes: wild people, the factionless.
+            EnsureKey("Other", false);
         }
 
         private void EnsureKey(string key, bool defaultValue)

@@ -3,6 +3,7 @@ using RimWorld.Planet;
 using System.Collections.Generic;
 using Verse;
 using Ustas.RimAI.Core.Personas;
+using Ustas.RimAI.Communication.Personas.Automation;
 using Ustas.RimAI.Communication.Personas.History;
 
 namespace Ustas.RimAI.Communication.Personas
@@ -12,6 +13,11 @@ namespace Ustas.RimAI.Communication.Personas
         private PersonaHistoryStore _history = new PersonaHistoryStore();
 
         public PersonaHistoryStore History => _history;
+
+        private PawnAutoEvolveRegistry _autoEvolvePawns = new PawnAutoEvolveRegistry();
+
+        /// <summary>Per-pawn Auto-Evolve choices for this game.</summary>
+        public PawnAutoEvolveRegistry AutoEvolvePawns => _autoEvolvePawns;
 
         private Dictionary<int, int> _lastEvolveTicks = new Dictionary<int, int>();
         private Dictionary<int, long> _lastEvolveBioAgeTicks = new Dictionary<int, long>(); 
@@ -36,6 +42,8 @@ namespace Ustas.RimAI.Communication.Personas
             Scribe_Collections.Look(ref _dailySnapshotDays, PersonaScribeLabels.WorldComponent.DailySnapshotDays, LookMode.Value, LookMode.Value);
             Scribe_Values.Look(ref lastRuleCheckTick, PersonaScribeLabels.WorldComponent.LastRuleCheckTick, 0);
             Scribe_Deep.Look(ref _history, "personaHistory");
+            Scribe_Deep.Look(ref _autoEvolvePawns, "autoEvolvePawns");
+            if (Scribe.mode == LoadSaveMode.LoadingVars && _autoEvolvePawns == null) _autoEvolvePawns = new PawnAutoEvolveRegistry();
             // World.FinalizeInit runs before the loader's PostLoadInit pass, so a save
             // written before persona history existed must have its store now, not there.
             if (Scribe.mode == LoadSaveMode.LoadingVars && _history == null) _history = new PersonaHistoryStore();
@@ -73,9 +81,20 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 _historyPrunePending = false;
                 _history.RemoveMissingPawns();
+                RemoveMissingAutoEvolvePawns();
             }
             if (PersonasComposition.Current.IsStarted)
                 PersonasComposition.Current.Automation.Tick(this);
+        }
+
+        void RemoveMissingAutoEvolvePawns()
+        {
+            var known = new HashSet<int>();
+            foreach (Pawn pawn in PawnsFinder.AllMapsWorldAndTemporary_AliveOrDead)
+            {
+                if (pawn != null) known.Add(pawn.thingIDNumber);
+            }
+            _autoEvolvePawns.RemoveWhere(id => !known.Contains(id));
         }
 
         public void SaveDailySnapshot(Pawn p)

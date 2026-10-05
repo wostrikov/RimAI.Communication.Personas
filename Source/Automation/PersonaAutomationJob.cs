@@ -56,6 +56,8 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         public static bool IsEligible(Pawn pawn, PersonaAutomationSettings settings)
         {
             if (!IsLivePersonaPawn(pawn) || settings == null) return false;
+            // A pawn the player left out in the per-pawn roster takes no update, scheduled or not.
+            if (Find.World?.GetComponent<DirectorWorldComponent>()?.AutoEvolvePawns.IsExcluded(pawn) == true) return false;
             PawnRoleCategory category = PawnRoleClassifier.Classify(pawn);
             if (category == PawnRoleCategory.Colonist) return true;
             return settings.autoEvolveIncludeCaptives

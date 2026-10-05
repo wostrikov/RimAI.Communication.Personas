@@ -214,6 +214,7 @@ namespace Ustas.RimAI.Communication.Personas
 
             Rect searchRect = new Rect(curX, toolY, 180f, 24f);
             string newSearch = Widgets.TextField(searchRect, _searchText);
+            TooltipHandler.TipRegion(searchRect, "RPD_Batch_SearchTip".Translate());
             if (newSearch != _searchText)
             {
                 _searchText = newSearch;
@@ -607,6 +608,17 @@ namespace Ustas.RimAI.Communication.Personas
             {
                 pawnsToShow.AddRange(allMapPawns.Where(p => p.IsMutant || p.IsCreepJoiner || p.def.race.IsAnomalyEntity));
             }
+
+            if (filters.TryGetValue("Other", out bool oth) && oth)
+                pawnsToShow.AddRange(allMapPawns.Where(p =>
+                    p.RaceProps.Humanlike &&
+                    !p.IsFreeColonist &&
+                    !p.IsPrisonerOfColony &&
+                    !p.IsSlaveOfColony &&
+                    !p.IsMutant &&
+                    !p.IsCreepJoiner &&
+                    !p.def.race.IsAnomalyEntity &&
+                    p.Faction == null));
 
             if (filters.TryGetValue("Animals", out bool ani) && ani) pawnsToShow.AddRange(allMapPawns.Where(p => p.RaceProps.Animal && p.Faction == Faction.OfPlayer));
             if (filters.TryGetValue("Mechs", out bool mec) && mec) pawnsToShow.AddRange(allMapPawns.Where(p => p.RaceProps.IsMechanoid && p.Faction == Faction.OfPlayer));

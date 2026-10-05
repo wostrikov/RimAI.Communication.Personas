@@ -20,7 +20,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             absorbInputAroundWindow = true;
         }
 
-        public override Vector2 InitialSize => new Vector2(560f, 660f);
+        public override Vector2 InitialSize => new Vector2(560f, 700f);
 
         public override void PreClose()
         {
@@ -51,6 +51,8 @@ namespace Ustas.RimAI.Communication.Personas.UI
 
             DrawMode(list);
             list.Gap(6f);
+            DrawRosterButton(list);
+            list.Gap(6f);
             Rect notesLabel = list.Label("RPD_AutoEvolve_Notes".Translate());
             TooltipHandler.TipRegion(notesLabel, "RPD_AutoEvolve_NotesTip".Translate());
             _settings.autoEvolveNotes = Widgets.TextArea(list.GetRect(64f), _settings.autoEvolveNotes ?? string.Empty);
@@ -67,6 +69,18 @@ namespace Ustas.RimAI.Communication.Personas.UI
             list.CheckboxLabeled("RPD_AutoEvolve_EventTraitAdded".Translate(), ref _settings.evolveOnTraitGained, "RPD_AutoEvolve_EventTraitAddedTip".Translate());
 
             list.End();
+        }
+
+        void DrawRosterButton(Listing_Standard list)
+        {
+            DirectorWorldComponent world = Current.ProgramState == ProgramState.Playing
+                ? Find.World?.GetComponent<DirectorWorldComponent>()
+                : null;
+            Rect row = list.GetRect(28f);
+            Rect button = new Rect(row.x, row.y, 220f, 26f);
+            if (Widgets.ButtonText(button, "RPD_AutoEvolve_Roster".Translate(), active: world != null) && world != null)
+                Find.WindowStack.Add(new Window_AutoEvolveRoster(_settings, world));
+            TooltipHandler.TipRegion(button, world != null ? "RPD_AutoEvolve_RosterTip".Translate() : "RPD_AutoEvolve_RosterNoGame".Translate());
         }
 
         void DrawMode(Listing_Standard list)

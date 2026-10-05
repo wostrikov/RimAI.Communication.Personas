@@ -169,4 +169,22 @@
   <RPD_History_CurrentPersona>Current persona</RPD_History_CurrentPersona>
   <RPD_AutoEvolve_Notes>Notes for every Auto-Evolve request</RPD_AutoEvolve_Notes>
   <RPD_AutoEvolve_NotesTip>Added to the built-in prompt of automatic evolves, not the editor's button. Preset variables such as {{pawn.name}} work here.</RPD_AutoEvolve_NotesTip>
+  <RPD_AutoEvolve_Roster>Per-pawn settings...</RPD_AutoEvolve_Roster>
+  <RPD_AutoEvolve_RosterTip>Leave single pawns out of Auto-Evolve, or give one its own schedule.</RPD_AutoEvolve_RosterTip>
+  <RPD_AutoEvolve_RosterTitle>Auto-Evolve by pawn</RPD_AutoEvolve_RosterTitle>
+  <RPD_AutoEvolve_RosterNoGame>Available while a game is running.</RPD_AutoEvolve_RosterNoGame>
+  <RPD_AutoEvolve_RosterHint>An empty interval follows the global one ({0} days); 0 means events only.</RPD_AutoEvolve_RosterHint>
+  <RPD_AutoEvolve_RosterPawn>Pawn</RPD_AutoEvolve_RosterPawn>
+  <RPD_AutoEvolve_RosterRole>Role</RPD_AutoEvolve_RosterRole>
+  <RPD_AutoEvolve_RosterEnabled>Auto-Evolve</RPD_AutoEvolve_RosterEnabled>
+  <RPD_AutoEvolve_RosterEnabledTip>Unticked: this pawn takes no automatic update, neither scheduled nor from events. Captives are covered only while "Include prisoners and slaves" is on.</RPD_AutoEvolve_RosterEnabledTip>
+  <RPD_AutoEvolve_RosterInterval>Interval, days</RPD_AutoEvolve_RosterInterval>
+  <RPD_AutoEvolve_RosterIntervalTip>Days between this pawn's scheduled updates. Empty: the global interval. 0: events only.</RPD_AutoEvolve_RosterIntervalTip>
+  <RPD_AutoEvolve_RosterDefault>default ({0})</RPD_AutoEvolve_RosterDefault>
+  <RPD_AutoEvolve_RosterLast>Last update</RPD_AutoEvolve_RosterLast>
+  <RPD_AutoEvolve_RosterNever>never</RPD_AutoEvolve_RosterNever>
+  <RPD_AutoEvolve_RosterDaysAgo>{0} days ago</RPD_AutoEvolve_RosterDaysAgo>
+  <RPD_Roster_Empty>No pawns to show.</RPD_Roster_Empty>
+  <RPD_Batch_SearchTip>Search the visible pawn list by name.</RPD_Batch_SearchTip>
+  <RPD_Filter_Other>Other</RPD_Filter_Other>
 </LanguageData>
