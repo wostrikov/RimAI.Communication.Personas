@@ -64,4 +64,15 @@
   <RPD_History_Director>Director</RPD_History_Director>
   <RPD_History_Restored>Restored</RPD_History_Restored>
   <RPD_History_Scheduled>Scheduled update.</RPD_History_Scheduled>
+  <RPD_Automation_PauseAtSpeed>Pause automatic work at game speed</RPD_Automation_PauseAtSpeed>
+  <RPD_Automation_PauseAtSpeedTip>No new automatic request starts while the game runs at this speed or faster, so fast-forwarding does not spend a request on every pawn. A request already running still finishes.</RPD_Automation_PauseAtSpeedTip>
+  <RPD_Automation_PauseNever>Never</RPD_Automation_PauseNever>
+  <RPD_Automation_PauseAtSpeedValue>{0}x and faster</RPD_Automation_PauseAtSpeedValue>
+  <RPD_Experimental_FuseReason>Automatic persona work turned itself off: {0}</RPD_Experimental_FuseReason>
+  <RPD_Experimental_ClearError>Clear and resume</RPD_Experimental_ClearError>
+  <RPD_Experimental_AutoGenRuntimeFailed>Auto-Gen hit an internal error (see the log).</RPD_Experimental_AutoGenRuntimeFailed>
+  <RPD_Experimental_AutoEvolveRuntimeFailed>Auto-Evolve hit an internal error (see the log).</RPD_Experimental_AutoEvolveRuntimeFailed>
+  <RPD_Experimental_AutomationRuntimeFailed>the automation hit an internal error (see the log).</RPD_Experimental_AutomationRuntimeFailed>
+  <RPD_Experimental_AutoGenTimeout>three Auto-Gen requests in a row got no answer.</RPD_Experimental_AutoGenTimeout>
+  <RPD_Experimental_AutoEvolveTimeout>three Auto-Evolve requests in a row got no answer.</RPD_Experimental_AutoEvolveTimeout>
 </LanguageData>

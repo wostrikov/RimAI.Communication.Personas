@@ -54,6 +54,14 @@ namespace Ustas.RimAI.Communication.Personas.Config
         public bool notifyOnAutoChange;
         public int historyMaxRecords = PersonaHistoryPolicy.DefaultMaxRecords;
 
+        // No new automatic request starts at this game speed or faster (TimeSpeed
+        // as a number: 2 = fast, 3 = superfast, 4 = ultrafast); 0 never pauses.
+        public int pauseAtSpeed = PersonaAutomationPolicy.DefaultPauseAtSpeed;
+
+        // Set by PersonaAutomationFuse; cleared only by the player.
+        public bool fuseTripped;
+        public string fuseReason = string.Empty;
+
         public bool AnyEnabled => autoGenEnabled || autoEvolveEnabled;
 
         public void ExposeData()
@@ -72,11 +80,16 @@ namespace Ustas.RimAI.Communication.Personas.Config
             Scribe_Values.Look(ref evolveOnTraitGained, "evolveOnTraitGained", false);
             Scribe_Values.Look(ref notifyOnAutoChange, "notifyOnAutoChange", false);
             Scribe_Values.Look(ref historyMaxRecords, "historyMaxRecords", PersonaHistoryPolicy.DefaultMaxRecords);
+            Scribe_Values.Look(ref pauseAtSpeed, "pauseAtSpeed", PersonaAutomationPolicy.DefaultPauseAtSpeed);
+            Scribe_Values.Look(ref fuseTripped, "fuseTripped", false);
+            Scribe_Values.Look(ref fuseReason, "fuseReason", string.Empty);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 autoEvolveIntervalDays = PersonaAutomationPolicy.ClampIntervalDays(autoEvolveIntervalDays);
                 historyMaxRecords = PersonaHistoryPolicy.ClampMaxRecords(historyMaxRecords);
+                pauseAtSpeed = PersonaAutomationPolicy.ClampPauseAtSpeed(pauseAtSpeed);
+                if (fuseReason == null) fuseReason = string.Empty;
                 EnsureCategories();
             }
         }

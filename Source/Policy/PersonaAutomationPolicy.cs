@@ -18,6 +18,24 @@ namespace Ustas.RimAI.Communication.Personas.Policy
         // same whichever of the two wrote its development lines.
         public const string DevelopmentTag = "[Development]:";
 
+        // Superfast: the speed at which a player is skipping time rather than watching it.
+        public const int DefaultPauseAtSpeed = 3;
+        public const int MaxPauseAtSpeed = 4;
+
+        public static int ClampPauseAtSpeed(int speed)
+        {
+            if (speed <= 0) return 0;
+            if (speed < 2) return 2;
+            return speed > MaxPauseAtSpeed ? MaxPauseAtSpeed : speed;
+        }
+
+        /// <summary>Whether a new request waits because the game runs at the pause speed or faster.</summary>
+        public static bool IsPausedAtSpeed(int currentSpeed, int pauseAtSpeed)
+        {
+            int threshold = ClampPauseAtSpeed(pauseAtSpeed);
+            return threshold > 0 && currentSpeed >= threshold;
+        }
+
         public static int ClampIntervalDays(int days)
         {
             if (days < 0) return 0;

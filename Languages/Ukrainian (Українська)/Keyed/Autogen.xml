@@ -109,4 +109,15 @@
   <RPD_History_Scheduled>Заплановане оновлення.</RPD_History_Scheduled>
   <!-- Batch Director Notes Hints -->
   <RPD_Batch_SceneNotesHint>Ці нотатки буде додано до промптів генерації. Підтримується синтаксис Scriban для динамічного вмісту. Використовуйте {%raw%}...{%endraw%}, щоб екранувати приклади коду.</RPD_Batch_SceneNotesHint>
+  <RPD_Automation_PauseAtSpeed>Призупиняти автоматичну роботу на швидкості гри</RPD_Automation_PauseAtSpeed>
+  <RPD_Automation_PauseAtSpeedTip>Поки гра йде на цій швидкості чи швидше, нові автоматичні запити не починаються, тож перемотування часу не витрачає запит на кожного персонажа. Запит, що вже триває, все одно завершиться.</RPD_Automation_PauseAtSpeedTip>
+  <RPD_Automation_PauseNever>Ніколи</RPD_Automation_PauseNever>
+  <RPD_Automation_PauseAtSpeedValue>{0}x і швидше</RPD_Automation_PauseAtSpeedValue>
+  <RPD_Experimental_FuseReason>Автоматична робота з персонами вимкнулася сама: {0}</RPD_Experimental_FuseReason>
+  <RPD_Experimental_ClearError>Скинути й продовжити</RPD_Experimental_ClearError>
+  <RPD_Experimental_AutoGenRuntimeFailed>внутрішня помилка автогенерації (див. журнал).</RPD_Experimental_AutoGenRuntimeFailed>
+  <RPD_Experimental_AutoEvolveRuntimeFailed>внутрішня помилка автоеволюції (див. журнал).</RPD_Experimental_AutoEvolveRuntimeFailed>
+  <RPD_Experimental_AutomationRuntimeFailed>внутрішня помилка автоматизації (див. журнал).</RPD_Experimental_AutomationRuntimeFailed>
+  <RPD_Experimental_AutoGenTimeout>три запити автогенерації поспіль лишилися без відповіді.</RPD_Experimental_AutoGenTimeout>
+  <RPD_Experimental_AutoEvolveTimeout>три запити автоеволюції поспіль лишилися без відповіді.</RPD_Experimental_AutoEvolveTimeout>
 </LanguageData>

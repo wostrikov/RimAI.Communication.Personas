@@ -7,6 +7,7 @@ using RimWorld.Planet;
 using Ustas.RimAI.Communication.Data;
 using Ustas.RimAI.Communication.Personas.Config;
 using Ustas.RimAI.Communication.Personas.Diagnostics;
+using Ustas.RimAI.Communication.Personas.Policy;
 using Ustas.RimAI.Communication.Service;
 using Ustas.RimAI.Core.AI;
 using Ustas.RimAI.Core.Diagnostics;
@@ -41,6 +42,7 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         PersonaAutomationJob _active;
         World _world;
         int _nextStartCheckTick;
+        int _consecutiveTimeouts;
 
         public PersonaAutomationCoordinator()
         {
@@ -78,6 +80,7 @@ namespace Ustas.RimAI.Communication.Personas.Automation
             _scheduler.Clear();
             _world = null;
             _nextStartCheckTick = 0;
+            _consecutiveTimeouts = 0;
         }
 
         public bool Enqueue(Pawn pawn, PersonaAutomationKind kind, bool roleChange, string triggerKey, string triggerContext)
@@ -110,27 +113,48 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         {
             BindWorld(component.world);
             PersonaAutomationSettings settings = PersonasMod.Settings?.Automation;
-            if (settings == null || !settings.AnyEnabled)
+            if (settings == null || !settings.AnyEnabled || PersonaAutomationFuse.IsTripped(settings))
             {
                 if (_active != null || _queue.Count > 0) Reset();
                 Inbox.Clear();
                 return;
             }
 
-            int now = Find.TickManager.TicksGame;
-            Triggers.Flush(Inbox, component, now);
-            _scheduler.Tick(this, component, now);
-
-            if (_active != null)
+            PersonaAutomationKind? working = null;
+            try
             {
-                PollActive(component, now);
-                return;
-            }
+                int now = Find.TickManager.TicksGame;
+                Triggers.Flush(Inbox, component, now);
+                _scheduler.Tick(this, component, now);
 
-            if (now < _nextStartCheckTick) return;
-            _nextStartCheckTick = now + StartCheckIntervalTicks;
-            if (_queue.Count == 0 || AIService.IsBusy() || RimAiBackground.IsShuttingDown) return;
-            StartNext(component, now);
+                if (_active != null)
+                {
+                    working = _active.Kind;
+                    PollActive(component, now, settings);
+                    return;
+                }
+
+                if (now < _nextStartCheckTick) return;
+                _nextStartCheckTick = now + StartCheckIntervalTicks;
+                if (_queue.Count == 0 || AIService.IsBusy() || RimAiBackground.IsShuttingDown) return;
+                // Fast-forwarding: let the time pass rather than spend a request per pawn on it.
+                if (PersonaAutomationPolicy.IsPausedAtSpeed((int)Find.TickManager.CurTimeSpeed, settings.pauseAtSpeed)) return;
+                working = _queue[0].Kind;
+                StartNext(component, now);
+            }
+            // RimAI.catch-boundary: ALLOWED_TOP_LEVEL_BOUNDARY — world-tick automation fault opens the fuse instead of repeating each tick
+            catch (Exception ex)
+            {
+                PersonaAutomationFuse.Trip(settings, FailureReason(working), ex);
+                Reset();
+            }
+        }
+
+        static string FailureReason(PersonaAutomationKind? kind)
+        {
+            if (kind == PersonaAutomationKind.Generate) return PersonaAutomationFuse.GenerateFailedReason;
+            if (kind == PersonaAutomationKind.Evolve) return PersonaAutomationFuse.EvolveFailedReason;
+            return PersonaAutomationFuse.AutomationFailedReason;
         }
 
         void StartNext(DirectorWorldComponent component, int now)
@@ -159,7 +183,7 @@ namespace Ustas.RimAI.Communication.Personas.Automation
             }
         }
 
-        void PollActive(DirectorWorldComponent component, int now)
+        void PollActive(DirectorWorldComponent component, int now, PersonaAutomationSettings settings)
         {
             PersonaAutomationJob job = _active;
             if (!job.Task.IsCompleted)
@@ -170,9 +194,17 @@ namespace Ustas.RimAI.Communication.Personas.Automation
                     + " timed out after " + (int)RequestTimeout.TotalSeconds + " s and was dropped.");
                 AbandonActive();
                 if (job.Kind == PersonaAutomationKind.Evolve) _scheduler.Backoff(job.Pawn, now);
+                if (++_consecutiveTimeouts >= PersonaAutomationFuse.MaxConsecutiveTimeouts)
+                {
+                    PersonaAutomationFuse.Trip(settings, job.Kind == PersonaAutomationKind.Generate
+                        ? PersonaAutomationFuse.GenerateTimeoutReason
+                        : PersonaAutomationFuse.EvolveTimeoutReason, null);
+                    Reset();
+                }
                 return;
             }
 
+            _consecutiveTimeouts = 0;
             _active = null;
             bool applied = false;
             if (job.Task.IsFaulted)
