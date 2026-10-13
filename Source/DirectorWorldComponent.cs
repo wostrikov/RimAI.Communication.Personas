@@ -90,11 +90,11 @@ namespace Ustas.RimAI.Communication.Personas
         }
 
         /// <summary>
-        /// Forgets every pawn the game no longer holds. A prisoner Auto-Evolve had
-        /// anchored, a visitor whose daily status a dialogue asked for: each left
-        /// a timestamp and a character sheet here, and until 2026-10-13 only the
-        /// history and the Auto-Evolve choices were ever cleared - once, after a
-        /// load - so a long colony's save kept a sheet for pawns long gone.
+        /// Forgets every pawn the game no longer holds. A prisoner Auto-Evolve
+        /// anchored, a visitor whose daily status a dialogue asked for: each
+        /// leaves a timestamp and a character sheet here, and nothing else ever
+        /// takes them out, so without this a long colony's save keeps a sheet
+        /// for everyone who has walked across the map.
         /// </summary>
         void RemoveRecordsOfMissingPawns()
         {

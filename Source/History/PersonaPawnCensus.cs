@@ -14,10 +14,10 @@ namespace Ustas.RimAI.Communication.Personas.History
     /// leaves the dead out of what it reports as unspawned, so the body in the
     /// grave - which a resurrector serum can still bring back - is in none of
     /// them. Caravans and transporters in flight are a list of their own as
-    /// well, and AllMapsWorldAndTemporary_AliveOrDead, which this module asked
-    /// until 2026-10-13, does not include it. Either way a pawn that was only
-    /// away or only dead lost its persona history and its Auto-Evolve choices
-    /// on the next load.
+    /// well, and AllMapsWorldAndTemporary_AliveOrDead, the obvious one to
+    /// ask, does not include it. Asked that way, a pawn that is only away or
+    /// only dead loses its persona history and its Auto-Evolve choices on the
+    /// next load.
     /// </summary>
     internal static class PersonaPawnCensus
     {

@@ -3,8 +3,8 @@ using System.IO;
 using Ustas.RimAI.Communication.Personas.Policy;
 
 /// <summary>
-/// What the review of the donor's 2026-10-08 release brought in, and the
-/// defects of our own that turned up while reading the module for it: the
+/// What a review of the upstream mod's release brought in, and the defects
+/// of our own that turned up while reading the module for it: the
 /// per-pawn records nothing ever cleared, a character sheet built twice, the
 /// equipment section the profile carried twice, and the pawns that lost their
 /// history for being dead or away from home on the day of a load.
