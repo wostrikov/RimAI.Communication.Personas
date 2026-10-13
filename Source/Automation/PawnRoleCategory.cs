@@ -15,6 +15,35 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         Other
     }
 
+    /// <summary>
+    /// Where a pawn stood at one moment: its role and the factions that role is
+    /// made of. Taken before a faction or guest-status change so the persona
+    /// update can say what the pawn came from; the factions are kept as they
+    /// are and put into words later, on the world tick.
+    /// </summary>
+    public struct PawnRoleSnapshot
+    {
+        public PawnRoleCategory Role;
+        public Faction Faction;
+        // Whose prisoner the pawn is, and the faction a slave was taken from.
+        public Faction HeldBy;
+        public Faction TakenFrom;
+
+        public static PawnRoleSnapshot Of(Pawn pawn)
+        {
+            var snapshot = new PawnRoleSnapshot { Role = PawnRoleClassifier.Classify(pawn) };
+            if (snapshot.Role == PawnRoleCategory.None) return snapshot;
+            snapshot.Faction = pawn.Faction;
+            Pawn_GuestTracker guest = pawn.guest;
+            if (guest != null)
+            {
+                if (guest.IsPrisoner) snapshot.HeldBy = guest.HostFaction;
+                if (guest.IsSlave) snapshot.TakenFrom = guest.SlaveFaction;
+            }
+            return snapshot;
+        }
+    }
+
     public static class PawnRoleClassifier
     {
         public static readonly PawnRoleCategory[] Ordered =

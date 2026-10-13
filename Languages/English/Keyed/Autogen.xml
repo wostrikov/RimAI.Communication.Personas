@@ -79,5 +79,5 @@
   <RPD_AutoGen_AdvancedPresetTip>A Communication prompt preset to use for this category instead of the prompt slot. {{director_trigger_context}} in it holds the event that asked for the persona. If the preset is missing or renders nothing, the slot's prompt is used.</RPD_AutoGen_AdvancedPresetTip>
   <RPD_AutoGen_AdvancedNone>None (use the slot)</RPD_AutoGen_AdvancedNone>
   <RPD_AutoGen_Notes>Notes for every Auto-Gen request</RPD_AutoGen_Notes>
-  <RPD_AutoGen_NotesTip>Added to the built-in Auto-Gen prompt, for every category. Preset variables such as {{pawn.name}} work here. Not used by a category that has a Communication preset.</RPD_AutoGen_NotesTip>
+  <RPD_AutoGen_NotesTip>Added to the built-in Auto-Gen prompt, for every category. Preset variables such as {{pawn.name}} work here. A category that has a Communication preset gets them where the preset says {{autogen_director_notes}}.</RPD_AutoGen_NotesTip>
 </LanguageData>

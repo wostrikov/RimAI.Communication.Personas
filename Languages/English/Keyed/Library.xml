@@ -35,6 +35,10 @@
   <RPD_Library_TargetMissing>WARNING: Def not found! (Mod missing?)</RPD_Library_TargetMissing>
   <RPD_Library_PresetsPool>Allowed Presets Pool (Randomly picked):</RPD_Library_PresetsPool>
   <RPD_Library_NoDefsFound>No compatible defs found</RPD_Library_NoDefsFound>
+  <RPD_Library_AgeRange>Age, years:</RPD_Library_AgeRange>
+  <RPD_Library_AgeRangeTip>The rule applies to pawns whose biological age is within this range, both ends included.</RPD_Library_AgeRangeTip>
+  <RPD_Library_SelectAll>Select all</RPD_Library_SelectAll>
+  <RPD_Library_UnselectAll>Unselect all</RPD_Library_UnselectAll>
 
   <!-- Preset Browser Window -->
   <RPD_Browser_ApplySelected>Apply Selected</RPD_Browser_ApplySelected>
@@ -47,6 +51,7 @@
   <RPD_RuleType_FactionDef>Faction</RPD_RuleType_FactionDef>
   <RPD_RuleType_RaceDef>Race</RPD_RuleType_RaceDef>
   <RPD_RuleType_XenotypeDef>Xenotype</RPD_RuleType_XenotypeDef>
+  <RPD_RuleType_Age>Age</RPD_RuleType_Age>
 <!-- Import/Export Window -->
   <RPD_IO_Export>Export...</RPD_IO_Export>
   <RPD_IO_TipExport>Left-click: Copy to Clipboard\nRight-click: Save to File</RPD_IO_TipExport>

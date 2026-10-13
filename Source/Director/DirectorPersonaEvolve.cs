@@ -32,8 +32,10 @@ public static class DirectorPersonaEvolve
         /// triggered it. Overwrite asks for a rewritten persona instead of a
         /// development line. A Communication prompt preset selected for evolve
         /// owns the whole prompt; it reaches the triggering events through
-        /// {{director_trigger_context}}. Auto-Evolve's own notes are added to the
-        /// built-in prompt of an automatic request only.
+        /// {{director_trigger_context}}, the memories since the last update
+        /// through {{pawn.d_evolve_memories}} and Auto-Evolve's notes through
+        /// {{evolve_director_notes}}. Those notes belong to an automatic request
+        /// only, in a preset and in the built-in prompt alike.
         /// </summary>
         public static (TalkRequest request, string currentPersona) PrepareEvolveRequest(
             Pawn p,
@@ -57,7 +59,7 @@ public static class DirectorPersonaEvolve
                 string finalPrompt = "";
                 string finalContext = "";
 
-                if (DirectorPresetRenderer.TryRender(presetName, p, triggerEvents, out string presetContext, out string presetPrompt))
+                if (DirectorPresetRenderer.TryRender(presetName, p, triggerEvents, out string presetContext, out string presetPrompt, automatic: editorWindow == null))
                 {
                     finalContext = presetContext;
                     finalPrompt = presetPrompt;

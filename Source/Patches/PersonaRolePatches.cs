@@ -22,12 +22,12 @@ namespace Ustas.RimAI.Communication.Personas.Patches
 
     internal static class Patch_PersonaRoleOnSetFaction
     {
-        static void Prefix(Pawn __instance, out PawnRoleCategory __state)
+        static void Prefix(Pawn __instance, out PawnRoleSnapshot __state)
         {
             __state = PersonaRoleHook.Capture(__instance);
         }
 
-        static void Postfix(Pawn __instance, PawnRoleCategory __state)
+        static void Postfix(Pawn __instance, PawnRoleSnapshot __state)
         {
             PersonaRoleHook.Record(__instance, __state);
         }
@@ -35,12 +35,12 @@ namespace Ustas.RimAI.Communication.Personas.Patches
 
     internal static class Patch_PersonaRoleOnGuestStatus
     {
-        static void Prefix(Pawn ___pawn, out PawnRoleCategory __state)
+        static void Prefix(Pawn ___pawn, out PawnRoleSnapshot __state)
         {
             __state = PersonaRoleHook.Capture(___pawn);
         }
 
-        static void Postfix(Pawn ___pawn, PawnRoleCategory __state)
+        static void Postfix(Pawn ___pawn, PawnRoleSnapshot __state)
         {
             PersonaRoleHook.Record(___pawn, __state);
         }
@@ -57,18 +57,18 @@ namespace Ustas.RimAI.Communication.Personas.Patches
 
     internal static class PersonaRoleHook
     {
-        internal static PawnRoleCategory Capture(Pawn pawn)
+        internal static PawnRoleSnapshot Capture(Pawn pawn)
         {
-            if (pawn?.RaceProps == null || !pawn.RaceProps.Humanlike || PawnGenerator.IsBeingGenerated(pawn)) return PawnRoleCategory.None;
+            if (pawn?.RaceProps == null || !pawn.RaceProps.Humanlike || PawnGenerator.IsBeingGenerated(pawn)) return default;
             PersonaGameEventInbox inbox = PersonaHookBoundary.Inbox;
-            if (inbox == null || !inbox.WantsRoleChanges) return PawnRoleCategory.None;
-            return PawnRoleClassifier.Classify(pawn);
+            if (inbox == null || !inbox.WantsRoleChanges) return default;
+            return PawnRoleSnapshot.Of(pawn);
         }
 
         /// <summary>Records where the pawn started; its new role is read once the change has settled.</summary>
-        internal static void Record(Pawn pawn, PawnRoleCategory before)
+        internal static void Record(Pawn pawn, PawnRoleSnapshot before)
         {
-            if (before == PawnRoleCategory.None) return;
+            if (before.Role == PawnRoleCategory.None) return;
             PersonaHookBoundary.Inbox?.Record(new PersonaGameEvent { Kind = PersonaGameEventKind.RoleChange, Subject = pawn, From = before });
         }
     }

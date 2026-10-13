@@ -62,7 +62,8 @@ namespace Ustas.RimAI.Communication.Personas
         }
     }
 
-    public enum RuleType { FactionDef, RaceDef, XenotypeDef }
+    // Saved by name, so a new kind goes at the end and nothing is renumbered.
+    public enum RuleType { FactionDef, RaceDef, XenotypeDef, Age }
 
     public class AssignmentRule : IExposable
     {
@@ -71,6 +72,10 @@ namespace Ustas.RimAI.Communication.Personas
         public RuleType type;
         public int priority = 0;
         public List<string> allowedPresetIds = new List<string>();
+        // An Age rule's range in biological years, both ends inclusive; the
+        // other kinds do not read it.
+        public int minAge = PersonaScribeLabels.AssignmentRule.DefaultMinAge;
+        public int maxAge = PersonaScribeLabels.AssignmentRule.DefaultMaxAge;
 
         public void ExposeData()
         {
@@ -79,6 +84,8 @@ namespace Ustas.RimAI.Communication.Personas
             Scribe_Values.Look(ref type, PersonaScribeLabels.AssignmentRule.Type);
             Scribe_Values.Look(ref priority, PersonaScribeLabels.AssignmentRule.Priority, PersonaScribeLabels.AssignmentRule.DefaultPriority);
             Scribe_Collections.Look(ref allowedPresetIds, PersonaScribeLabels.AssignmentRule.AllowedPresetIds, LookMode.Value);
+            Scribe_Values.Look(ref minAge, PersonaScribeLabels.AssignmentRule.MinAge, PersonaScribeLabels.AssignmentRule.DefaultMinAge);
+            Scribe_Values.Look(ref maxAge, PersonaScribeLabels.AssignmentRule.MaxAge, PersonaScribeLabels.AssignmentRule.DefaultMaxAge);
         }
     }
 

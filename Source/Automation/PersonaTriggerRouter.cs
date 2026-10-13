@@ -13,7 +13,9 @@ namespace Ustas.RimAI.Communication.Personas.Automation
     /// status in separate steps, and only the state after both is its new role.
     ///
     /// The context strings are written for the model, in the same plain English
-    /// as the rest of the Director's prompt data.
+    /// as the rest of the Director's prompt data; their wording is
+    /// <see cref="PersonaTriggerContextPolicy"/>'s, and this class supplies the
+    /// names.
     /// </summary>
     public sealed class PersonaTriggerRouter
     {
@@ -55,8 +57,8 @@ namespace Ustas.RimAI.Communication.Personas.Automation
 
             foreach (PersonaGameEvent change in roleStart.Values)
             {
-                PawnRoleCategory to = PawnRoleClassifier.Classify(change.Subject);
-                if (to != PawnRoleCategory.None && to != change.From)
+                PawnRoleSnapshot to = PawnRoleSnapshot.Of(change.Subject);
+                if (to.Role != PawnRoleCategory.None && to.Role != change.From.Role)
                     DispatchRoleChange(change.Subject, change.From, to, world, now);
             }
         }
@@ -86,17 +88,18 @@ namespace Ustas.RimAI.Communication.Personas.Automation
             }
         }
 
-        void DispatchRoleChange(Pawn pawn, PawnRoleCategory from, PawnRoleCategory to, DirectorWorldComponent world, int now)
+        void DispatchRoleChange(Pawn pawn, PawnRoleSnapshot from, PawnRoleSnapshot to, DirectorWorldComponent world, int now)
         {
             PersonaAutomationSettings s = Settings;
             if (s == null || !AutoEvolveEligibility.IsLivePersonaPawn(pawn)) return;
 
-            string key = "role:" + pawn.thingIDNumber + ":" + from + ":" + to;
-            string context = "Role changed from " + from + " to " + to + ".";
+            string key = "role:" + pawn.thingIDNumber + ":" + from.Role + ":" + to.Role;
+            string context = PersonaTriggerContextPolicy.RoleChange(
+                from.Role.ToString(), to.Role.ToString(), DescribeRoleState(from), DescribeRoleState(to));
 
             // A pawn still wearing a placeholder gets a real persona written for
             // its new role; one with a persona of its own grows into the role.
-            AutoGenCategorySettings category = s.GetCategory(to);
+            AutoGenCategorySettings category = s.GetCategory(to.Role);
             if (s.autoGenEnabled && category != null && category.onRoleChange
                 && PersonaOwnership.HasNoOwnPersona(pawn, world.History))
             {
@@ -125,13 +128,15 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         /// </summary>
         void Birth(Pawn child, Pawn mother, Pawn father, int now)
         {
-            string context = child != null
-                ? "Became a parent: " + child.LabelShortCap + " was born."
-                : "Became a parent: a child was born.";
-            if (mother != null) OfferEvolve(mother, "birth:" + mother.thingIDNumber, context, now);
+            string childName = child?.LabelShortCap;
+            Pawn otherOfMother = father != mother ? father : null;
+            if (mother != null)
+                OfferEvolve(mother, "birth:" + mother.thingIDNumber,
+                    PersonaTriggerContextPolicy.Birth(childName, otherOfMother?.LabelShortCap), now);
             if (father != null && father != mother && mother != null
                 && LovePartnerRelationUtility.LovePartnerRelationExists(mother, father))
-                OfferEvolve(father, "birth:" + father.thingIDNumber, context, now);
+                OfferEvolve(father, "birth:" + father.thingIDNumber,
+                    PersonaTriggerContextPolicy.Birth(childName, mother.LabelShortCap), now);
         }
 
         void DirectFamilyDeath(Pawn deceased, int now)
@@ -152,7 +157,44 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         {
             if (trait?.def == null || trait.Suppressed) return;
             OfferEvolve(pawn, "trait:" + pawn.thingIDNumber + ":" + trait.def.defName,
-                "Gained a new trait: " + trait.LabelCap + ".", now);
+                PersonaTriggerContextPolicy.TraitGained(trait.LabelCap, DescribeTrait(trait, pawn)), now);
+        }
+
+        /// <summary>The trait's own description, as the character card shows it for this pawn.</summary>
+        static string DescribeTrait(Trait trait, Pawn pawn)
+        {
+            string description = trait.CurrentData?.description;
+            if (string.IsNullOrWhiteSpace(description)) return null;
+            return description.Formatted(pawn.Named("PAWN")).AdjustedFor(pawn).Resolve().StripTags();
+        }
+
+        static string DescribeRoleState(PawnRoleSnapshot state) =>
+            PersonaTriggerContextPolicy.RoleState(
+                DescribeFaction(state.Faction), DescribeFaction(state.HeldBy), DescribeFaction(state.TakenFrom));
+
+        /// <summary>The faction's name and how it stands towards the colony; null for no faction.</summary>
+        static string DescribeFaction(Faction faction)
+        {
+            if (faction == null) return null;
+            string standing = null;
+            if (faction.IsPlayer)
+            {
+                standing = "the player's colony";
+            }
+            else
+            {
+                Faction player = Faction.OfPlayerSilentFail;
+                // allowNull: a temporary faction can have no relation to anyone,
+                // and asking for one the plain way logs an error about it.
+                FactionRelation relation = player != null ? faction.RelationWith(player, allowNull: true) : null;
+                if (relation != null)
+                {
+                    standing = relation.kind == FactionRelationKind.Hostile ? "hostile to the colony"
+                        : relation.kind == FactionRelationKind.Ally ? "allied with the colony"
+                        : "neutral to the colony";
+                }
+            }
+            return PersonaTriggerContextPolicy.Faction(faction.Name, standing);
         }
 
         /// <summary>Parents, children and spouses: the relations whose death reshapes a person.</summary>

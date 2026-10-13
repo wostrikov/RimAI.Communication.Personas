@@ -40,9 +40,10 @@
   <RPD_Library_TargetMissing>УВАГА: визначення не знайдено! (Мод відсутній?)</RPD_Library_TargetMissing>
   <RPD_Library_NoDefsFound>Сумісних визначень не знайдено</RPD_Library_NoDefsFound>
   <RPD_RuleType_Age>Вік</RPD_RuleType_Age>
-  <RPD_Library_AgeRange>Діапазон віку</RPD_Library_AgeRange>
+  <RPD_Library_AgeRange>Вік, років:</RPD_Library_AgeRange>
+  <RPD_Library_AgeRangeTip>Правило діє для персонажів, чий біологічний вік у цьому діапазоні, межі включно.</RPD_Library_AgeRangeTip>
   <RPD_Library_SelectAll>Вибрати все</RPD_Library_SelectAll>
-  <RPD_Library_UnselectAll>Скасувати вибір усього</RPD_Library_UnselectAll>
+  <RPD_Library_UnselectAll>Зняти вибір</RPD_Library_UnselectAll>
   <RPD_Library_Category>Категорія: {0}</RPD_Library_Category>
   <RPD_Library_PresetsPool>Бібліотека пресетів</RPD_Library_PresetsPool>
   <!-- Preset Browser Window -->

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
@@ -10,20 +11,28 @@ namespace Ustas.RimAI.Communication.Personas.UI
     /// <summary>
     /// Auto-Evolve pawn by pawn: leave one out, or give it its own schedule.
     /// Lists the pawns Auto-Evolve can cover on every map; captives are listed
-    /// but greyed while the setting that covers them is off.
+    /// but greyed while the setting that covers them is off. Ticked rows take
+    /// the bar's actions together, which is what makes forty colonists workable.
     /// </summary>
     public sealed class Window_AutoEvolveRoster : Window
     {
         const float RowHeight = 30f;
-        const float NameWidth = 190f;
-        const float RoleWidth = 110f;
-        const float CheckWidth = 90f;
-        const float IntervalWidth = 130f;
+        const float SelectWidth = 30f;
+        const float NameWidth = 200f;
+        const float RoleWidth = 120f;
+        const float CheckWidth = 100f;
+        const float IntervalWidth = 140f;
+        const float BarHeight = 26f;
+        const float BarGap = 6f;
 
         readonly PersonaAutomationSettings _settings;
         readonly DirectorWorldComponent _world;
         readonly PawnRosterView _roster = new PawnRosterView();
         readonly Dictionary<int, string> _intervalBuffers = new Dictionary<int, string>();
+        // The ticked rows, by pawn id; kept across the search so a selection
+        // can be gathered from several searches.
+        readonly HashSet<int> _selected = new HashSet<int>();
+        string _bulkInterval = string.Empty;
         List<Pawn> _pawns;
         int _refreshAtFrame;
 
@@ -36,7 +45,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             absorbInputAroundWindow = true;
         }
 
-        public override Vector2 InitialSize => new Vector2(720f, 560f);
+        public override Vector2 InitialSize => new Vector2(860f, 580f);
 
         public override void DoWindowContents(Rect inRect)
         {
@@ -54,6 +63,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             {
                 _pawns = CollectPawns();
                 _refreshAtFrame = Time.frameCount + 120;
+                ForgetSelectionOfMissingPawns();
             }
 
             GUI.color = Color.gray;
@@ -63,8 +73,9 @@ namespace Ustas.RimAI.Communication.Personas.UI
             Text.Font = GameFont.Small;
             GUI.color = Color.white;
 
-            DrawHeader(new Rect(inRect.x, inRect.y + 58f, inRect.width, 24f));
-            Rect body = new Rect(inRect.x, inRect.y + 84f, inRect.width, inRect.height - 84f - 50f);
+            DrawBulkBar(new Rect(inRect.x, inRect.y + 58f, inRect.width, BarHeight));
+            DrawHeader(new Rect(inRect.x, inRect.y + 90f, inRect.width, 24f));
+            Rect body = new Rect(inRect.x, inRect.y + 116f, inRect.width, inRect.height - 116f - 50f);
             _roster.Draw(body, _pawns, RowHeight, DrawRow);
         }
 
@@ -85,16 +96,120 @@ namespace Ustas.RimAI.Communication.Personas.UI
             return pawns;
         }
 
-        static void DrawHeader(Rect row)
+        void ForgetSelectionOfMissingPawns()
         {
+            if (_selected.Count == 0) return;
+            var listed = new HashSet<int>();
+            foreach (Pawn pawn in _pawns) listed.Add(pawn.thingIDNumber);
+            _selected.RemoveWhere(id => !listed.Contains(id));
+        }
+
+        /// <summary>What the ticked rows do together: in or out of Auto-Evolve, and one interval for all.</summary>
+        void DrawBulkBar(Rect row)
+        {
+            PawnAutoEvolveRegistry registry = _world.AutoEvolvePawns;
+            bool any = _selected.Count > 0;
+            float x = row.x;
+
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(new Rect(x, row.y, 120f, row.height), "RPD_AutoEvolve_SelectedCount".Translate(_selected.Count));
+            Text.Anchor = TextAnchor.UpperLeft;
+            x += 120f + BarGap;
+
+            if (BarButton(ref x, row, 100f, "RPD_AutoEvolve_EnableSelected", any))
+                ForSelected(pawn => registry.SetExcluded(pawn, false));
+            if (BarButton(ref x, row, 100f, "RPD_AutoEvolve_DisableSelected", any))
+                ForSelected(pawn => registry.SetExcluded(pawn, true));
+
+            x += BarGap;
+            Rect intervalStart = new Rect(x, row.y, 0f, row.height);
+            Text.Anchor = TextAnchor.MiddleRight;
+            Widgets.Label(new Rect(x, row.y, 120f, row.height), "RPD_AutoEvolve_BatchInterval".Translate());
+            Text.Anchor = TextAnchor.UpperLeft;
+            x += 120f + BarGap;
+            _bulkInterval = DigitsOnly(Widgets.TextField(new Rect(x, row.y + 1f, 56f, row.height - 2f), _bulkInterval));
+            x += 56f + BarGap;
+            if (BarButton(ref x, row, 110f, "RPD_AutoEvolve_ApplyInterval", any))
+            {
+                int days = _bulkInterval.Length == 0 ? PawnAutoEvolveOverride.UseDefaultInterval : int.Parse(_bulkInterval);
+                ForSelected(pawn =>
+                {
+                    registry.SetInterval(pawn, days);
+                    // The row shows what it was typed; drop that so it shows what it is now.
+                    _intervalBuffers.Remove(pawn.thingIDNumber);
+                });
+            }
+            intervalStart.xMax = x - BarGap;
+            TooltipHandler.TipRegion(intervalStart, "RPD_AutoEvolve_BatchIntervalTip".Translate());
+
+            x += BarGap;
+            if (BarButton(ref x, row, 130f, "RPD_AutoEvolve_ClearSelection", any))
+                _selected.Clear();
+        }
+
+        static bool BarButton(ref float x, Rect row, float width, string key, bool active)
+        {
+            bool clicked = Widgets.ButtonText(new Rect(x, row.y, width, row.height), key.Translate(), active: active);
+            x += width + BarGap;
+            return clicked && active;
+        }
+
+        void ForSelected(Action<Pawn> change)
+        {
+            foreach (Pawn pawn in _pawns)
+            {
+                if (_selected.Contains(pawn.thingIDNumber)) change(pawn);
+            }
+        }
+
+        // Four digits is past the longest interval the setting accepts, and
+        // keeps the number inside an int whatever is pasted.
+        static string DigitsOnly(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return string.Empty;
+            string digits = new string(Array.FindAll(text.ToCharArray(), char.IsDigit));
+            return digits.Length > 4 ? digits.Substring(0, 4) : digits;
+        }
+
+        void DrawHeader(Rect row)
+        {
+            DrawSelectAll(new Rect(row.x + 4f, row.y, SelectWidth, row.height));
+
             GUI.color = Color.gray;
-            float x = row.x + 4f;
+            float x = row.x + 4f + SelectWidth;
             Header(ref x, row, NameWidth, "RPD_AutoEvolve_RosterPawn".Translate(), null);
             Header(ref x, row, RoleWidth, "RPD_AutoEvolve_RosterRole".Translate(), null);
             Header(ref x, row, CheckWidth, "RPD_AutoEvolve_RosterEnabled".Translate(), "RPD_AutoEvolve_RosterEnabledTip".Translate());
             Header(ref x, row, IntervalWidth, "RPD_AutoEvolve_RosterInterval".Translate(), "RPD_AutoEvolve_RosterIntervalTip".Translate());
             Header(ref x, row, row.xMax - x, "RPD_AutoEvolve_RosterLast".Translate(), null);
             GUI.color = Color.white;
+        }
+
+        /// <summary>Ticks or clears every row the search is showing; rows it hides keep their own state.</summary>
+        void DrawSelectAll(Rect rect)
+        {
+            IReadOnlyList<Pawn> shown = _roster.Shown;
+            bool all = shown.Count > 0;
+            foreach (Pawn pawn in shown)
+            {
+                if (!_selected.Contains(pawn.thingIDNumber))
+                {
+                    all = false;
+                    break;
+                }
+            }
+
+            bool ticked = all;
+            Widgets.Checkbox(new Vector2(rect.x, rect.y), ref ticked, disabled: shown.Count == 0);
+            if (ticked != all)
+            {
+                foreach (Pawn pawn in shown)
+                {
+                    if (ticked) _selected.Add(pawn.thingIDNumber);
+                    else _selected.Remove(pawn.thingIDNumber);
+                }
+            }
+            TooltipHandler.TipRegion(rect, "RPD_AutoEvolve_SelectAllTip".Translate());
         }
 
         static void Header(ref float x, Rect row, float width, string text, string tip)
@@ -112,6 +227,16 @@ namespace Ustas.RimAI.Communication.Personas.UI
             bool covered = role == PawnRoleCategory.Colonist || _settings.autoEvolveIncludeCaptives;
 
             float x = row.x + 4f;
+            bool selected = _selected.Contains(pawn.thingIDNumber);
+            bool wasSelected = selected;
+            Widgets.Checkbox(new Vector2(x, row.y + 3f), ref selected);
+            if (selected != wasSelected)
+            {
+                if (selected) _selected.Add(pawn.thingIDNumber);
+                else _selected.Remove(pawn.thingIDNumber);
+            }
+            x += SelectWidth;
+
             Text.Anchor = TextAnchor.MiddleLeft;
             if (!covered) GUI.color = Color.gray;
             Widgets.Label(new Rect(x, row.y, NameWidth, row.height), pawn.LabelShortCap);
@@ -151,7 +276,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
             string edited = Widgets.TextField(rect, buffer);
             if (edited != buffer)
             {
-                string digits = new string(System.Array.FindAll(edited.ToCharArray(), char.IsDigit));
+                string digits = DigitsOnly(edited);
                 _intervalBuffers[id] = digits;
                 registry.SetInterval(pawn, digits.Length == 0 ? PawnAutoEvolveOverride.UseDefaultInterval : int.Parse(digits));
             }

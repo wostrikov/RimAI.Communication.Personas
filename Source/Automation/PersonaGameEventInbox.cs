@@ -24,7 +24,8 @@ namespace Ustas.RimAI.Communication.Personas.Automation
         public Pawn Other;
         public Pawn Third;
         public Trait Trait;
-        public PawnRoleCategory From;
+        // A role change: where the pawn stood before it.
+        public PawnRoleSnapshot From;
     }
 
     /// <summary>

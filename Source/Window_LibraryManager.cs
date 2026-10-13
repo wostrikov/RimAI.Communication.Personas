@@ -3,6 +3,7 @@ using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Ustas.RimAI.Communication.Personas.Policy;
 using Verse;
 
 namespace Ustas.RimAI.Communication.Personas
@@ -332,10 +333,10 @@ namespace Ustas.RimAI.Communication.Personas
             float bottomMargin = 70f;
             Rect listRect = new Rect(innerLeft.x, topY, innerLeft.width, innerLeft.height - (topY - innerLeft.y) - bottomMargin);
             var filtered = PersonasMod.Settings.assignmentRules
-                .Where(r => searchWidget.filter.Matches(r.targetDefName ?? "")).ToList();
+                .Where(r => searchWidget.filter.Matches(RuleTargetLabel(r))).ToList();
 
             DrawLeftList(listRect, filtered,
-                r => $"{r.type}: {r.targetDefName ?? "None"} (P:{r.priority})",
+                r => $"{TranslateRuleType(r.type)}: {RuleTargetLabel(r)} (P:{r.priority})",
                 r => selectedRule = r,
                 ref scrollRight,
                 selectedRule,
@@ -384,13 +385,20 @@ namespace Ustas.RimAI.Communication.Personas
                     Find.WindowStack.Add(new FloatMenu(opts));
                 }
 
-                string btnLabel = selectedRule.targetDefName ?? "RPD_Library_TargetSelect".Translate();
-                if (!IsDefExisting(selectedRule.type, selectedRule.targetDefName)) GUI.color = Color.red;
-                if (editor.ButtonText("RPD_Library_TargetDef".Translate(btnLabel))) OpenDefSelector(selectedRule);
-                GUI.color = Color.white;
+                if (selectedRule.type == RuleType.Age)
+                {
+                    DrawAgeRange(editor.GetRect(28f), selectedRule);
+                }
+                else
+                {
+                    string btnLabel = selectedRule.targetDefName ?? "RPD_Library_TargetSelect".Translate();
+                    if (!IsDefExisting(selectedRule.type, selectedRule.targetDefName)) GUI.color = Color.red;
+                    if (editor.ButtonText("RPD_Library_TargetDef".Translate(btnLabel))) OpenDefSelector(selectedRule);
+                    GUI.color = Color.white;
+                }
 
                 editor.GapLine();
-                editor.Label("RPD_Library_PresetsPool".Translate());
+                DrawPoolHeader(editor.GetRect(24f), selectedRule);
 
                 float poolH = rightRect.height - editor.CurHeight - 80f;
                 Rect poolRect = editor.GetRect(poolH);
@@ -469,6 +477,64 @@ namespace Ustas.RimAI.Communication.Personas
             }
 
             Widgets.EndScrollView();
+        }
+
+        /// <summary>What a rule is about, for the list and its search: the def, or the years of an Age rule.</summary>
+        private static string RuleTargetLabel(AssignmentRule rule)
+        {
+            if (rule.type == RuleType.Age) return rule.minAge + "-" + rule.maxAge;
+            return rule.targetDefName ?? "None";
+        }
+
+        private static void DrawAgeRange(Rect row, AssignmentRule rule)
+        {
+            const float fieldWidth = 60f;
+            Text.Anchor = TextAnchor.MiddleLeft;
+            string label = "RPD_Library_AgeRange".Translate();
+            float labelWidth = Mathf.Min(Text.CalcSize(label).x + 10f, row.width - 2f * fieldWidth - 30f);
+            Widgets.Label(new Rect(row.x, row.y, labelWidth, row.height), label);
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            float x = row.x + labelWidth;
+            string minBuffer = rule.minAge.ToString();
+            Widgets.TextFieldNumeric(new Rect(x, row.y, fieldWidth, row.height), ref rule.minAge, ref minBuffer,
+                PersonaAssignmentRulePolicy.MinAllowedAge, PersonaAssignmentRulePolicy.MaxAllowedAge);
+            x += fieldWidth;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(new Rect(x, row.y, 30f, row.height), "-");
+            Text.Anchor = TextAnchor.UpperLeft;
+            x += 30f;
+            string maxBuffer = rule.maxAge.ToString();
+            Widgets.TextFieldNumeric(new Rect(x, row.y, fieldWidth, row.height), ref rule.maxAge, ref maxBuffer,
+                PersonaAssignmentRulePolicy.MinAllowedAge, PersonaAssignmentRulePolicy.MaxAllowedAge);
+            TooltipHandler.TipRegion(row, "RPD_Library_AgeRangeTip".Translate());
+        }
+
+        /// <summary>The pool's heading, with the two buttons that tick or clear every preset at once.</summary>
+        private static void DrawPoolHeader(Rect row, AssignmentRule rule)
+        {
+            const float buttonWidth = 130f;
+            // One line whatever the language: the heading shares its row with
+            // two buttons, and a wrapped one would run into the pool below.
+            Rect heading = new Rect(row.x, row.y, row.width - 2f * buttonWidth - 12f, row.height);
+            string title = "RPD_Library_PresetsPool".Translate();
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Text.WordWrap = false;
+            Widgets.Label(heading, title);
+            Text.WordWrap = true;
+            Text.Anchor = TextAnchor.UpperLeft;
+            TooltipHandler.TipRegion(heading, title);
+
+            var presets = PersonasMod.Settings.userPresets;
+            if (Widgets.ButtonText(new Rect(row.xMax - 2f * buttonWidth - 6f, row.y, buttonWidth, row.height), "RPD_Library_SelectAll".Translate()))
+            {
+                foreach (CustomPreset preset in presets)
+                {
+                    if (preset != null && !rule.allowedPresetIds.Contains(preset.id)) rule.allowedPresetIds.Add(preset.id);
+                }
+            }
+            if (Widgets.ButtonText(new Rect(row.xMax - buttonWidth, row.y, buttonWidth, row.height), "RPD_Library_UnselectAll".Translate()))
+                rule.allowedPresetIds.Clear();
         }
 
         private bool IsDefExisting(RuleType type, string defName)
@@ -559,6 +625,8 @@ namespace Ustas.RimAI.Communication.Personas
                     return "RPD_RuleType_RaceDef".Translate();
                 case RuleType.XenotypeDef:
                     return "RPD_RuleType_XenotypeDef".Translate();
+                case RuleType.Age:
+                    return "RPD_RuleType_Age".Translate();
                 default:
                     return type.ToString();
             }

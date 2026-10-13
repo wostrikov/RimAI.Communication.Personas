@@ -123,5 +123,5 @@
   <RPD_AutoGen_AdvancedPresetTip>Пресет промпту Communication для цієї категорії замість промпту зі слота. {{director_trigger_context}} у ньому містить подію, яка попросила персону. Якщо пресету немає або він нічого не дає, використовується промпт слота.</RPD_AutoGen_AdvancedPresetTip>
   <RPD_AutoGen_AdvancedNone>Немає (промпт слота)</RPD_AutoGen_AdvancedNone>
   <RPD_AutoGen_Notes>Нотатки для кожного запиту автогенерації</RPD_AutoGen_Notes>
-  <RPD_AutoGen_NotesTip>Додаються до вбудованого промпту автогенерації для всіх категорій. Змінні пресетів на кшталт {{pawn.name}} тут працюють. Категорія з пресетом Communication їх не використовує.</RPD_AutoGen_NotesTip>
+  <RPD_AutoGen_NotesTip>Додаються до вбудованого промпту автогенерації для всіх категорій. Змінні пресетів на кшталт {{pawn.name}} тут працюють. Категорія з пресетом Communication отримує їх там, де в пресеті стоїть {{autogen_director_notes}}.</RPD_AutoGen_NotesTip>
 </LanguageData>

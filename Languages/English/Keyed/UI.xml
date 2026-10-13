@@ -168,9 +168,9 @@
   <RPD_AutoEvolve_InternalPromptNotice>Both modes use the Communication preset chosen for Evolve, if any; otherwise each mode uses its own built-in prompt. The editor's Evolve button follows this mode too.</RPD_AutoEvolve_InternalPromptNotice>
   <RPD_History_CurrentPersona>Current persona</RPD_History_CurrentPersona>
   <RPD_AutoEvolve_Notes>Notes for every Auto-Evolve request</RPD_AutoEvolve_Notes>
-  <RPD_AutoEvolve_NotesTip>Added to the built-in prompt of automatic evolves, not the editor's button. Preset variables such as {{pawn.name}} work here.</RPD_AutoEvolve_NotesTip>
+  <RPD_AutoEvolve_NotesTip>Added to the built-in prompt of automatic evolves, not the editor's button. Preset variables such as {{pawn.name}} work here. A Communication preset chosen for Evolve gets them where it says {{evolve_director_notes}}.</RPD_AutoEvolve_NotesTip>
   <RPD_AutoEvolve_Roster>Per-pawn settings...</RPD_AutoEvolve_Roster>
-  <RPD_AutoEvolve_RosterTip>Leave single pawns out of Auto-Evolve, or give one its own schedule.</RPD_AutoEvolve_RosterTip>
+  <RPD_AutoEvolve_RosterTip>Leave pawns out of Auto-Evolve or give them a schedule of their own, one by one or several at once.</RPD_AutoEvolve_RosterTip>
   <RPD_AutoEvolve_RosterTitle>Auto-Evolve by pawn</RPD_AutoEvolve_RosterTitle>
   <RPD_AutoEvolve_RosterNoGame>Available while a game is running.</RPD_AutoEvolve_RosterNoGame>
   <RPD_AutoEvolve_RosterHint>An empty interval follows the global one ({0} days); 0 means events only.</RPD_AutoEvolve_RosterHint>
@@ -184,6 +184,14 @@
   <RPD_AutoEvolve_RosterLast>Last update</RPD_AutoEvolve_RosterLast>
   <RPD_AutoEvolve_RosterNever>never</RPD_AutoEvolve_RosterNever>
   <RPD_AutoEvolve_RosterDaysAgo>{0} days ago</RPD_AutoEvolve_RosterDaysAgo>
+  <RPD_AutoEvolve_SelectAllTip>Tick or clear every pawn the list is showing.</RPD_AutoEvolve_SelectAllTip>
+  <RPD_AutoEvolve_SelectedCount>Selected: {0}</RPD_AutoEvolve_SelectedCount>
+  <RPD_AutoEvolve_EnableSelected>Enable</RPD_AutoEvolve_EnableSelected>
+  <RPD_AutoEvolve_DisableSelected>Disable</RPD_AutoEvolve_DisableSelected>
+  <RPD_AutoEvolve_BatchInterval>Interval, days:</RPD_AutoEvolve_BatchInterval>
+  <RPD_AutoEvolve_ApplyInterval>Apply</RPD_AutoEvolve_ApplyInterval>
+  <RPD_AutoEvolve_BatchIntervalTip>Gives every ticked pawn this interval. Empty: back to the global interval. 0: events only.</RPD_AutoEvolve_BatchIntervalTip>
+  <RPD_AutoEvolve_ClearSelection>Clear selection</RPD_AutoEvolve_ClearSelection>
   <RPD_Roster_Empty>No pawns to show.</RPD_Roster_Empty>
   <RPD_Batch_SearchTip>Search the visible pawn list by name.</RPD_Batch_SearchTip>
   <RPD_Filter_Other>Other</RPD_Filter_Other>

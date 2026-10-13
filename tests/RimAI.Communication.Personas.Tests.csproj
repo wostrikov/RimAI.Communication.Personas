@@ -13,6 +13,8 @@
     <Compile Include="..\Source\Policy\PersonaPresetLibraryIoPolicy.cs" Link="Policy\PersonaPresetLibraryIoPolicy.cs" />
     <Compile Include="..\Source\Policy\PersonaAutomationPolicy.cs" Link="Policy\PersonaAutomationPolicy.cs" />
     <Compile Include="..\Source\Policy\PersonaHistoryPolicy.cs" Link="Policy\PersonaHistoryPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaTriggerContextPolicy.cs" Link="Policy\PersonaTriggerContextPolicy.cs" />
+    <Compile Include="..\Source\Policy\PersonaAssignmentRulePolicy.cs" Link="Policy\PersonaAssignmentRulePolicy.cs" />
     <None Include="..\Source\Director\DirectorPersonalityGenerator.cs" Link="DirectorPersonalityGenerator.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Director\DirectorPersonaVariantFlow.cs" Link="DirectorPersonaVariantFlow.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Director\DirectorCharacterDataBuilder.cs" Link="DirectorCharacterDataBuilder.cs.src" CopyToOutputDirectory="PreserveNewest" />
@@ -21,5 +23,13 @@
     <None Include="..\Source\Window_PersonaVariantPicker.cs" Link="Window_PersonaVariantPicker.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\PersonasSettings.cs" Link="PersonasSettings.cs.src" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\Source\Window_ImportExport.cs" Link="Window_ImportExport.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\PersonaResolver.cs" Link="PersonaResolver.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\DirectorWorldComponent.cs" Link="DirectorWorldComponent.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\DirectorDataEngine.cs" Link="DirectorDataEngine.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\DirectorApiAdapter.cs" Link="DirectorApiAdapter.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Director\DirectorPresetRenderer.cs" Link="DirectorPresetRenderer.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\Director\DirectorPromptComposer.cs" Link="DirectorPromptComposer.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\History\PersonaPawnCensus.cs" Link="PersonaPawnCensus.cs.src" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Source\History\PersonaHistoryStore.cs" Link="PersonaHistoryStore.cs.src" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

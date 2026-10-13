@@ -69,14 +69,21 @@ public static class DirectorPromptComposer
 
             try
             {
-                List<Pawn> allPawns = DirectorContextTracker.GetPawns();
+                // The tracked list is the dialogue's participants as they were when
+                // the context was captured, and one of them can be gone by now: a
+                // null among them throws in every variable that walks the list.
+                List<Pawn> participants = DirectorContextTracker.GetPawns()?.FindAll(candidate => candidate != null);
                 PromptContext contextObj;
-                if (allPawns != null && allPawns.Contains(p))
+                if (participants != null && participants.Contains(p))
                 {
-                    contextObj = new PromptContext(allPawns)
+                    contextObj = new PromptContext(participants)
                     {
                         CurrentPawn = p
                     };
+                    // The list constructor takes the map of whoever is first, which
+                    // is not this pawn's, and is nothing when the first one is in a
+                    // caravan while this one stands on a map.
+                    contextObj.Map = p?.Map ?? participants.Find(candidate => candidate.Map != null)?.Map;
                 }
                 else
                 {

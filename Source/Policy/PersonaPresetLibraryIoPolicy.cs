@@ -22,6 +22,9 @@ public sealed class PersonaLibraryRuleRecord
     public string Type;
     public int Priority;
     public List<string> AllowedPresetIds = new List<string>();
+    // Read by an Age rule only; the defaults are the ones a rule is created with.
+    public int MinAge;
+    public int MaxAge = 99;
 }
 
 public sealed class PersonaLibrarySnapshot
@@ -74,6 +77,8 @@ public static class PersonaPresetLibraryIoPolicy
                 new XAttribute("type", rule.Type ?? string.Empty),
                 new XAttribute("priority", rule.Priority.ToString(CultureInfo.InvariantCulture)),
                 new XAttribute("target", rule.TargetDefName ?? string.Empty),
+                new XAttribute("minAge", rule.MinAge.ToString(CultureInfo.InvariantCulture)),
+                new XAttribute("maxAge", rule.MaxAge.ToString(CultureInfo.InvariantCulture)),
                 string.Join(",", rule.AllowedPresetIds ?? new List<string>())));
         }
 
@@ -134,6 +139,9 @@ public static class PersonaPresetLibraryIoPolicy
                 Type = (string)element.Attribute("type") ?? string.Empty,
                 Priority = ParseInt((string)element.Attribute("priority"), 0),
                 TargetDefName = (string)element.Attribute("target") ?? string.Empty,
+                // A file written before rules could go by age has neither attribute.
+                MinAge = ParseInt((string)element.Attribute("minAge"), 0),
+                MaxAge = ParseInt((string)element.Attribute("maxAge"), 99),
                 AllowedPresetIds = ids
             });
         }
@@ -191,6 +199,8 @@ public static class PersonaPresetLibraryIoPolicy
                     TargetDefName = rule.TargetDefName,
                     Type = rule.Type,
                     Priority = rule.Priority,
+                    MinAge = rule.MinAge,
+                    MaxAge = rule.MaxAge,
                     AllowedPresetIds = new List<string>(rule.AllowedPresetIds ?? new List<string>())
                 });
             }

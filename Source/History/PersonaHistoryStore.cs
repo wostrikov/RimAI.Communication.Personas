@@ -9,7 +9,7 @@ namespace Ustas.RimAI.Communication.Personas.History
     /// Persona history for every pawn, saved inside <see cref="DirectorWorldComponent"/>.
     /// Bounded twice: each pawn keeps at most the configured number of records
     /// (<see cref="PersonaHistoryPolicy.MaxMaxRecords"/> at the most), and pawns
-    /// that no longer exist anywhere are dropped when the world finishes loading.
+    /// that no longer exist anywhere are dropped after a load and once a day.
     /// </summary>
     public sealed class PersonaHistoryStore : IExposable
     {
@@ -74,15 +74,13 @@ namespace Ustas.RimAI.Communication.Personas.History
             foreach (int id in empty) _byPawn.Remove(id);
         }
 
-        /// <summary>Drops the history of pawns the game no longer knows, alive or dead.</summary>
-        public void RemoveMissingPawns()
+        /// <summary>
+        /// Drops the history of pawns the game no longer holds. <paramref name="known"/> is
+        /// <see cref="PersonaPawnCensus.KnownIds"/>: the caller asks once for everything it prunes.
+        /// </summary>
+        public void RemoveMissingPawns(HashSet<int> known)
         {
-            if (_byPawn.Count == 0) return;
-            var known = new HashSet<int>();
-            foreach (Pawn pawn in PawnsFinder.AllMapsWorldAndTemporary_AliveOrDead)
-            {
-                if (pawn != null) known.Add(pawn.thingIDNumber);
-            }
+            if (_byPawn.Count == 0 || known == null) return;
 
             var missing = new List<int>();
             foreach (int id in _byPawn.Keys)

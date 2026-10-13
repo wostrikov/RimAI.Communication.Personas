@@ -177,9 +177,9 @@
   <RPD_AutoEvolve_InternalPromptNotice>Обидва режими використовують пресет Communication, вибраний для розвитку, якщо він є; інакше кожен режим має свій вбудований промпт. Кнопка «Розвивати» в редакторі теж дотримується цього режиму.</RPD_AutoEvolve_InternalPromptNotice>
   <RPD_History_CurrentPersona>Поточна особистість</RPD_History_CurrentPersona>
   <RPD_AutoEvolve_Notes>Нотатки для кожного запиту автоеволюції</RPD_AutoEvolve_Notes>
-  <RPD_AutoEvolve_NotesTip>Додаються до вбудованого промпту автоматичної еволюції, а не кнопки в редакторі. Змінні пресетів на кшталт {{pawn.name}} тут працюють.</RPD_AutoEvolve_NotesTip>
+  <RPD_AutoEvolve_NotesTip>Додаються до вбудованого промпту автоматичної еволюції, а не кнопки в редакторі. Змінні пресетів на кшталт {{pawn.name}} тут працюють. Пресет Communication, вибраний для еволюції, отримує їх там, де в ньому стоїть {{evolve_director_notes}}.</RPD_AutoEvolve_NotesTip>
   <RPD_AutoEvolve_Roster>Налаштування для персонажів...</RPD_AutoEvolve_Roster>
-  <RPD_AutoEvolve_RosterTip>Виключити окремих персонажів з автоеволюції або дати комусь власний розклад.</RPD_AutoEvolve_RosterTip>
+  <RPD_AutoEvolve_RosterTip>Виключити персонажів з автоеволюції або дати їм власний розклад — по одному чи кільком одразу.</RPD_AutoEvolve_RosterTip>
   <RPD_AutoEvolve_RosterTitle>Автоеволюція за персонажами</RPD_AutoEvolve_RosterTitle>
   <RPD_AutoEvolve_RosterNoGame>Доступно лише під час гри.</RPD_AutoEvolve_RosterNoGame>
   <RPD_AutoEvolve_RosterHint>Порожній інтервал — загальний ({0} дн.); 0 — лише події.</RPD_AutoEvolve_RosterHint>
@@ -193,6 +193,14 @@
   <RPD_AutoEvolve_RosterLast>Останнє оновлення</RPD_AutoEvolve_RosterLast>
   <RPD_AutoEvolve_RosterNever>ніколи</RPD_AutoEvolve_RosterNever>
   <RPD_AutoEvolve_RosterDaysAgo>{0} дн. тому</RPD_AutoEvolve_RosterDaysAgo>
+  <RPD_AutoEvolve_SelectAllTip>Позначити або зняти всіх персонажів, яких показує список.</RPD_AutoEvolve_SelectAllTip>
+  <RPD_AutoEvolve_SelectedCount>Вибрано: {0}</RPD_AutoEvolve_SelectedCount>
+  <RPD_AutoEvolve_EnableSelected>Увімкнути</RPD_AutoEvolve_EnableSelected>
+  <RPD_AutoEvolve_DisableSelected>Вимкнути</RPD_AutoEvolve_DisableSelected>
+  <RPD_AutoEvolve_BatchInterval>Інтервал, днів:</RPD_AutoEvolve_BatchInterval>
+  <RPD_AutoEvolve_ApplyInterval>Застосувати</RPD_AutoEvolve_ApplyInterval>
+  <RPD_AutoEvolve_BatchIntervalTip>Задає цей інтервал усім позначеним персонажам. Порожньо — повернути загальний інтервал. 0 — лише події.</RPD_AutoEvolve_BatchIntervalTip>
+  <RPD_AutoEvolve_ClearSelection>Зняти вибір</RPD_AutoEvolve_ClearSelection>
   <RPD_Roster_Empty>Немає персонажів для показу.</RPD_Roster_Empty>
   <RPD_Batch_SearchTip>Пошук у видимому списку персонажів за іменем.</RPD_Batch_SearchTip>
   <RPD_Filter_Other>Інші</RPD_Filter_Other>

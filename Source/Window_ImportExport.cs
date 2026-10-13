@@ -249,6 +249,8 @@ namespace Ustas.RimAI.Communication.Personas
                         TargetDefName = rule.targetDefName,
                         Type = rule.type.ToString(),
                         Priority = rule.priority,
+                        MinAge = rule.minAge,
+                        MaxAge = rule.maxAge,
                         AllowedPresetIds = new List<string>(rule.allowedPresetIds ?? new List<string>())
                     });
                 }
@@ -289,6 +291,8 @@ namespace Ustas.RimAI.Communication.Personas
                     targetDefName = record.TargetDefName,
                     type = type,
                     priority = record.Priority,
+                    minAge = PersonaAssignmentRulePolicy.ClampAge(record.MinAge),
+                    maxAge = PersonaAssignmentRulePolicy.ClampAge(record.MaxAge),
                     allowedPresetIds = new List<string>(record.AllowedPresetIds ?? new List<string>())
                 });
             }

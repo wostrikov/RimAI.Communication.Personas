@@ -62,10 +62,11 @@ namespace Ustas.RimAI.Communication.Personas
 			{
 				stringBuilder.AppendLine(GetHealthInfo(p, context.Inc_Health_Desc));
 			}
-			if (context.Inc_Equipment) stringBuilder.AppendLine(GetEquipmentInfo(p, simpleEquipment));
+			// Once. The profile used to carry the equipment section twice, the
+			// second time always in full, which also undid simpleEquipment.
 			if (context.Inc_Equipment)
 			{
-				stringBuilder.AppendLine(GetEquipmentInfo(p));
+				stringBuilder.AppendLine(GetEquipmentInfo(p, simpleEquipment));
 			}
 			if (context.Inc_Inventory)
 			{
@@ -196,13 +197,19 @@ namespace Ustas.RimAI.Communication.Personas
 			return worldComp?.GetOrUpdateDailyDiff(p) ?? "";
 		}
 
+		/// <summary>
+		/// What the pawn has lived through since its persona was last updated.
+		/// Empty when nothing is recorded, so a preset can test for it and leave
+		/// its own heading out; this used to answer with a sentence saying there
+		/// were none, which no template can tell from a memory.
+		/// </summary>
 		public static string GetEvolveMemories(Pawn p)
 		{
             if (p == null) return "";
             var worldComp = Find.World.GetComponent<DirectorWorldComponent>();
 			int lastTick = worldComp?.GetLastEvolveTick(p) ?? -1;
 
-			return DirectorUtils.GetExternalMemories(p, lastTick) ?? "No new memories.";
+			return DirectorUtils.GetExternalMemories(p, lastTick) ?? "";
 		}
 
 		public static string GetTimeInfo(Pawn p)

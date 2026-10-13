@@ -40,6 +40,9 @@ namespace Ustas.RimAI.Communication.Personas
             Reg("d_status_diff", p => DirectorDataEngine.GetDailyStatusDiff(p), "Daily Status Changes");
             Reg("d_evolve_current_persona", p => DirectorDataEngine.GetActiveUIText(p), "Evolve: Text currently in editor window (or hediff)");
             Reg("d_evolve_time_info", p => DirectorDataEngine.GetTimeInfo(p), "Evolve: Time passed since last update");
+            Reg("d_evolve_memories",
+                p => DirectorPresetRenderer.IsRendering ? DirectorDataEngine.GetEvolveMemories(p) : "",
+                "Evolve: Memories since the last update (empty in a dialogue, and when there are none)");
             RimTalkPromptAPI.RegisterPawnVariable(ModId, "d_evolve_diff",
                 p => DirectorDataEngine.GetEvolveStatusDiff(p),
                 "Evolve: Status changes since 'Set Time'");
@@ -49,6 +52,20 @@ namespace Ustas.RimAI.Communication.Personas
                 "director_notes",
                 _ => PersonasMod.Settings.directorNotes,
                 "Global notes from Persona Director"
+            );
+
+            RimTalkPromptAPI.RegisterContextVariable(
+                ModId,
+                "evolve_director_notes",
+                ctx => DirectorPresetRenderer.NotesForPreset(PersonasMod.Settings.Automation?.autoEvolveNotes, ctx?.CurrentPawn),
+                "Auto-Evolve: the notes from its settings, in an automatic request (empty elsewhere)"
+            );
+
+            RimTalkPromptAPI.RegisterContextVariable(
+                ModId,
+                "autogen_director_notes",
+                ctx => DirectorPresetRenderer.NotesForPreset(PersonasMod.Settings.Automation?.autoGenNotes, ctx?.CurrentPawn),
+                "Auto-Gen: the notes from its settings, in an automatic request (empty elsewhere)"
             );
 
             RimTalkPromptAPI.RegisterContextVariable(
@@ -115,9 +132,12 @@ namespace Ustas.RimAI.Communication.Personas
             Reg("d_traits_list_with_desc", p => DirectorDataEngine.GetTraitsInfo(p, includeDesc: true));
             Reg("d_ideology_list", p => DirectorDataEngine.GetIdeologyInfo(p, includeDesc: false));
             Reg("d_ideology_list_with_desc", p => DirectorDataEngine.GetIdeologyInfo(p, includeDesc: true));
-            Reg("d_skills_list", p => DirectorDataEngine.GetSkillsInfo(p, true));
+            // The plain lists answer without descriptions, as the genes, traits and
+            // ideology ones always did; these two used to be copies of their
+            // _with_desc twins.
+            Reg("d_skills_list", p => DirectorDataEngine.GetSkillsInfo(p, includeDesc: false));
             Reg("d_skills_list_with_desc", p => DirectorDataEngine.GetSkillsInfo(p, includeDesc: true), "With Passion");
-            Reg("d_health_list", p => DirectorDataEngine.GetHealthInfo(p, true));
+            Reg("d_health_list", p => DirectorDataEngine.GetHealthInfo(p, includeDesc: false));
             Reg("d_health_list_with_desc", p => DirectorDataEngine.GetHealthInfo(p, includeDesc: true));
             Reg("d_relations", p => DirectorDataEngine.GetRelationsInfo(p));
             Reg("d_equipment", p => DirectorDataEngine.GetEquipmentInfo(p));

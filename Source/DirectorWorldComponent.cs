@@ -27,9 +27,10 @@ namespace Ustas.RimAI.Communication.Personas
 
         public int lastRuleCheckTick = 0;
 
-        // Set by FinalizeInit, done on the first tick: see FinalizeInit.
-        private bool _historyPrunePending;
-        private HashSet<int> _processedPawnIds = new HashSet<int>();
+        // When the per-pawn records are next checked against the pawns the game
+        // still holds. Not saved: a load checks on its first tick, see FinalizeInit.
+        private int _nextPruneTick = int.MaxValue;
+
         public DirectorWorldComponent(World world) : base(world) { }
 
         public override void ExposeData()
@@ -62,13 +63,14 @@ namespace Ustas.RimAI.Communication.Personas
         public override void FinalizeInit(bool fromLoad)
         {
             base.FinalizeInit(fromLoad);
+            // Not pruned here: on a load this runs before the maps are read, so every
+            // pawn on a map would look missing and lose its history. The first tick
+            // knows them all. A new game starts at tick zero with nothing to prune.
+            _nextPruneTick = fromLoad ? 0 : GenDate.TicksPerDay;
             if (!PersonasComposition.Current.IsStarted) return;
             // A new game or a loaded save: whatever the automation held belongs
             // to the world before this one.
             PersonasComposition.Current.Automation.BindWorld(world);
-            // Not here: on a load this runs before the maps are read, so every pawn on
-            // a map would look missing and lose its history. The first tick knows them all.
-            _historyPrunePending = fromLoad;
         }
 
         // The game already guards each world component's tick and logs what it
@@ -77,24 +79,45 @@ namespace Ustas.RimAI.Communication.Personas
         public override void WorldComponentTick()
         {
             base.WorldComponentTick();
-            if (_historyPrunePending)
+            int now = GenTicks.TicksGame;
+            if (now >= _nextPruneTick)
             {
-                _historyPrunePending = false;
-                _history.RemoveMissingPawns();
-                RemoveMissingAutoEvolvePawns();
+                _nextPruneTick = now + GenDate.TicksPerDay;
+                RemoveRecordsOfMissingPawns();
             }
             if (PersonasComposition.Current.IsStarted)
                 PersonasComposition.Current.Automation.Tick(this);
         }
 
-        void RemoveMissingAutoEvolvePawns()
+        /// <summary>
+        /// Forgets every pawn the game no longer holds. A prisoner Auto-Evolve had
+        /// anchored, a visitor whose daily status a dialogue asked for: each left
+        /// a timestamp and a character sheet here, and until 2026-10-13 only the
+        /// history and the Auto-Evolve choices were ever cleared - once, after a
+        /// load - so a long colony's save kept a sheet for pawns long gone.
+        /// </summary>
+        void RemoveRecordsOfMissingPawns()
         {
-            var known = new HashSet<int>();
-            foreach (Pawn pawn in PawnsFinder.AllMapsWorldAndTemporary_AliveOrDead)
-            {
-                if (pawn != null) known.Add(pawn.thingIDNumber);
-            }
+            HashSet<int> known = PersonaPawnCensus.KnownIds();
+            _history.RemoveMissingPawns(known);
             _autoEvolvePawns.RemoveWhere(id => !known.Contains(id));
+            RemoveMissingKeys(_lastEvolveTicks, known);
+            RemoveMissingKeys(_lastEvolveBioAgeTicks, known);
+            RemoveMissingKeys(_dataSnapshots, known);
+            RemoveMissingKeys(_dailySnapshots, known);
+            RemoveMissingKeys(_dailySnapshotDays, known);
+        }
+
+        static void RemoveMissingKeys<T>(Dictionary<int, T> byPawn, HashSet<int> known)
+        {
+            if (byPawn.Count == 0) return;
+            List<int> missing = null;
+            foreach (int id in byPawn.Keys)
+            {
+                if (!known.Contains(id)) (missing ??= new List<int>()).Add(id);
+            }
+            if (missing == null) return;
+            foreach (int id in missing) byPawn.Remove(id);
         }
 
         public void SaveDailySnapshot(Pawn p)
@@ -135,10 +158,16 @@ namespace Ustas.RimAI.Communication.Personas
             return diff == "No significant changes." ? "No changes today." : diff;
         }
 
-        public void SetTimestamp(Pawn p, string snapshotData = null) 
+        /// <summary>
+        /// Records now as the moment the pawn's persona was last brought up to
+        /// date, with the character sheet the next update is compared against.
+        /// A caller that has just built that sheet hands it over; it used to be
+        /// accepted and then built a second time.
+        /// </summary>
+        public void SetTimestamp(Pawn p, string snapshotData = null)
         {
             if (p == null) return;
-            string snapshot = DirectorUtils.BuildCustomCharacterData(p, isSnapshot: true, simpleEquipment: false);
+            string snapshot = snapshotData ?? DirectorUtils.BuildCustomCharacterData(p, isSnapshot: true, simpleEquipment: false);
 
             int id = p.thingIDNumber;
             _lastEvolveTicks[id] = GenTicks.TicksGame;
@@ -165,19 +194,6 @@ namespace Ustas.RimAI.Communication.Personas
         {
             if (p != null && _lastEvolveBioAgeTicks.TryGetValue(p.thingIDNumber, out long ageTicks)) return ageTicks;
             return -1;
-        }
-
-        public bool HasBeenProcessed(Pawn p)
-        {
-            return p != null && _processedPawnIds.Contains(p.thingIDNumber);
-        }
-
-        public void MarkAsProcessed(Pawn p)
-        {
-            if (p != null)
-            {
-                _processedPawnIds.Add(p.thingIDNumber);
-            }
         }
     }
 }

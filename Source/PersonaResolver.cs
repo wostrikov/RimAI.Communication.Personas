@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ustas.RimAI.Communication.Data;
+using Ustas.RimAI.Communication.Personas.Policy;
 using Ustas.RimAI.Core.Diagnostics;
 using Verse;
 
@@ -125,6 +126,10 @@ public static class PersonaResolver
 
     static bool IsMatch(Pawn p, AssignmentRule rule)
     {
+        // An Age rule names no def; every other kind is nothing without one.
+        if (rule.type == RuleType.Age)
+            return p.ageTracker != null
+                && PersonaAssignmentRulePolicy.AgeMatches(p.ageTracker.AgeBiologicalYears, rule.minAge, rule.maxAge);
         if (string.IsNullOrEmpty(rule.targetDefName))
             return false;
         switch (rule.type)

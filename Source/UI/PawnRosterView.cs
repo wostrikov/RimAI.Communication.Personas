@@ -14,6 +14,10 @@ namespace Ustas.RimAI.Communication.Personas.UI
     {
         readonly QuickSearchWidget _search = new QuickSearchWidget();
         Vector2 _scroll;
+        List<Pawn> _shown = new List<Pawn>();
+
+        /// <summary>The pawns the last draw listed, after the search: what "all of them" means to the caller.</summary>
+        public IReadOnlyList<Pawn> Shown => _shown;
 
         public void Draw(Rect rect, IReadOnlyList<Pawn> pawns, float rowHeight, Action<Rect, Pawn> drawRow)
         {
@@ -31,6 +35,7 @@ namespace Ustas.RimAI.Communication.Personas.UI
                 }
             }
             _search.noResultsMatched = _search.filter.Active && shown.Count == 0;
+            _shown = shown;
 
             Rect body = new Rect(rect.x, searchRect.yMax + 6f, rect.width, rect.height - searchRect.height - 6f);
             if (shown.Count == 0)
