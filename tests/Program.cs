@@ -8,7 +8,8 @@ internal static class Program
             + PersonaProfileNotesAndEvolutionTests.Run()
             + PersonaPresetLibraryIoTests.Run()
             + PersonaAutomationPolicyTests.Run()
-            + PersonaDonorReviewTests.Run();
+            + PersonaDonorReviewTests.Run()
+            + PersonaTemplateRenderTests.Run();
         Console.WriteLine("PERSONAS_FOCUSED_TESTS_OK passed=" + n);
         Console.WriteLine("TESTS total=" + n + " failed=0");
         return 0;

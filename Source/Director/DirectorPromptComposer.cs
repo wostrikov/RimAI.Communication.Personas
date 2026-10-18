@@ -19,6 +19,7 @@ using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 using Ustas.RimAI.Communication.Personas.Diagnostics;
+using Ustas.RimAI.Core.Diagnostics;
 
 namespace Ustas.RimAI.Communication.Personas;
 
@@ -90,11 +91,20 @@ public static class DirectorPromptComposer
                     contextObj = new PromptContext(p);
                 }
 
-                return ScribanParser.Render(rawText, contextObj, false) ?? rawText;
+                if (ScribanParser.TryRender(rawText, contextObj, out string rendered, out string renderError))
+                    return rendered;
+
+                // A persona that fails to render is left out of this prompt rather than sent
+                // as its literal template text. Once per template: this runs for every talk.
+                RimAiLog.WarningOnce(RimAiLogCategory.Personas,
+                    $"[Director] Persona template for {p?.LabelShort ?? "a pawn"} failed to render and is left out of the prompt. {renderError}",
+                    ("persona-render:" + rawText).GetHashCode());
+                return string.Empty;
             }
             catch (Exception)
             {
-                return rawText;
+                // Same rule as a failed render: no literal template text in the prompt.
+                return string.Empty;
             }
         }
 }

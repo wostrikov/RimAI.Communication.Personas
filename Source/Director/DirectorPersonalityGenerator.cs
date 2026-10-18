@@ -51,7 +51,14 @@ public static class DirectorPersonalityGenerator
             {
                 if (!entry.Enabled) continue;
 
-                string renderedText = ScribanParser.Render(entry.Content, contextObj, true);
+                // A broken entry would otherwise reach the model as its literal template text;
+                // the preset is dropped and the caller uses its built-in prompt instead.
+                if (!ScribanParser.TryRender(entry.Content, contextObj, out string renderedText, out string renderError))
+                {
+                    RimAiLog.Warning(RimAiLogCategory.Personas,
+                        $"[Director] Preset '{presetName}' entry '{entry.Name}' failed to render; using the built-in prompt. {renderError}");
+                    return null;
+                }
                 if (string.IsNullOrWhiteSpace(renderedText)) continue;
 
                 string roleStr = entry.Role.ToString();

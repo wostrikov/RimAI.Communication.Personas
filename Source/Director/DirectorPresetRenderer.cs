@@ -37,7 +37,8 @@ namespace Ustas.RimAI.Communication.Personas
             !string.IsNullOrWhiteSpace(presetName) && presetName != NoPreset;
 
         /// <summary>
-        /// False when the preset is missing or renders nothing; the caller then uses its built-in prompt.
+        /// False when the preset is missing, an entry fails to render, or it renders nothing; the
+        /// caller then uses its built-in prompt.
         /// <paramref name="automatic"/> says the request is Auto-Gen's or Auto-Evolve's rather than
         /// the player's own click, which is when the automatic notes apply.
         /// </summary>
@@ -68,7 +69,14 @@ namespace Ustas.RimAI.Communication.Personas
                 foreach (var entry in preset.Entries)
                 {
                     if (entry == null || !entry.Enabled) continue;
-                    string rendered = ScribanParser.Render(entry.Content, contextObj, true);
+                    // A broken entry would otherwise reach the model as its literal template
+                    // text; the preset is dropped and the caller uses its built-in prompt.
+                    if (!ScribanParser.TryRender(entry.Content, contextObj, out string rendered, out string renderError))
+                    {
+                        RimAiLog.Warning(RimAiLogCategory.Personas,
+                            $"[Director] Preset '{presetName}' entry '{entry.Name}' failed to render. Falling back to internal. {renderError}");
+                        return false;
+                    }
                     if (string.IsNullOrWhiteSpace(rendered)) continue;
                     StringBuilder target = entry.Role.ToString().ToLowerInvariant() == "system" ? system : user;
                     if (target.Length > 0) target.AppendLine("\n");
@@ -106,7 +114,11 @@ namespace Ustas.RimAI.Communication.Personas
             try
             {
                 _renderingNotes = true;
-                return ScribanParser.Render(notes, new PromptContext(pawn), true)?.Trim() ?? string.Empty;
+                if (ScribanParser.TryRender(notes, new PromptContext(pawn), out string rendered, out string renderError))
+                    return rendered?.Trim() ?? string.Empty;
+                // The request goes ahead without the notes rather than with their template text.
+                RimAiLog.Warning(RimAiLogCategory.Personas, $"[Director] Automatic notes failed to render and are left out. {renderError}");
+                return string.Empty;
             }
             finally
             {
